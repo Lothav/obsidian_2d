@@ -8,6 +8,6 @@ set(CORE_MAIN_FILE src/main.cpp)
 
 include_directories(include)
 
-set(EXECUTABLE_OUTPUT_PATH build)
+set(EXECUTABLE_OUTPUT_PATH bin)
 
 add_executable(core ${CORE_MAIN_FILE})
