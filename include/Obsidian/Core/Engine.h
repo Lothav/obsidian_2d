@@ -81,7 +81,7 @@ namespace Obsidian
                 /* Init defualt scene, register objects*/
 
                 /* Game Loop */
-                while(false) {
+                while(LIKELY(false)) {
                     //Loop trought entities and execute update
                 }
 
