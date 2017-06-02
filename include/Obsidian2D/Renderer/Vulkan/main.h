@@ -18,6 +18,7 @@ namespace Obsidian2D
 				VkResult setGlobalExtensionProperties(layer_properties &layer_props);
 				VkApplicationInfo setApplicationInfo();
 				VkResult setInstanceInfo(VkApplicationInfo app_info);
+				VkResult enumerateDevice(struct VulkanInfo &info, uint32_t gpu_count);
 			public:
 				void bootstrap();
 			};

@@ -7,7 +7,18 @@ using namespace  Obsidian2D::Renderer::Vulkan;
 void Instance::bootstrap(){
 	this->setGlobalLayerProperties(this->info);
 	VkApplicationInfo app_info = this->setApplicationInfo();
-	VkResult setInstanceInfo = this->setInstanceInfo(app_info);
+	VkResult set_instance_info = this->setInstanceInfo(app_info);
+
+	if(set_instance_info == VK_SUCCESS){
+		uint32_t gpu_count = 1;
+		VkResult enum_devices = this->enumerateDevice(this->info, gpu_count);
+
+		//////
+
+	} else {
+		//@TODO throw error
+	}
+
 }
 
 VkResult Instance::setGlobalLayerProperties(struct VulkanInfo &info) {
@@ -90,6 +101,29 @@ VkResult Instance::setInstanceInfo(VkApplicationInfo app_info){
 
 	VkResult res = vkCreateInstance(&inst_info, NULL, &info.inst);
 	assert(res == VK_SUCCESS);
+
+	return res;
+}
+
+VkResult Instance::enumerateDevice(struct VulkanInfo &info, uint32_t gpu_count) {
+	uint32_t const req_count = gpu_count;
+	VkResult res = vkEnumeratePhysicalDevices(info.inst, &gpu_count, NULL);
+	assert(gpu_count);
+	info.gpus.resize(gpu_count);
+
+	res = vkEnumeratePhysicalDevices(info.inst, &gpu_count, info.gpus.data());
+	assert(!res && gpu_count >= req_count);
+
+	vkGetPhysicalDeviceQueueFamilyProperties(info.gpus[0], &info.queue_family_count, NULL);
+	assert(info.queue_family_count >= 1);
+
+	info.queue_props.resize(info.queue_family_count);
+	vkGetPhysicalDeviceQueueFamilyProperties(info.gpus[0], &info.queue_family_count, info.queue_props.data());
+	assert(info.queue_family_count >= 1);
+
+	/* This is as good a place as any to do this */
+	vkGetPhysicalDeviceMemoryProperties(info.gpus[0], &info.memory_properties);
+	vkGetPhysicalDeviceProperties(info.gpus[0], &info.gpu_props);
 
 	return res;
 }
