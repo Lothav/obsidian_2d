@@ -9,7 +9,7 @@ namespace Obsidian2D
 	{
 		namespace Vulkan
 		{
-			class Main
+			class Instance
 			{
 				struct VulkanInfo info = {};
 				VkResult setGlobalLayerProperties(struct VulkanInfo &info);

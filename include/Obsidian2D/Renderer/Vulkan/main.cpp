@@ -1,11 +1,11 @@
 #include <malloc.h>
 #include "main.h"
 
-void Obsidian2D::Renderer::Vulkan::Main::bootstrap(){
+void Obsidian2D::Renderer::Vulkan::Instance::bootstrap(){
 	this->setGlobalLayerProperties(this->info);
 }
 
-VkResult Obsidian2D::Renderer::Vulkan::Main::setGlobalLayerProperties(struct VulkanInfo &info) {
+VkResult Obsidian2D::Renderer::Vulkan::Instance::setGlobalLayerProperties(struct VulkanInfo &info) {
 
 	uint32_t instance_layer_count;
 	VkLayerProperties *vk_props = NULL;
@@ -40,7 +40,7 @@ VkResult Obsidian2D::Renderer::Vulkan::Main::setGlobalLayerProperties(struct Vul
 	return res;
 }
 
-VkResult Obsidian2D::Renderer::Vulkan::Main::setGlobalExtensionProperties(layer_properties &layer_props) {
+VkResult Obsidian2D::Renderer::Vulkan::Instance::setGlobalExtensionProperties(layer_properties &layer_props) {
 	VkExtensionProperties *instance_extensions;
 	uint32_t instance_extension_count;
 	VkResult res;

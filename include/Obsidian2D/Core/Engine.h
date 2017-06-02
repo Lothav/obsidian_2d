@@ -91,7 +91,7 @@ namespace Obsidian2D
                 Obsidian2D::Core::App::Config config = app->getConfig();
 
                 //TODO: Create renderer base class and render blank screen
-				Obsidian2D::Renderer::Vulkan::Main vulkan;
+				Obsidian2D::Renderer::Vulkan::Instance vulkan;
 				vulkan.bootstrap();
 
                 /* Init defualt scene, register objects*/
