@@ -21,7 +21,7 @@
 #include "Obsidian/Core/App.h"
 
 
-#include "Obsidian/Renderer/vulkan/instance.h"
+#include "Obsidian/Renderer/vulkan/main.h"
 
 namespace Obsidian
 {
@@ -77,16 +77,9 @@ namespace Obsidian
 
                 //TODO: Create renderer base class and render blank screen
                 if(config.renderer == "default") {
-                    Vulkan::Instance vkInstance;
-                    VkResult res = vkInstance.InstanceVulkan();
-                    if (res == VK_ERROR_INCOMPATIBLE_DRIVER) {
-                        std::cout << "cannot find a compatible Vulkan ICD\n";
-                        exit(-1);
-                    } else if (res) {
-                        std::cout << "unknown error\n";
-                        exit(-1);
-                    }
-                }
+                    Obsidian::Renderer::Vulkan::Main vulkan;
+					vulkan.bootstrap();
+				}
                 /* Init Renderer, audio, Resource manager, AI, Input based on App Config*/
 
                 /* Init defualt scene, register objects*/
