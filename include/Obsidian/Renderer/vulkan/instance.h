@@ -2,7 +2,7 @@
 #define OBSIDIAN2D_CORE_INSTANCE_H
 
 #include <Obsidian/Util/Loggable.h>
-#include <Obsidian/Renderer/vulkan/x86_64/include/vulkan/vulkan.h>
+#include <vulkan.h>
 
 #define APP_NAME "Obsidian_2D"
 
