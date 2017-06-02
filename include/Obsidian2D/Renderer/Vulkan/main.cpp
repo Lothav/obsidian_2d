@@ -1,11 +1,16 @@
 #include <malloc.h>
 #include "main.h"
+#include <assert.h>
 
-void Obsidian2D::Renderer::Vulkan::Instance::bootstrap(){
+using namespace  Obsidian2D::Renderer::Vulkan;
+
+void Instance::bootstrap(){
 	this->setGlobalLayerProperties(this->info);
+	VkApplicationInfo app_info = this->setApplicationInfo();
+	VkResult setInstanceInfo = this->setInstanceInfo(app_info);
 }
 
-VkResult Obsidian2D::Renderer::Vulkan::Instance::setGlobalLayerProperties(struct VulkanInfo &info) {
+VkResult Instance::setGlobalLayerProperties(struct VulkanInfo &info) {
 
 	uint32_t instance_layer_count;
 	VkLayerProperties *vk_props = NULL;
@@ -40,7 +45,7 @@ VkResult Obsidian2D::Renderer::Vulkan::Instance::setGlobalLayerProperties(struct
 	return res;
 }
 
-VkResult Obsidian2D::Renderer::Vulkan::Instance::setGlobalExtensionProperties(layer_properties &layer_props) {
+VkResult Instance::setGlobalExtensionProperties(layer_properties &layer_props) {
 	VkExtensionProperties *instance_extensions;
 	uint32_t instance_extension_count;
 	VkResult res;
@@ -55,6 +60,36 @@ VkResult Obsidian2D::Renderer::Vulkan::Instance::setGlobalExtensionProperties(la
 		instance_extensions = layer_props.extensions.data();
 		res = vkEnumerateInstanceExtensionProperties(layer_name, &instance_extension_count, instance_extensions);
 	} while (res == VK_INCOMPLETE);
+
+	return res;
+}
+
+VkApplicationInfo Instance::setApplicationInfo(){
+
+	VkApplicationInfo app_info = {};
+	app_info.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
+	app_info.pNext = NULL;
+	app_info.pApplicationName = APP_NAME;
+	app_info.applicationVersion = 1;
+	app_info.pEngineName = APP_NAME;
+	app_info.engineVersion = 1;
+	app_info.apiVersion = VK_API_VERSION_1_0;
+	return app_info;
+}
+
+VkResult Instance::setInstanceInfo(VkApplicationInfo app_info){
+	VkInstanceCreateInfo inst_info = {};
+	inst_info.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
+	inst_info.pNext = NULL;
+	inst_info.flags = 0;
+	inst_info.pApplicationInfo = &app_info;
+	inst_info.enabledLayerCount = (uint32_t)info.instance_layer_names.size();
+	inst_info.ppEnabledLayerNames = info.instance_layer_names.size() ? info.instance_layer_names.data() : NULL;
+	inst_info.enabledExtensionCount = (uint32_t) info.instance_extension_names.size();
+	inst_info.ppEnabledExtensionNames = info.instance_extension_names.data();
+
+	VkResult res = vkCreateInstance(&inst_info, NULL, &info.inst);
+	assert(res == VK_SUCCESS);
 
 	return res;
 }

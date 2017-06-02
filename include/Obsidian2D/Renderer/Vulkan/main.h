@@ -3,6 +3,8 @@
 
 #include "Obsidian2D/Util/VulkanInfo.h"
 
+#define APP_NAME "Obsidian2D"
+
 namespace Obsidian2D
 {
 	namespace Renderer
@@ -14,6 +16,8 @@ namespace Obsidian2D
 				struct VulkanInfo info = {};
 				VkResult setGlobalLayerProperties(struct VulkanInfo &info);
 				VkResult setGlobalExtensionProperties(layer_properties &layer_props);
+				VkApplicationInfo setApplicationInfo();
+				VkResult setInstanceInfo(VkApplicationInfo app_info);
 			public:
 				void bootstrap();
 			};
