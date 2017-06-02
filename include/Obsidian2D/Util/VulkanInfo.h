@@ -5,7 +5,7 @@
 #ifndef OBSIDIAN2D_CORE_OBSIDIANVULKANINFO_H
 #define OBSIDIAN2D_CORE_OBSIDIANVULKANINFO_H
 
-#include <vulkan.h>
+#include <vulkan/vulkan.h>
 #include <xcb/xcb.h>
 #include <vector>
 
@@ -141,8 +141,5 @@ struct VulkanInfo {
 	VkViewport viewport;
 	VkRect2D scissor;
 };
-
-
-
 
 #endif //OBSIDIAN2D_CORE_OBSIDIANVULKANINFO_H
