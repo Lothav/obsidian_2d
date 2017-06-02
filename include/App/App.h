@@ -2,10 +2,10 @@
 #define _APP_APP_
     #define APP_DEBUG 1
 
-#include "Obsidian/Core/App.h"
+#include "Obsidian2D/Core/App.h"
 
 namespace App {
-    class App: public Obsidian::Core::App
+    class App: public Obsidian2D::Core::App
     {
     private:
     protected:

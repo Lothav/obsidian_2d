@@ -1,5 +1,7 @@
-# core
-Obsidian Engine Core and Module Loader
+# Obsidian2D
+2D game engine and framework
 
 
-#c++14 cross-platform
+* C++14
+* Cross-platform
+* Opinated

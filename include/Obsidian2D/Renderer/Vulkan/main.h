@@ -1,9 +1,9 @@
 #ifndef OBSIDIAN2D_CORE_MAIN_H
 #define OBSIDIAN2D_CORE_MAIN_H
 
-#include "Obsidian/Util/VulkanInfo.h"
+#include "Obsidian2D/Util/VulkanInfo.h"
 
-namespace Obsidian
+namespace Obsidian2D
 {
 	namespace Renderer
 	{

@@ -1,11 +1,11 @@
-#ifndef _OBSIDIAN_LOGGER_
-#define _OBSIDIAN_LOGGER_
+#ifndef _OBSIDIAN2D_LOGGER_
+#define _OBSIDIAN2D_LOGGER_
 
 #include <iostream>
 #include <string>
 #include <functional>
 
-namespace Obsidian
+namespace Obsidian2D
 {
     namespace Util
     {
@@ -40,4 +40,4 @@ namespace Obsidian
     }
 }
 
-#endif //_OBSIDIAN_LOGGER_
+#endif //_OBSIDIAN2D_LOGGER_

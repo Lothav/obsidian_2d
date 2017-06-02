@@ -1,9 +1,9 @@
-#ifndef _OBSIDIAN_CORE_APP_
-#define _OBSIDIAN_CORE_APP_
+#ifndef _OBSIDIAN2D_CORE_APP_
+#define _OBSIDIAN2D_CORE_APP_
 
-#include "Obsidian/Util/Loggable.h"
+#include "Obsidian2D/Util/Loggable.h"
 
-namespace Obsidian
+namespace Obsidian2D
 {
     namespace Core
     {
@@ -31,7 +31,7 @@ namespace Obsidian
                 this->log("init()");
             }
 
-            virtual Obsidian::Core::App::Config getConfig()
+            virtual Obsidian2D::Core::App::Config getConfig()
             {
                 return Config();
             }
@@ -39,4 +39,4 @@ namespace Obsidian
     }
 }
 
-#endif //_OBSIDIAN_CORE_APP_
+#endif //_OBSIDIAN2D_CORE_APP_
