@@ -1,9 +1,9 @@
-#ifndef _OBSIDIAN_CORE_REGISTRY_
-#define _OBSIDIAN_CORE_REGISTRY_
+#ifndef _OBSIDIAN2D_CORE_REGISTRY_
+#define _OBSIDIAN2D_CORE_REGISTRY_
 
-#include "Obsidian/Util/Loggable.h"
+#include "Obsidian2D/Util/Loggable.h"
 
-namespace Obsidian
+namespace Obsidian2D
 {
     namespace Core
     {
@@ -27,4 +27,4 @@ namespace Obsidian
     }
 }
 
-#endif //_OBSIDIAN_CORE_REGISTRY_
+#endif //_OBSIDIAN2D_CORE_REGISTRY_

@@ -1,9 +1,9 @@
-#ifndef _OBSIDIAN_TIME_
-#define _OBSIDIAN_TIME_
+#ifndef _OBSIDIAN2D_TIME_
+#define _OBSIDIAN2D_TIME_
 
 #include <chrono>
 
-namespace Obsidian
+namespace Obsidian2D
 {
     namespace Util
     {
@@ -23,4 +23,4 @@ namespace Obsidian
     }
 }
 
-#endif //_OBSIDIAN_TIME_
+#endif //_OBSIDIAN2D_TIME_
