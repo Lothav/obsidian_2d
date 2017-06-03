@@ -16,7 +16,7 @@ void Window::bootstrap(){
 		this->enumerateDevice(gpu_count);
 		this->createDevice();
 		this->createCommandBuffer();
-		this->setWindowSize(800, 600);
+		this->setWindowSize();
 		this->setXCBConnection();
 		this->createWindow();
 		
@@ -26,12 +26,12 @@ void Window::bootstrap(){
 
 }
 
-void Window::setWindowSize(int32_t width, int32_t height){
+void Window::setWindowSize(){
 #ifdef __ANDROID__
-	AndroidGetWindowSize(&info.width, &info.height);
+	AndroidGetWindowSize(&this->info.width, &this->info.height);
 #else
-	this->info.width = width;
-	this->info.height = height;
+	this->info.width = this->width;
+	this->info.height = this->height;
 #endif
 }
 
@@ -85,16 +85,15 @@ void Window::createWindow() {
 
 	xcb_map_window(this->info.connection, this->info.window);
 
-	// Force the x/y coordinates to 100,100 results are identical in consecutive
+	// Force the x/y coordinates to 100, 100 results are identical in consecutive
 	// runs
 	const uint32_t coords[] = {100, 100};
 	xcb_configure_window(this->info.connection, this->info.window, XCB_CONFIG_WINDOW_X | XCB_CONFIG_WINDOW_Y, coords);
 	xcb_flush(this->info.connection);
 
 	xcb_generic_event_t *e;
-	while ((e = xcb_wait_for_event(this->info.connection))) {
+	while ((e = xcb_wait_for_event(this->info.connection)))
 		if ((e->response_type & ~0x80) == XCB_EXPOSE) break;
-	}
 }
 
 void Window::destroyWindow() {

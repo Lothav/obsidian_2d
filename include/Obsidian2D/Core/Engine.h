@@ -91,8 +91,8 @@ namespace Obsidian2D
                 Obsidian2D::Core::App::Config config = app->getConfig();
 
                 //TODO: Create renderer base class and render blank screen
-				Obsidian2D::Renderer::Window* vulkan = new Obsidian2D::Renderer::Window();
-				vulkan->bootstrap();
+				Obsidian2D::Renderer::Window* window = new Obsidian2D::Renderer::Window(800, 600);
+				window->bootstrap();
 
                 /* Init defualt scene, register objects*/
 
@@ -105,11 +105,11 @@ namespace Obsidian2D
                 free(app);
 				app = nullptr;
 
-				vulkan->destroyCommandBuffers();
-				vulkan->destroyDevice();
-                vulkan->destroyWindow();
-                vulkan->destroyInstance();
-				free(vulkan);
+				window->destroyCommandBuffers();
+				window->destroyDevice();
+                window->destroyWindow();
+                window->destroyInstance();
+				free(window);
 
                 return Obsidian2D::Error::None;
             }
