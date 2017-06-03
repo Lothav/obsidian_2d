@@ -11,6 +11,7 @@ namespace Obsidian2D
 	{
 		class Instance
 		{
+		private:
 			struct VulkanInfo info = {};
 			VkDevice device;
 
@@ -18,7 +19,7 @@ namespace Obsidian2D
 			VkResult setGlobalExtensionProperties(layer_properties &layer_props);
 			VkApplicationInfo setApplicationInfo();
 			VkResult setInstanceInfo(VkApplicationInfo app_info);
-			void enumerateDevice(struct VulkanInfo &info, uint32_t gpu_count);
+			void enumerateDevice(uint32_t gpu_count);
 			void createDevice();
 		public:
 			void bootstrap();

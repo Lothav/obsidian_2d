@@ -12,7 +12,7 @@ void Instance::bootstrap(){
 
 	if(set_instance_info == VK_SUCCESS && set_global_layer == VK_SUCCESS){
 		uint32_t gpu_count = 1;
-		this->enumerateDevice(this->info, gpu_count);
+		this->enumerateDevice(gpu_count);
 		this->createDevice();
 
 	} else {
@@ -106,26 +106,25 @@ VkResult Instance::setInstanceInfo(VkApplicationInfo app_info){
 	return res;
 }
 
-void Instance::enumerateDevice(struct VulkanInfo &info, uint32_t gpu_count) {
+void Instance::enumerateDevice(uint32_t gpu_count) {
 	uint32_t const req_count = gpu_count;
-	VkResult res = vkEnumeratePhysicalDevices(info.inst, &gpu_count, NULL);
+	VkResult res = vkEnumeratePhysicalDevices(this->info.inst, &gpu_count, NULL);
 	assert(gpu_count);
-	info.gpus.resize(gpu_count);
+	this->info.gpus.resize(gpu_count);
 
-	res = vkEnumeratePhysicalDevices(info.inst, &gpu_count, info.gpus.data());
+	res = vkEnumeratePhysicalDevices(this->info.inst, &gpu_count, this->info.gpus.data());
 	assert(!res && gpu_count >= req_count);
 
-	vkGetPhysicalDeviceQueueFamilyProperties(info.gpus[0], &info.queue_family_count, NULL);
-	assert(info.queue_family_count >= 1);
+	vkGetPhysicalDeviceQueueFamilyProperties(this->info.gpus[0], &this->info.queue_family_count, NULL);
+	assert(this->info.queue_family_count >= 1);
 
-	info.queue_props.resize(info.queue_family_count);
-	vkGetPhysicalDeviceQueueFamilyProperties(info.gpus[0], &info.queue_family_count, info.queue_props.data());
-	assert(info.queue_family_count >= 1);
+	this->info.queue_props.resize(this->info.queue_family_count);
+	vkGetPhysicalDeviceQueueFamilyProperties(this->info.gpus[0], &this->info.queue_family_count, this->info.queue_props.data());
+	assert(this->info.queue_family_count >= 1);
 
 	/* This is as good a place as any to do this */
-	vkGetPhysicalDeviceMemoryProperties(info.gpus[0], &info.memory_properties);
-	vkGetPhysicalDeviceProperties(info.gpus[0], &info.gpu_props);
-
+	vkGetPhysicalDeviceMemoryProperties(this->info.gpus[0], &this->info.memory_properties);
+	vkGetPhysicalDeviceProperties(this->info.gpus[0], &this->info.gpu_props);
 }
 
 void Instance::destroyInstance() {
@@ -164,14 +163,13 @@ void Instance::createDevice() {
 	device_info.pNext = NULL;
 	device_info.queueCreateInfoCount = 1;
 	device_info.pQueueCreateInfos = &queue_info;
-	device_info.enabledExtensionCount = 0;
-	device_info.ppEnabledExtensionNames = NULL;
+	device_info.enabledExtensionCount = (uint32_t)this->info.device_extension_names.size();
+	device_info.ppEnabledExtensionNames = device_info.enabledExtensionCount ? this->info.device_extension_names.data() : NULL;
 	device_info.enabledLayerCount = 0;
 	device_info.ppEnabledLayerNames = NULL;
 	device_info.pEnabledFeatures = NULL;
 
-	VkDevice device;
-	VkResult res = vkCreateDevice(info.gpus[0], &device_info, NULL, &this->device);
+	VkResult res = vkCreateDevice(this->info.gpus[0], &device_info, NULL, &this->device);
 	assert(res == VK_SUCCESS);
 }
 
