@@ -4,24 +4,6 @@
 
 using namespace Obsidian2D::Renderer;
 
-void Instance::bootstrap(){
-	VkResult set_global_layer = this->setGlobalLayerProperties(this->info);
-
-	VkApplicationInfo app_info = this->setApplicationInfo();
-	VkResult set_instance_info = this->setInstanceInfo(app_info);
-
-	if(set_instance_info == VK_SUCCESS && set_global_layer == VK_SUCCESS){
-		uint32_t gpu_count = 1;
-		this->enumerateDevice(gpu_count);
-		this->createDevice();
-		this->createCommandBuffer();
-
-	} else {
-		//@TODO throw error
-	}
-
-}
-
 VkResult Instance::setGlobalLayerProperties(struct VulkanInfo &info) {
 
 	uint32_t instance_layer_count;
@@ -167,7 +149,7 @@ void Instance::createDevice() {
 	device_info.ppEnabledLayerNames = NULL;
 	device_info.pEnabledFeatures = NULL;
 
-	VkResult res = vkCreateDevice(this->info.gpus[0], &device_info, NULL, &this->device);
+	VkResult res = vkCreateDevice(this->info.gpus[0], &device_info, NULL, &this->info.device);
 	assert(res == VK_SUCCESS);
 }
 

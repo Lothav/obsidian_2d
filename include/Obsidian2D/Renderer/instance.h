@@ -11,7 +11,7 @@ namespace Obsidian2D
 	{
 		class Instance
 		{
-		private:
+		protected:
 			struct VulkanInfo info = {};
 			VkDevice device;
 
@@ -23,7 +23,6 @@ namespace Obsidian2D
 			void createDevice();
 			void createCommandBuffer();
 		public:
-			void bootstrap();
 			void destroyCommandBuffers();
 			void destroyInstance();
 			void destroyDevice();
