@@ -16,7 +16,7 @@ void Window::bootstrap(){
 		this->enumerateDevice(gpu_count);
 		this->createDevice();
 		this->createCommandBuffer();
-		this->setWindowSize(50, 50);
+		this->setWindowSize(800, 600);
 		this->setXCBConnection();
 		this->createWindow();
 		

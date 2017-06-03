@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.7)
 project(Obsidian2D_CORE)
 
 set(CMAKE_CXX_STANDARD 14)
-set(CMAKE_CXX_FLAGS "-Wall -Wpedantic -lvulkan")
+set(CMAKE_CXX_FLAGS "-Wall -Wpedantic -lvulkan -lxcb")
 
 set(CORE_MAIN_FILE src/main.cpp src/instance.cpp src/window.cpp)
 
