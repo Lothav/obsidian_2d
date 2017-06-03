@@ -14,6 +14,7 @@ void Instance::bootstrap(){
 		uint32_t gpu_count = 1;
 		this->enumerateDevice(gpu_count);
 		this->createDevice();
+		this->createCommandBuffer();
 
 	} else {
 		//@TODO throw error
@@ -27,9 +28,6 @@ VkResult Instance::setGlobalLayerProperties(struct VulkanInfo &info) {
 	VkLayerProperties *vk_props = NULL;
 	VkResult res;
 #ifdef __ANDROID__
-	// This place is the first place for samples to use Vulkan APIs.
-    // Here, we are going to open Vulkan.so on the device and retrieve function pointers using
-    // vulkan_wrapper helper.
     if (!InitVulkan()) {
         LOGE("Failied initializing Vulkan APIs!");
         return VK_ERROR_INITIALIZATION_FAILED;
@@ -175,4 +173,34 @@ void Instance::createDevice() {
 
 void Instance::destroyDevice() {
 	vkDestroyDevice(this->device, NULL);
+}
+
+void Instance::createCommandBuffer() {
+	VkResult U_ASSERT_ONLY res;
+
+	VkCommandPoolCreateInfo cmd_pool_info = {};
+	cmd_pool_info.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
+	cmd_pool_info.pNext = NULL;
+	cmd_pool_info.queueFamilyIndex = this->info.graphics_queue_family_index;
+	cmd_pool_info.flags = 0;
+
+	res = vkCreateCommandPool(this->info.device, &cmd_pool_info, NULL, &this->info.cmd_pool);
+	assert(res == VK_SUCCESS);
+
+	/* Create the command buffer from the command pool */
+	VkCommandBufferAllocateInfo cmd = {};
+	cmd.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+	cmd.pNext = NULL;
+	cmd.commandPool = this->info.cmd_pool;
+	cmd.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+	cmd.commandBufferCount = 1;
+
+	res = vkAllocateCommandBuffers(this->info.device, &cmd, &this->info.cmd);
+	assert(res == VK_SUCCESS);
+}
+
+void Instance::destroyCommandBuffers() {
+	VkCommandBuffer cmd_bufs[1] = {this->info.cmd};
+	vkFreeCommandBuffers(this->info.device, this->info.cmd_pool, 1, cmd_bufs);
+	vkDestroyCommandPool(this->info.device, this->info.cmd_pool, NULL);
 }

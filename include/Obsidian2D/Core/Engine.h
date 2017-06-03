@@ -105,6 +105,7 @@ namespace Obsidian2D
                 free(app);
 				app = nullptr;
 
+				vulkan->destroyCommandBuffers();
 				vulkan->destroyDevice();
 				vulkan->destroyInstance();
 				free(vulkan);

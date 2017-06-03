@@ -21,8 +21,10 @@ namespace Obsidian2D
 			VkResult setInstanceInfo(VkApplicationInfo app_info);
 			void enumerateDevice(uint32_t gpu_count);
 			void createDevice();
+			void createCommandBuffer();
 		public:
 			void bootstrap();
+			void destroyCommandBuffers();
 			void destroyInstance();
 			void destroyDevice();
 		};
