@@ -103,8 +103,10 @@ namespace Obsidian2D
 
                 this->log("Cleaning up memory");
                 free(app);
+				app = nullptr;
+
+				vulkan->destroyInstance();
 				free(vulkan);
-                app = nullptr;
 
                 return Obsidian2D::Error::None;
             }

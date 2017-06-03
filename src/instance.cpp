@@ -127,3 +127,7 @@ VkResult Instance::enumerateDevice(struct VulkanInfo &info, uint32_t gpu_count) 
 
 	return res;
 }
+
+void Instance::destroyInstance() {
+	vkDestroyInstance(this->info.inst, NULL);
+}

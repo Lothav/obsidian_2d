@@ -19,6 +19,7 @@ namespace Obsidian2D
 			VkResult enumerateDevice(struct VulkanInfo &info, uint32_t gpu_count);
 		public:
 			void bootstrap();
+			void destroyInstance();
 		};
 	}
 }
