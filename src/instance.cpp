@@ -5,15 +5,15 @@
 using namespace Obsidian2D::Renderer;
 
 void Instance::bootstrap(){
-	this->setGlobalLayerProperties(this->info);
+	VkResult set_global_layer = this->setGlobalLayerProperties(this->info);
+
 	VkApplicationInfo app_info = this->setApplicationInfo();
 	VkResult set_instance_info = this->setInstanceInfo(app_info);
 
-	if(set_instance_info == VK_SUCCESS){
+	if(set_instance_info == VK_SUCCESS && set_global_layer == VK_SUCCESS){
 		uint32_t gpu_count = 1;
-		VkResult enum_devices = this->enumerateDevice(this->info, gpu_count);
-
-		//////
+		this->enumerateDevice(this->info, gpu_count);
+		this->createDevice();
 
 	} else {
 		//@TODO throw error
@@ -52,6 +52,7 @@ VkResult Instance::setGlobalLayerProperties(struct VulkanInfo &info) {
 		info.instance_layer_properties.push_back(layer_props);
 	}
 	free(vk_props);
+	assert(res == VK_SUCCESS);
 
 	return res;
 }
@@ -105,7 +106,7 @@ VkResult Instance::setInstanceInfo(VkApplicationInfo app_info){
 	return res;
 }
 
-VkResult Instance::enumerateDevice(struct VulkanInfo &info, uint32_t gpu_count) {
+void Instance::enumerateDevice(struct VulkanInfo &info, uint32_t gpu_count) {
 	uint32_t const req_count = gpu_count;
 	VkResult res = vkEnumeratePhysicalDevices(info.inst, &gpu_count, NULL);
 	assert(gpu_count);
@@ -125,9 +126,55 @@ VkResult Instance::enumerateDevice(struct VulkanInfo &info, uint32_t gpu_count) 
 	vkGetPhysicalDeviceMemoryProperties(info.gpus[0], &info.memory_properties);
 	vkGetPhysicalDeviceProperties(info.gpus[0], &info.gpu_props);
 
-	return res;
 }
 
 void Instance::destroyInstance() {
 	vkDestroyInstance(this->info.inst, NULL);
+}
+
+void Instance::createDevice() {
+	VkDeviceQueueCreateInfo queue_info = {};
+
+	vkGetPhysicalDeviceQueueFamilyProperties(this->info.gpus[0], &this->info.queue_family_count, NULL);
+	assert(this->info.queue_family_count >= 1);
+
+	this->info.queue_props.resize(this->info.queue_family_count);
+	vkGetPhysicalDeviceQueueFamilyProperties(this->info.gpus[0], &this->info.queue_family_count, this->info.queue_props.data());
+	assert(this->info.queue_family_count >= 1);
+
+	bool found = false;
+	for (unsigned int i = 0; i < this->info.queue_family_count; i++) {
+		if (this->info.queue_props[i].queueFlags & VK_QUEUE_GRAPHICS_BIT) {
+			queue_info.queueFamilyIndex = i;
+			found = true;
+			break;
+		}
+	}
+	assert(found);
+	assert(this->info.queue_family_count >= 1);
+
+	float queue_priorities[1] = {0.0};
+	queue_info.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
+	queue_info.pNext = NULL;
+	queue_info.queueCount = 1;
+	queue_info.pQueuePriorities = queue_priorities;
+
+	VkDeviceCreateInfo device_info = {};
+	device_info.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
+	device_info.pNext = NULL;
+	device_info.queueCreateInfoCount = 1;
+	device_info.pQueueCreateInfos = &queue_info;
+	device_info.enabledExtensionCount = 0;
+	device_info.ppEnabledExtensionNames = NULL;
+	device_info.enabledLayerCount = 0;
+	device_info.ppEnabledLayerNames = NULL;
+	device_info.pEnabledFeatures = NULL;
+
+	VkDevice device;
+	VkResult res = vkCreateDevice(info.gpus[0], &device_info, NULL, &this->device);
+	assert(res == VK_SUCCESS);
+}
+
+void Instance::destroyDevice() {
+	vkDestroyDevice(this->device, NULL);
 }

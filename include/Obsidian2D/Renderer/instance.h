@@ -12,14 +12,18 @@ namespace Obsidian2D
 		class Instance
 		{
 			struct VulkanInfo info = {};
+			VkDevice device;
+
 			VkResult setGlobalLayerProperties(struct VulkanInfo &info);
 			VkResult setGlobalExtensionProperties(layer_properties &layer_props);
 			VkApplicationInfo setApplicationInfo();
 			VkResult setInstanceInfo(VkApplicationInfo app_info);
-			VkResult enumerateDevice(struct VulkanInfo &info, uint32_t gpu_count);
+			void enumerateDevice(struct VulkanInfo &info, uint32_t gpu_count);
+			void createDevice();
 		public:
 			void bootstrap();
 			void destroyInstance();
+			void destroyDevice();
 		};
 	}
 }
