@@ -1,8 +1,8 @@
 #include <malloc.h>
-#include "main.h"
+#include "Obsidian2D/Renderer/instance.h"
 #include <assert.h>
 
-using namespace  Obsidian2D::Renderer::Vulkan;
+using namespace Obsidian2D::Renderer;
 
 void Instance::bootstrap(){
 	this->setGlobalLayerProperties(this->info);

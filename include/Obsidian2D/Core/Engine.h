@@ -22,7 +22,7 @@
 #include "Obsidian2D/Core/App.h"
 
 
-#include "Obsidian2D/Renderer/Vulkan/main.h"
+#include "Obsidian2D/Renderer/instance.h"
 
 namespace Obsidian2D
 {
@@ -91,8 +91,8 @@ namespace Obsidian2D
                 Obsidian2D::Core::App::Config config = app->getConfig();
 
                 //TODO: Create renderer base class and render blank screen
-				Obsidian2D::Renderer::Vulkan::Instance vulkan;
-				vulkan.bootstrap();
+				Obsidian2D::Renderer::Instance* vulkan = new Obsidian2D::Renderer::Instance();
+				vulkan->bootstrap();
 
                 /* Init defualt scene, register objects*/
 
@@ -103,6 +103,7 @@ namespace Obsidian2D
 
                 this->log("Cleaning up memory");
                 free(app);
+				free(vulkan);
                 app = nullptr;
 
                 return Obsidian2D::Error::None;
