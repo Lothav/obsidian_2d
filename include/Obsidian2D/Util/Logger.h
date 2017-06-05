@@ -44,7 +44,7 @@ namespace Obsidian2D
 
                 Logger::lastTime = currentTime;
 
-                std::cout << "[#" << Logger::logCount++ << "] [Δ +" << timeDiff << "]" << userPrefix << info << std::endl;
+                std::cout << "[#" << Logger::logCount++ << "][" << currentTime <<"][Δ +" << timeDiff << "]" << userPrefix << info << std::endl;
             }
         };
 
