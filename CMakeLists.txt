@@ -4,9 +4,12 @@ project(Obsidian2D_CORE)
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_FLAGS "-Wall -Wpedantic -lvulkan -lxcb")
 
+set(CMAKE_BUILD_TYPE Debug)
+
 set(CORE_MAIN_FILE src/main.cpp src/instance.cpp src/window.cpp)
 
 include_directories(include)
+
 
 set(UTIL_FILES include/Obsidian2D/Util/VulkanInfo.h)
 set(CORE_FILES include/Obsidian2D/Core/Engine.h)

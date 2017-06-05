@@ -2,7 +2,7 @@
 #include <iostream>
 #include <assert.h>
 #include "Obsidian2D/Renderer/window.h"
-
+#include <bitset>
 using namespace Obsidian2D::Renderer;
 
 void Window::bootstrap(){
@@ -66,7 +66,8 @@ void Window::createWindow() {
 
 	value_mask = XCB_CW_BACK_PIXEL | XCB_CW_EVENT_MASK;
 	value_list[0] = this->info.screen->black_pixel;
-	value_list[1] = XCB_EVENT_MASK_KEY_RELEASE | XCB_EVENT_MASK_EXPOSURE;
+	value_list[1] = XCB_EVENT_MASK_KEY_RELEASE | XCB_EVENT_MASK_EXPOSURE | XCB_EVENT_MASK_BUTTON_PRESS |
+					XCB_EVENT_MASK_KEY_PRESS | XCB_EVENT_MASK_ENTER_WINDOW | XCB_EVENT_MASK_LEAVE_WINDOW;
 
 	xcb_create_window(this->info.connection, XCB_COPY_FROM_PARENT, this->info.window, this->info.screen->root,
 					  0, 0, (uint16_t)this->info.width, (uint16_t)this->info.height, 0,
@@ -92,11 +93,24 @@ void Window::createWindow() {
 	xcb_flush(this->info.connection);
 
 	xcb_generic_event_t *e;
-	while ((e = xcb_wait_for_event(this->info.connection)))
-		if ((e->response_type & ~0x80) == XCB_EXPOSE) break;
+	while ((e = xcb_wait_for_event(this->info.connection))) {
+		if ((e->response_type & ~0x80) == XCB_CLIENT_MESSAGE) {
+			if((*(xcb_client_message_event_t*)e).data.data32[0] == (*this->info.atom_wm_delete_window).atom) {
+				break;
+			}
+		} else if((e->response_type & ~0x80) == XCB_ENTER_NOTIFY) {
+			this->log("Mouse Enter");
+		} else if((e->response_type & ~0x80) == XCB_LEAVE_NOTIFY) {
+			this->log("Mouse Leave");
+		} else {
+			this->log("Uncaught event: " + std::to_string((e->response_type & ~0x80)));
+		}
+	}
+
 }
 
 void Window::destroyWindow() {
 	vkDestroySurfaceKHR(this->info.inst, this->info.surface, NULL);
 	xcb_destroy_window(this->info.connection, this->info.window);
-	xcb_disconnect(this->info.connection);}
+	xcb_disconnect(this->info.connection);
+}

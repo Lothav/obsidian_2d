@@ -12,7 +12,8 @@ namespace App {
     public:
         App()
         {
-
+            //https://harrylovescode.gitbooks.io/vulkan-api/content/chap05/chap05-linux.html
+            //renderer->draw(Util::Shapes::Square(10, 10, Util::Color::White));
         }
     };
 }

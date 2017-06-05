@@ -2,12 +2,13 @@
 #define OBSIDIAN2D_CORE_WINDOW_H
 
 #include "instance.h"
+#include "Obsidian2D/Util/Loggable.h"
 
 namespace Obsidian2D
 {
 	namespace Renderer
 	{
-		class Window: public Instance
+		class Window: public Instance, public Loggable
 		{
 		private:
 			int32_t width;

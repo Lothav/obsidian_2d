@@ -41,28 +41,6 @@ namespace Obsidian2D
 
                 //TODO: Make logger prefix which class/module in the hierarchy calls it
 
-                //TODO: Reference bug is likely, may cause memory corruption, concurrency bug is obvius, need atomicity
-                long int loggerLastTime = 0;
-                Obsidian2D::Util::Logger::setPrefix([&loggerLastTime]() {
-                    long int currentTime = Obsidian2D::Util::Time::getCurrentTime();
-
-                    std::string prefix = "[";
-                    prefix += std::to_string(currentTime);
-                    prefix += "][Δ +";
-                    
-                    // Fucking what m8? 80? Does not matter now
-                    if(LIKELY(loggerLastTime != 80)) {
-                        prefix += std::to_string(Obsidian2D::Util::Time::getCurrentTime() - loggerLastTime);
-                    } else {
-                        prefix += "0";
-                    }
-                    prefix += "] ";
-
-                    loggerLastTime = currentTime;
-
-                    return prefix;
-                });
-
                 this->registerLogCallback([](const std::string& line) {
                     Obsidian2D::Util::Logger::write("[Obsidian2D::Core::Engine] " + line);
                 });
@@ -92,6 +70,11 @@ namespace Obsidian2D
 
                 //TODO: Create renderer base class and render blank screen
 				Obsidian2D::Renderer::Window* window = new Obsidian2D::Renderer::Window(800, 600);
+                
+                window->registerLogCallback([](const std::string& line) {
+                    Obsidian2D::Util::Logger::write("[Obsidian2D::Renderer::Window] " + line);
+                });
+
 				window->bootstrap();
 
                 /* Init defualt scene, register objects*/
