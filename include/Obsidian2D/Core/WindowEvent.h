@@ -1,5 +1,5 @@
-#ifndef _OBSIDIAN2D_CORE_WIDOWEVENT_
-#define _OBSIDIAN2D_CORE_WIDOWEVENT_
+#ifndef _OBSIDIAN2D_CORE_WINDOWEVENT_
+#define _OBSIDIAN2D_CORE_WINDOWEVENT_
 
 #include "Obsidian2D/Util/Loggable.h"
 
@@ -7,7 +7,7 @@ namespace Obsidian2D
 {
     namespace Core
     {
-        enum WidowEvent
+        enum WindowEvent
         {
             Click   = 1,
             MoveIn  = 2,
@@ -17,4 +17,4 @@ namespace Obsidian2D
     }
 }
 
-#endif //_OBSIDIAN2D_CORE_WIDOWEVENT_
+#endif //_OBSIDIAN2D_CORE_WINDOWEVENT_
