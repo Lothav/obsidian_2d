@@ -4,11 +4,11 @@
 namespace Obsidian2D
 {
 
-    enum Error
-    {
-        None         = 0,
-        RendererInit = 1,
-    };
+	enum Error
+	{
+		None         = 0,
+		RendererInit = 1,
+	};
 
 }
 

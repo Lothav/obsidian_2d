@@ -5,22 +5,22 @@
 
 namespace Obsidian2D
 {
-    namespace Util
-    {
-        class Time
-        {
-        private:
+	namespace Util
+	{
+		class Time
+		{
+		private:
 
-        protected:
+		protected:
 
-        public:
-            static unsigned long long getCurrentTime()
-            {
-                return std::chrono::system_clock::now().time_since_epoch() / std::chrono::milliseconds(1);
-            }
-            
-        };
-    }
+		public:
+			static unsigned long long getCurrentTime()
+			{
+				return std::chrono::system_clock::now().time_since_epoch() / std::chrono::milliseconds(1);
+			}
+			
+		};
+	}
 }
 
 #endif //_OBSIDIAN2D_TIME_

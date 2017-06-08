@@ -1,15 +1,15 @@
 #ifndef _OBSIDIAN2D_CORE_ENGINE_
 #define _OBSIDIAN2D_CORE_ENGINE_
-    #define OBSIDIAN2D_VERSION 0.0.1
+	#define OBSIDIAN2D_VERSION 0.0.1
 
-    #ifdef __linux__ 
-        #define LIKELY(x)   __builtin_expect((x),1)
-        #define UNLIKELY(x) __builtin_expect((x),0)
-    #elif _WIN32
-        #define LIKELY(x)   x
-        #define UNLIKELY(x) x
-    #endif
-    
+	#ifdef __linux__ 
+		#define LIKELY(x)   __builtin_expect((x),1)
+		#define UNLIKELY(x) __builtin_expect((x),0)
+	#elif _WIN32
+		#define LIKELY(x)   x
+		#define UNLIKELY(x) x
+	#endif
+	
 
 #include "Obsidian2D/Util/Time.h"
 
@@ -21,83 +21,94 @@
 #include "Obsidian2D/Core/Registry.h"
 #include "Obsidian2D/Core/App.h"
 
-
-#include "Obsidian2D/Renderer/window.h"
+#include "Obsidian2D/Renderer/XcbWindow.h"
 
 namespace Obsidian2D
 {
-    namespace Core
-    {
-        class Engine : public Loggable
-        {
-        private:
+	namespace Core
+	{
+		class Engine : public Loggable
+		{
+		private:
 
-        protected:
-            Registry registry;
+		protected:
+			Registry registry;
 
-        public:
-            Engine()
-            {
+		public:
+			Engine()
+			{
 
-                //TODO: Make logger prefix which class/module in the hierarchy calls it
+				//TODO: Make logger prefix which class/module in the hierarchy calls it
 
-                this->registerLogCallback([](const std::string& line) {
-                    Obsidian2D::Util::Logger::write("[Obsidian2D::Core::Engine] " + line);
-                });
+				this->registerLogCallback([](const std::string& line) {
+					Obsidian2D::Util::Logger::write("[Obsidian2D::Core::Engine] " + line);
+				});
 
-                registry.registerLogCallback([](const std::string& line) {
-                    Obsidian2D::Util::Logger::write("[Obsidian2D::Core::Registry] " + line);
-                });
-            }
+				registry.registerLogCallback([](const std::string& line) {
+					Obsidian2D::Util::Logger::write("[Obsidian2D::Core::Registry] " + line);
+				});
+			}
 
-            int start(Obsidian2D::Core::App* app)
-            {
-                this->log("start()");
+			int start(Obsidian2D::Core::App* app)
+			{
+				this->log("start()");
 
-                app->registerLogCallback([](const std::string& line) {
-                    Obsidian2D::Util::Logger::write("[Obsidian2D::Core::App] " + line);
-                });
+				app->registerLogCallback([](const std::string& line) {
+					Obsidian2D::Util::Logger::write("[Obsidian2D::Core::App] " + line);
+				});
 
-                //TODO: Check for consistent scenes like pause menu and stuff
+				//TODO: Check for consistent scenes like pause menu and stuff
 
-                //Pre initialization
-                app->init();
+				//Pre initialization
+				app->init();
 
-                /* Register GameStates/Scenes */
+				/* Register GameStates/Scenes */
 
-                /* Register routes, configs, default scene */
-                Obsidian2D::Core::App::Config config = app->getConfig();
+				/* Register routes, configs, default scene */
+				Obsidian2D::Core::App::Config config = app->getConfig();
 
-                //TODO: Create renderer base class and render blank screen
-				Obsidian2D::Renderer::Window* window = new Obsidian2D::Renderer::Window(800, 600);
-                
-                window->registerLogCallback([](const std::string& line) {
-                    Obsidian2D::Util::Logger::write("[Obsidian2D::Renderer::Window] " + line);
-                });
+				//TODO: Create renderer base class and render blank screen
+				Obsidian2D::Renderer::XcbWindow* window = new Obsidian2D::Renderer::XcbWindow(800, 600);
+				
+				window->registerLogCallback([](const std::string& line) {
+					Obsidian2D::Util::Logger::write("[Obsidian2D::Renderer::Window] " + line);
+				});
 
+				window->logExtensions();
+				
 				window->bootstrap();
 
-                /* Init defualt scene, register objects*/
+				/* Init defualt scene, register objects*/
 
-                /* Game Loop */
-                while(LIKELY(false)) {
-                    //Loop trought entities and execute update
-                }
+				/* Game Loop */
+				bool running = true;
+				while(running) {
+					while(WindowEvent e = window->poolEvent()) {
+						if(e == WindowEvent::Close) {
+							this->log("[Window Event] Close");
+							running = false;
+						} else if(e == WindowEvent::ButtonDown) {
+							this->log("[Window Event] Click!");
+						} else {
+							this->log("[Window Event] Unknow");
+						}
+					}
+				}
 
-                this->log("Cleaning up memory");
-                free(app);
+				this->log("Cleaning up memory");
+				free(app);
 				app = nullptr;
 
 				window->destroyCommandBuffers();
 				window->destroyDevice();
-                window->destroyWindow();
-                window->destroyInstance();
+				window->destroyWindow();
+				window->destroyInstance();
 				free(window);
 
-                return Obsidian2D::Error::None;
-            }
-        };
-    }
+				return Obsidian2D::Error::None;
+			}
+		};
+	}
 }
 
 #endif //_OBSIDIAN2D_CORE_ENGINE_

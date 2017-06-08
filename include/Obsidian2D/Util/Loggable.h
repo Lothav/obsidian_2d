@@ -7,24 +7,24 @@
 class Loggable
 {
 private:
-    std::function<void(const std::string&)> logCallback = nullptr;
+	std::function<void(const std::string&)> logCallback = nullptr;
 
 protected:
-    Loggable() {};
-    ~Loggable() {}
+	Loggable() {};
+	~Loggable() {}
 
-    void log(const std::string& info)
-    {
-        if(this->logCallback != nullptr) {
-            this->logCallback(info);
-        } else {
-            std::cout << info << std::endl;
-        }
-    }
+	void log(const std::string& info)
+	{
+		if(this->logCallback != nullptr) {
+			this->logCallback(info);
+		} else {
+			std::cout << info << std::endl;
+		}
+	}
 public:
-    void registerLogCallback(std::function<void(const std::string&)> lambda)
-    {
-        this->logCallback = lambda;
-    }
+	void registerLogCallback(std::function<void(const std::string&)> lambda)
+	{
+		this->logCallback = lambda;
+	}
 };
 #endif // _OBSIDIAN2D_LOGGABLE_

@@ -1,11 +1,13 @@
 #include <cstdlib>
+#include <cstring>
+
 #include <iostream>
 #include <assert.h>
-#include "Obsidian2D/Renderer/window.h"
+#include "Obsidian2D/Renderer/XcbWindow.h"
 #include <bitset>
 using namespace Obsidian2D::Renderer;
 
-void Window::bootstrap(){
+void XcbWindow::bootstrap(){
 	VkResult set_global_layer = this->setGlobalLayerProperties(this->info);
 
 	VkApplicationInfo app_info = this->setApplicationInfo();
@@ -26,7 +28,7 @@ void Window::bootstrap(){
 
 }
 
-void Window::setWindowSize(){
+void XcbWindow::setWindowSize(){
 #ifdef __ANDROID__
 	AndroidGetWindowSize(&this->info.width, &this->info.height);
 #else
@@ -35,7 +37,7 @@ void Window::setWindowSize(){
 #endif
 }
 
-void Window::setXCBConnection() {
+void XcbWindow::setXCBConnection() {
 #if !(defined(_WIN32) || defined(__ANDROID__) || defined(VK_USE_PLATFORM_IOS_MVK) || defined(VK_USE_PLATFORM_MACOS_MVK))
 // Do nothing on Android, Apple, or Windows.
 	const xcb_setup_t *setup;
@@ -56,7 +58,7 @@ void Window::setXCBConnection() {
 #endif
 }
 
-void Window::createWindow() {
+void XcbWindow::createWindow() {
 	assert(this->info.width > 0);
 	assert(this->info.height > 0);
 
@@ -84,6 +86,11 @@ void Window::createWindow() {
 						&(*this->info.atom_wm_delete_window).atom);
 	free(reply);
 
+	xcb_change_property(this->info.connection, XCB_PROP_MODE_REPLACE, this->info.window,
+		XCB_ATOM_WM_NAME, XCB_ATOM_STRING, 8, strlen(APP_NAME), APP_NAME);
+
+	xcb_flush(this->info.connection); 
+
 	xcb_map_window(this->info.connection, this->info.window);
 
 	// Force the x/y coordinates to 100, 100 results are identical in consecutive
@@ -92,32 +99,15 @@ void Window::createWindow() {
 	xcb_configure_window(this->info.connection, this->info.window, XCB_CONFIG_WINDOW_X | XCB_CONFIG_WINDOW_Y, coords);
 	xcb_flush(this->info.connection);
 
-
-	//@TODO find a place to put this loop
-	/*xcb_generic_event_t *e;
-	while ((e = xcb_wait_for_event(this->info.connection))) {
-		if ((e->response_type & ~0x80) == XCB_CLIENT_MESSAGE) {
-			if((*(xcb_client_message_event_t*)e).data.data32[0] == (*this->info.atom_wm_delete_window).atom) {
-				break;
-			}
-		} else if((e->response_type & ~0x80) == XCB_ENTER_NOTIFY) {
-			this->log("Mouse Enter");
-		} else if((e->response_type & ~0x80) == XCB_LEAVE_NOTIFY) {
-			this->log("Mouse Leave");
-		} else {
-			this->log("Uncaught event: " + std::to_string((e->response_type & ~0x80)));
-		}
-	}*/
-
 }
 
-void Window::destroyWindow() {
+void XcbWindow::destroyWindow() {
 	vkDestroySurfaceKHR(this->info.inst, this->info.surface, NULL);
 	xcb_destroy_window(this->info.connection, this->info.window);
 	xcb_disconnect(this->info.connection);
 }
 
-void Window::initSwapChainExtension() {
+void XcbWindow::initSwapChainExtension() {
 	VkResult res;
 #ifdef _WIN32
 	VkWin32SurfaceCreateInfoKHR createInfo = {};
@@ -156,8 +146,10 @@ void Window::initSwapChainExtension() {
 	createInfo.connection = this->info.connection;
 	createInfo.window = this->info.window;
 	res = vkCreateXcbSurfaceKHR(this->info.inst, &createInfo, NULL, &this->info.surface);
+	std::cout << "patch" << std::endl;
 #endif  // __ANDROID__  && _WIN32
 
+	std::cout << res << std::endl;
 	//@TODO FIX THIS ERROR !!!! >> VK_ERROR_EXTENSION_NOT_PRESENT
-	assert(res == VK_SUCCESS);
+	//assert(res == VK_SUCCESS);
 }

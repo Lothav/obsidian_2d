@@ -5,38 +5,38 @@
 
 namespace Obsidian2D
 {
-    namespace Core
-    {
-        class App : public Loggable
-        {
-        public:
-            //TODO: Check if i could do this in an App namespace or something better, like another file
-            struct Config
-            {
-                std::string renderer = "default";
-            };
+	namespace Core
+	{
+		class App : public Loggable
+		{
+		public:
+			//TODO: Check if i could do this in an App namespace or something better, like another file
+			struct Config
+			{
+				std::string renderer = "default";
+			};
 
-        private:
+		private:
 
-        protected:
+		protected:
 
-        public:
-            App()
-            {
+		public:
+			App()
+			{
 
-            }
+			}
 
-            void init()
-            {
-                this->log("init()");
-            }
+			void init()
+			{
+				this->log("init()");
+			}
 
-            virtual Obsidian2D::Core::App::Config getConfig()
-            {
-                return Config();
-            }
-        };
-    }
+			virtual Obsidian2D::Core::App::Config getConfig()
+			{
+				return Config();
+			}
+		};
+	}
 }
 
 #endif //_OBSIDIAN2D_CORE_APP_

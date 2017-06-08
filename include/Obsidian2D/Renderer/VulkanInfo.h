@@ -2,8 +2,8 @@
 // Created by luizorv on 6/2/17.
 //
 
-#ifndef OBSIDIAN2D_CORE_OBSIDIANVULKANINFO_H
-#define OBSIDIAN2D_CORE_OBSIDIANVULKANINFO_H
+#ifndef OBSIDIAN2D_RENDERER_VULKANINFO_
+#define OBSIDIAN2D_RENDERER_VULKANINFO_
 
 #include <vulkan/vulkan.h>
 #include <xcb/xcb.h>
@@ -41,9 +41,9 @@ struct VulkanInfo {
 
 #ifdef _WIN32
 	#define APP_NAME_STR_LEN 80
-    HINSTANCE connection;        // hInstance - Windows Instance
-    char name[APP_NAME_STR_LEN]; // Name to put on the window/icon
-    HWND window;                 // hWnd - window handle
+	HINSTANCE connection;        // hInstance - Windows Instance
+	char name[APP_NAME_STR_LEN]; // Name to put on the window/icon
+	HWND window;                 // hWnd - window handle
 #elif (defined(VK_USE_PLATFORM_IOS_MVK) || defined(VK_USE_PLATFORM_MACOS_MVK))
 	void* window;
 #elif defined(__ANDROID__)
@@ -149,4 +149,4 @@ struct VulkanInfo {
 	VkRect2D scissor;
 };
 
-#endif //OBSIDIAN2D_CORE_OBSIDIANVULKANINFO_H
+#endif //OBSIDIAN2D_RENDERER_VULKANINFO_

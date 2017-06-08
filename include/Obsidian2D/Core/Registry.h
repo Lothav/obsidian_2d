@@ -5,26 +5,26 @@
 
 namespace Obsidian2D
 {
-    namespace Core
-    {
-        class Registry : public Loggable
-        {
-        private:
+	namespace Core
+	{
+		class Registry : public Loggable
+		{
+		private:
 
-        protected:
+		protected:
 
-        public:
-            Registry()
-            {
-                
-            }
+		public:
+			Registry()
+			{
+				
+			}
 
-            void test()
-            {
-                //this->log("a");
-            }
-        };
-    }
+			void test()
+			{
+				//this->log("a");
+			}
+		};
+	}
 }
 
 #endif //_OBSIDIAN2D_CORE_REGISTRY_
