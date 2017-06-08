@@ -19,7 +19,7 @@ void Window::bootstrap(){
 		this->setWindowSize();
 		this->setXCBConnection();
 		this->createWindow();
-		
+		this->initSwapChainExtension();
 	} else {
 		//@TODO throw error
 	}
@@ -92,7 +92,9 @@ void Window::createWindow() {
 	xcb_configure_window(this->info.connection, this->info.window, XCB_CONFIG_WINDOW_X | XCB_CONFIG_WINDOW_Y, coords);
 	xcb_flush(this->info.connection);
 
-	xcb_generic_event_t *e;
+
+	//@TODO find a place to put this loop
+	/*xcb_generic_event_t *e;
 	while ((e = xcb_wait_for_event(this->info.connection))) {
 		if ((e->response_type & ~0x80) == XCB_CLIENT_MESSAGE) {
 			if((*(xcb_client_message_event_t*)e).data.data32[0] == (*this->info.atom_wm_delete_window).atom) {
@@ -105,7 +107,7 @@ void Window::createWindow() {
 		} else {
 			this->log("Uncaught event: " + std::to_string((e->response_type & ~0x80)));
 		}
-	}
+	}*/
 
 }
 
@@ -113,4 +115,49 @@ void Window::destroyWindow() {
 	vkDestroySurfaceKHR(this->info.inst, this->info.surface, NULL);
 	xcb_destroy_window(this->info.connection, this->info.window);
 	xcb_disconnect(this->info.connection);
+}
+
+void Window::initSwapChainExtension() {
+	VkResult res;
+#ifdef _WIN32
+	VkWin32SurfaceCreateInfoKHR createInfo = {};
+	createInfo.sType = VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR;
+	createInfo.pNext = NULL;
+	createInfo.hinstance = this->info.connection;
+	createInfo.hwnd = this->info.window;
+	res = vkCreateWin32SurfaceKHR(this->info.inst, &createInfo, NULL, &this->info.surface);
+#elif defined(__ANDROID__)
+	GET_INSTANCE_PROC_ADDR(this->info.inst, CreateAndroidSurfaceKHR);
+
+	VkAndroidSurfaceCreateInfoKHR createInfo;
+	createInfo.sType = VK_STRUCTURE_TYPE_ANDROID_SURFACE_CREATE_INFO_KHR;
+	createInfo.pNext = nullptr;
+	createInfo.flags = 0;
+	createInfo.window = AndroidGetApplicationWindow();
+	res = info.fpCreateAndroidSurfaceKHR(this->info.inst, &createInfo, nullptr, &this->info.surface);
+#elif defined(VK_USE_PLATFORM_IOS_MVK)
+	VkIOSSurfaceCreateInfoMVK createInfo = {};
+	createInfo.sType = VK_STRUCTURE_TYPE_IOS_SURFACE_CREATE_INFO_MVK;
+	createInfo.pNext = NULL;
+	createInfo.flags = 0;
+	createInfo.pView = this->info.window;
+	res = vkCreateIOSSurfaceMVK(this->info.inst, &createInfo, NULL, &this->info.surface);
+#elif defined(VK_USE_PLATFORM_MACOS_MVK)
+	VkMacOSSurfaceCreateInfoMVK createInfo = {};
+	createInfo.sType = VK_STRUCTURE_TYPE_MACOS_SURFACE_CREATE_INFO_MVK;
+	createInfo.pNext = NULL;
+	createInfo.flags = 0;
+	createInfo.pView = this->info.window;
+	res = vkCreateMacOSSurfaceMVK(this->info.inst, &createInfo, NULL, &this->info.surface);
+#else
+	VkXcbSurfaceCreateInfoKHR createInfo = {};
+	createInfo.sType = VK_STRUCTURE_TYPE_XCB_SURFACE_CREATE_INFO_KHR;
+	createInfo.pNext = NULL;
+	createInfo.connection = this->info.connection;
+	createInfo.window = this->info.window;
+	res = vkCreateXcbSurfaceKHR(this->info.inst, &createInfo, NULL, &this->info.surface);
+#endif  // __ANDROID__  && _WIN32
+
+	//@TODO FIX THIS ERROR !!!! >> VK_ERROR_EXTENSION_NOT_PRESENT
+	assert(res == VK_SUCCESS);
 }

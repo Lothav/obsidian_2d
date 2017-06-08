@@ -17,6 +17,7 @@ namespace Obsidian2D
 			void setWindowSize();
 			void setXCBConnection(); // for Linux users :V
 			void createWindow();
+			void initSwapChainExtension();
 		public:
 			Window(int32_t width, int32_t height){
 				this->width = width;
