@@ -8,6 +8,8 @@
 #include <vulkan/vulkan.h>
 #include <xcb/xcb.h>
 #include <vector>
+#include "glm/glm.hpp"
+#include <glm/gtc/matrix_transform.hpp>
 
 typedef struct{
 	VkLayerProperties properties;
@@ -38,12 +40,11 @@ struct texture_object {
 };
 
 struct VulkanInfo {
-
 #ifdef _WIN32
 	#define APP_NAME_STR_LEN 80
-	HINSTANCE connection;        // hInstance - Windows Instance
-	char name[APP_NAME_STR_LEN]; // Name to put on the window/icon
-	HWND window;                 // hWnd - window handle
+    HINSTANCE connection;        // hInstance - Windows Instance
+    char name[APP_NAME_STR_LEN]; // Name to put on the window/icon
+    HWND window;                 // hWnd - window handle
 #elif (defined(VK_USE_PLATFORM_IOS_MVK) || defined(VK_USE_PLATFORM_MACOS_MVK))
 	void* window;
 #elif defined(__ANDROID__)
@@ -118,12 +119,11 @@ struct VulkanInfo {
 	VkVertexInputBindingDescription vi_binding;
 	VkVertexInputAttributeDescription vi_attribs[2];
 
-	//@TODO OpenGL Mathematics (glm.g-truc.net)
-	/*glm::mat4 Projection;
+	glm::mat4 Projection;
 	glm::mat4 View;
 	glm::mat4 Model;
 	glm::mat4 Clip;
-	glm::mat4 MVP;*/
+	glm::mat4 MVP;
 
 	VkCommandBuffer cmd; // Buffer for initialization commands
 	VkPipelineLayout pipeline_layout;

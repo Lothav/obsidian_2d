@@ -5,6 +5,7 @@
 #include <assert.h>
 
 #include <string>
+#include <cstring>
 
 #include "Obsidian2D/Renderer/VulkanInfo.h"
 
@@ -498,6 +499,69 @@ namespace Obsidian2D
 				view_info.image = this->info.depth.image;
 				res = vkCreateImageView(this->info.device, &view_info, NULL, &this->info.depth.view);
 				assert(res == VK_SUCCESS);
+			}
+			void initUniformBuffer() {
+				VkResult U_ASSERT_ONLY res;
+				bool U_ASSERT_ONLY pass;
+				float fov = glm::radians(45.0f);
+				if (info.width > info.height) {
+					fov *= static_cast<float>(info.height) / static_cast<float>(this->info.width);
+				}
+				this->info.Projection = glm::perspective(fov, static_cast<float>(this->info.width) / static_cast<float>(this->info.height), 0.1f, 100.0f);
+				this->info.View = glm::lookAt(glm::vec3(-5, 3, -10),  // Camera is at (-5,3,-10), in World Space
+										glm::vec3(0, 0, 0),     // and looks at the origin
+										glm::vec3(0, -1, 0)     // Head is up (set to 0,-1,0 to look upside-down)
+				);
+				this->info.Model = glm::mat4(1.0f);
+				// Vulkan clip space has inverted Y and half Z.
+				this->info.Clip = glm::mat4(1.0f, 0.0f, 0.0f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.5f, 0.0f, 0.0f, 0.0f, 0.5f, 1.0f);
+
+				this->info.MVP = this->info.Clip * this->info.Projection * this->info.View * this->info.Model;
+
+				/* VULKAN_KEY_START */
+				VkBufferCreateInfo buf_info = {};
+				buf_info.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
+				buf_info.pNext = NULL;
+				buf_info.usage = VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT;
+				buf_info.size = sizeof(this->info.MVP);
+				buf_info.queueFamilyIndexCount = 0;
+				buf_info.pQueueFamilyIndices = NULL;
+				buf_info.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+				buf_info.flags = 0;
+				res = vkCreateBuffer(info.device, &buf_info, NULL, &this->info.uniform_data.buf);
+				assert(res == VK_SUCCESS);
+
+				VkMemoryRequirements mem_reqs;
+				vkGetBufferMemoryRequirements(this->info.device, this->info.uniform_data.buf, &mem_reqs);
+
+				VkMemoryAllocateInfo alloc_info = {};
+				alloc_info.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
+				alloc_info.pNext = NULL;
+				alloc_info.memoryTypeIndex = 0;
+
+				alloc_info.allocationSize = mem_reqs.size;
+				pass = memory_type_from_properties(this->info, mem_reqs.memoryTypeBits,
+												   VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+												   &alloc_info.memoryTypeIndex);
+				assert(pass && "No mappable, coherent memory");
+
+				res = vkAllocateMemory(this->info.device, &alloc_info, NULL, &(this->info.uniform_data.mem));
+				assert(res == VK_SUCCESS);
+
+				uint8_t *pData;
+				res = vkMapMemory(this->info.device, this->info.uniform_data.mem, 0, mem_reqs.size, 0, (void **)&pData);
+				assert(res == VK_SUCCESS);
+
+				memcpy(pData, &this->info.MVP, sizeof(this->info.MVP));
+
+				vkUnmapMemory(this->info.device, this->info.uniform_data.mem);
+
+				res = vkBindBufferMemory(this->info.device, this->info.uniform_data.buf, this->info.uniform_data.mem, 0);
+				assert(res == VK_SUCCESS);
+
+				this->info.uniform_data.buffer_info.buffer = this->info.uniform_data.buf;
+				this->info.uniform_data.buffer_info.offset = 0;
+				this->info.uniform_data.buffer_info.range = sizeof(this->info.MVP);
 			}
 
 		public:

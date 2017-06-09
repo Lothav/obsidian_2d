@@ -29,6 +29,7 @@ void XcbWindow::bootstrap(){
 		this->initDeviceQueue();
 		this->initSwapChain();
 		this->initDepthBuffer();
+		this->initUniformBuffer();
 	} else {
 		//@TODO throw error
 	}
