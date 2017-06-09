@@ -30,6 +30,8 @@ void XcbWindow::bootstrap(){
 		this->initSwapChain();
 		this->initDepthBuffer();
 		this->initUniformBuffer();
+		this->initDescriptorAndPipelineLayouts(false);
+		this->initRenderpass(true);
 	} else {
 		//@TODO throw error
 	}

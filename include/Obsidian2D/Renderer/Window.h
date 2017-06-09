@@ -500,7 +500,8 @@ namespace Obsidian2D
 				res = vkCreateImageView(this->info.device, &view_info, NULL, &this->info.depth.view);
 				assert(res == VK_SUCCESS);
 			}
-			void initUniformBuffer() {
+			void initUniformBuffer()
+			{
 				VkResult U_ASSERT_ONLY res;
 				bool U_ASSERT_ONLY pass;
 				float fov = glm::radians(45.0f);
@@ -562,6 +563,113 @@ namespace Obsidian2D
 				this->info.uniform_data.buffer_info.buffer = this->info.uniform_data.buf;
 				this->info.uniform_data.buffer_info.offset = 0;
 				this->info.uniform_data.buffer_info.range = sizeof(this->info.MVP);
+			}
+
+			void initDescriptorAndPipelineLayouts(bool use_texture)
+			{
+				VkDescriptorSetLayoutBinding layout_bindings[2];
+				layout_bindings[0].binding = 0;
+				layout_bindings[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+				layout_bindings[0].descriptorCount = 1;
+				layout_bindings[0].stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
+				layout_bindings[0].pImmutableSamplers = NULL;
+
+				if (use_texture) {
+					layout_bindings[1].binding = 1;
+					layout_bindings[1].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+					layout_bindings[1].descriptorCount = 1;
+					layout_bindings[1].stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
+					layout_bindings[1].pImmutableSamplers = NULL;
+				}
+
+				/* Next take layout bindings and use them to create a descriptor set layout
+				 */
+				VkDescriptorSetLayoutCreateInfo descriptor_layout = {};
+				descriptor_layout.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
+				descriptor_layout.pNext = NULL;
+				descriptor_layout.bindingCount = use_texture ? 2 : 1;
+				descriptor_layout.pBindings = layout_bindings;
+
+				VkResult U_ASSERT_ONLY res;
+
+				this->info.desc_layout.resize(1);
+				res = vkCreateDescriptorSetLayout(this->info.device, &descriptor_layout, NULL, this->info.desc_layout.data());
+				assert(res == VK_SUCCESS);
+
+				/* Now use the descriptor layout to create a pipeline layout */
+				VkPipelineLayoutCreateInfo pPipelineLayoutCreateInfo = {};
+				pPipelineLayoutCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
+				pPipelineLayoutCreateInfo.pNext = NULL;
+				pPipelineLayoutCreateInfo.pushConstantRangeCount = 0;
+				pPipelineLayoutCreateInfo.pPushConstantRanges = NULL;
+				pPipelineLayoutCreateInfo.setLayoutCount = 1;
+				pPipelineLayoutCreateInfo.pSetLayouts = this->info.desc_layout.data();
+
+				res = vkCreatePipelineLayout(info.device, &pPipelineLayoutCreateInfo, NULL, &this->info.pipeline_layout);
+				assert(res == VK_SUCCESS);
+			}
+
+			void initRenderpass(bool include_depth, bool clear = true, VkImageLayout finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR)
+			{
+				/* DEPENDS on init_swap_chain() and init_depth_buffer() */
+
+				VkResult U_ASSERT_ONLY res;
+				/* Need attachments for render target and depth buffer */
+				VkAttachmentDescription attachments[2];
+				attachments[0].format = this->info.format;
+				attachments[0].samples = VK_SAMPLE_COUNT_1_BIT;
+				attachments[0].loadOp = clear ? VK_ATTACHMENT_LOAD_OP_CLEAR : VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+				attachments[0].storeOp = VK_ATTACHMENT_STORE_OP_STORE;
+				attachments[0].stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+				attachments[0].stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+				attachments[0].initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+				attachments[0].finalLayout = finalLayout;
+				attachments[0].flags = 0;
+
+				if (include_depth) {
+					attachments[1].format = this->info.depth.format;
+					attachments[1].samples = VK_SAMPLE_COUNT_1_BIT;
+					attachments[1].loadOp = clear ? VK_ATTACHMENT_LOAD_OP_CLEAR : VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+					attachments[1].storeOp = VK_ATTACHMENT_STORE_OP_STORE;
+					attachments[1].stencilLoadOp = VK_ATTACHMENT_LOAD_OP_LOAD;
+					attachments[1].stencilStoreOp = VK_ATTACHMENT_STORE_OP_STORE;
+					attachments[1].initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+					attachments[1].finalLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+					attachments[1].flags = 0;
+				}
+
+				VkAttachmentReference color_reference = {};
+				color_reference.attachment = 0;
+				color_reference.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+
+				VkAttachmentReference depth_reference = {};
+				depth_reference.attachment = 1;
+				depth_reference.layout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+
+				VkSubpassDescription subpass = {};
+				subpass.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
+				subpass.flags = 0;
+				subpass.inputAttachmentCount = 0;
+				subpass.pInputAttachments = NULL;
+				subpass.colorAttachmentCount = 1;
+				subpass.pColorAttachments = &color_reference;
+				subpass.pResolveAttachments = NULL;
+				subpass.pDepthStencilAttachment = include_depth ? &depth_reference : NULL;
+				subpass.preserveAttachmentCount = 0;
+				subpass.pPreserveAttachments = NULL;
+
+				VkRenderPassCreateInfo rp_info = {};
+				rp_info.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
+				rp_info.pNext = NULL;
+				rp_info.attachmentCount = include_depth ? 2 : 1;
+				rp_info.pAttachments = attachments;
+				rp_info.subpassCount = 1;
+				rp_info.pSubpasses = &subpass;
+				rp_info.dependencyCount = 0;
+				rp_info.pDependencies = NULL;
+
+				res = vkCreateRenderPass(this->info.device, &rp_info, NULL, &this->info.render_pass);
+				assert(res == VK_SUCCESS);
 			}
 
 		public:
