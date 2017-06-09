@@ -9,7 +9,7 @@
 
 #include "Obsidian2D/Renderer/VulkanInfo.h"
 
-#include "Obsidian2D/Util/Loggable.h"
+#include "Shaders.h"
 
 #define APP_NAME "Obsidian2D"
 
@@ -17,7 +17,7 @@ namespace Obsidian2D
 {
 	namespace Renderer
 	{
-		class Window : public Loggable
+		class Window : public Shaders
 		{
 		private:
 			bool memory_type_from_properties(struct VulkanInfo &info, uint32_t typeBits, VkFlags requirements_mask, uint32_t *typeIndex) {
@@ -44,14 +44,14 @@ namespace Obsidian2D
 				uint32_t instance_layer_count;
 				VkLayerProperties *vk_props = NULL;
 				VkResult res;
-			
-			#ifdef __ANDROID__
+
+#ifdef __ANDROID__
 				if (!InitVulkan()) {
 					LOGE("Failied initializing Vulkan APIs!");
 					return VK_ERROR_INITIALIZATION_FAILED;
 				}
 				LOGI("Loaded Vulkan APIs.");
-			#endif
+#endif
 
 				do {
 					res = vkEnumerateInstanceLayerProperties(&instance_layer_count, NULL);
@@ -89,7 +89,7 @@ namespace Obsidian2D
 					layer_props.extensions.resize(instance_extension_count);
 					instance_extensions = layer_props.extensions.data();
 					res = vkEnumerateInstanceExtensionProperties(layer_name, &instance_extension_count, instance_extensions);
-					
+
 				} while (res == VK_INCOMPLETE);
 
 				return res;
@@ -510,8 +510,8 @@ namespace Obsidian2D
 				}
 				this->info.Projection = glm::perspective(fov, static_cast<float>(this->info.width) / static_cast<float>(this->info.height), 0.1f, 100.0f);
 				this->info.View = glm::lookAt(glm::vec3(-5, 3, -10),  // Camera is at (-5,3,-10), in World Space
-										glm::vec3(0, 0, 0),     // and looks at the origin
-										glm::vec3(0, -1, 0)     // Head is up (set to 0,-1,0 to look upside-down)
+											  glm::vec3(0, 0, 0),     // and looks at the origin
+											  glm::vec3(0, -1, 0)     // Head is up (set to 0,-1,0 to look upside-down)
 				);
 				this->info.Model = glm::mat4(1.0f);
 				// Vulkan clip space has inverted Y and half Z.
@@ -671,6 +671,60 @@ namespace Obsidian2D
 				res = vkCreateRenderPass(this->info.device, &rp_info, NULL, &this->info.render_pass);
 				assert(res == VK_SUCCESS);
 			}
+			void initShaders() {
+				VkResult U_ASSERT_ONLY res;
+				bool U_ASSERT_ONLY retVal;
+
+				// If no shaders were submitted, just return
+				if (!(this->initialVertShaderText || this->initialFragShaderText)) return;
+
+				init_glslang();
+				VkShaderModuleCreateInfo moduleCreateInfo;
+
+				if (this->initialVertShaderText) {
+					std::vector<unsigned int> vtx_spv;
+					this->info.shaderStages[0].sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+					this->info.shaderStages[0].pNext = NULL;
+					this->info.shaderStages[0].pSpecializationInfo = NULL;
+					this->info.shaderStages[0].flags = 0;
+					this->info.shaderStages[0].stage = VK_SHADER_STAGE_VERTEX_BIT;
+					this->info.shaderStages[0].pName = "main";
+
+					retVal = GLSLtoSPV(VK_SHADER_STAGE_VERTEX_BIT, this->initialVertShaderText, vtx_spv);
+					assert(retVal);
+
+					moduleCreateInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
+					moduleCreateInfo.pNext = NULL;
+					moduleCreateInfo.flags = 0;
+					moduleCreateInfo.codeSize = vtx_spv.size() * sizeof(unsigned int);
+					moduleCreateInfo.pCode = vtx_spv.data();
+					res = vkCreateShaderModule(info.device, &moduleCreateInfo, NULL, &info.shaderStages[0].module);
+					assert(res == VK_SUCCESS);
+				}
+
+				if (this->initialFragShaderText) {
+					std::vector<unsigned int> frag_spv;
+					this->info.shaderStages[1].sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+					this->info.shaderStages[1].pNext = NULL;
+					this->info.shaderStages[1].pSpecializationInfo = NULL;
+					this->info.shaderStages[1].flags = 0;
+					this->info.shaderStages[1].stage = VK_SHADER_STAGE_FRAGMENT_BIT;
+					this->info.shaderStages[1].pName = "main";
+
+					retVal = GLSLtoSPV(VK_SHADER_STAGE_FRAGMENT_BIT, this->initialFragShaderText, frag_spv);
+					assert(retVal);
+
+					moduleCreateInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
+					moduleCreateInfo.pNext = NULL;
+					moduleCreateInfo.flags = 0;
+					moduleCreateInfo.codeSize = frag_spv.size() * sizeof(unsigned int);
+					moduleCreateInfo.pCode = frag_spv.data();
+					res = vkCreateShaderModule(this->info.device, &moduleCreateInfo, NULL, &this->info.shaderStages[1].module);
+					assert(res == VK_SUCCESS);
+				}
+
+				finalize_glslang();
+			}
 
 		public:
 			void destroyCommandBuffers()
@@ -703,7 +757,7 @@ namespace Obsidian2D
 					for (auto & extension : extensions) {
 						this->log(prefix + extension.extensionName);
 					}
-					
+
 				} while (res == VK_INCOMPLETE);
 			}
 		};

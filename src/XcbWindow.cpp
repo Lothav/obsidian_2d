@@ -32,6 +32,7 @@ void XcbWindow::bootstrap(){
 		this->initUniformBuffer();
 		this->initDescriptorAndPipelineLayouts(false);
 		this->initRenderpass(true);
+		this->initShaders();
 	} else {
 		//@TODO throw error
 	}
