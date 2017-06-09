@@ -11,7 +11,7 @@ void XcbWindow::bootstrap(){
 	VkResult set_global_layer = this->setGlobalLayerProperties(this->info);
 
 	VkApplicationInfo app_info = this->setApplicationInfo();
-	this->pushInstanceExtensions();
+	this->pushBackExtensions();
 
 	VkResult set_instance_info = this->setInstanceInfo(app_info);
 
@@ -151,7 +151,62 @@ void XcbWindow::initSwapChainExtension() {
 	std::cout << "patch" << std::endl;
 #endif  // __ANDROID__  && _WIN32
 
-	std::cout << res << std::endl;
-	//@TODO FIX THIS ERROR !!!! >> VK_ERROR_EXTENSION_NOT_PRESENT
 	assert(res == VK_SUCCESS);
+
+	VkBool32 *pSupportsPresent = (VkBool32 *)malloc(this->info.queue_family_count * sizeof(VkBool32));
+	for (uint32_t i = 0; i < this->info.queue_family_count; i++) {
+		vkGetPhysicalDeviceSurfaceSupportKHR(this->info.gpus[0], i, this->info.surface, &pSupportsPresent[i]);
+	}
+
+	// Search for a graphics and a present queue in the array of queue
+	// families, try to find one that supports both
+	this->info.graphics_queue_family_index = UINT32_MAX;
+	this->info.present_queue_family_index = UINT32_MAX;
+	for (uint32_t i = 0; i < this->info.queue_family_count; ++i) {
+		if ((this->info.queue_props[i].queueFlags & VK_QUEUE_GRAPHICS_BIT) != 0) {
+			if (this->info.graphics_queue_family_index == UINT32_MAX) this->info.graphics_queue_family_index = i;
+
+			if (pSupportsPresent[i] == VK_TRUE) {
+				this->info.graphics_queue_family_index = i;
+				this->info.present_queue_family_index = i;
+				break;
+			}
+		}
+	}
+
+	if (this->info.present_queue_family_index == UINT32_MAX) {
+		// If didn't find a queue that supports both graphics and present, then
+		// find a separate present queue.
+		for (size_t i = 0; i < this->info.queue_family_count; ++i)
+			if (pSupportsPresent[i] == VK_TRUE) {
+				this->info.present_queue_family_index = (u_int32_t)i;
+				break;
+			}
+	}
+	free(pSupportsPresent);
+
+	// Generate error if could not find queues that support graphics
+	// and present
+	if (this->info.graphics_queue_family_index == UINT32_MAX || this->info.present_queue_family_index == UINT32_MAX) {
+		std::cout << "Could not find a queues for both graphics and present";
+		exit(-1);
+	}
+
+	// Get the list of VkFormats that are supported:
+	uint32_t formatCount;
+	res = vkGetPhysicalDeviceSurfaceFormatsKHR(this->info.gpus[0], this->info.surface, &formatCount, NULL);
+	assert(res == VK_SUCCESS);
+	VkSurfaceFormatKHR *surfFormats = (VkSurfaceFormatKHR *)malloc(formatCount * sizeof(VkSurfaceFormatKHR));
+	res = vkGetPhysicalDeviceSurfaceFormatsKHR(this->info.gpus[0], this->info.surface, &formatCount, surfFormats);
+	assert(res == VK_SUCCESS);
+	// If the format list includes just one entry of VK_FORMAT_UNDEFINED,
+	// the surface has no preferred format.  Otherwise, at least one
+	// supported format will be returned.
+	if (formatCount == 1 && surfFormats[0].format == VK_FORMAT_UNDEFINED) {
+		this->info.format = VK_FORMAT_B8G8R8A8_UNORM;
+	} else {
+		assert(formatCount >= 1);
+		this->info.format = surfFormats[0].format;
+	}
+	free(surfFormats);
 }
