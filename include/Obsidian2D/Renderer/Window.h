@@ -90,9 +90,18 @@ namespace Obsidian2D
 				app_info.apiVersion = VK_API_VERSION_1_0;
 				return app_info;
 			}
+			void pushInstanceExtensions(){
+				this->info.instance_extension_names.push_back(VK_KHR_SURFACE_EXTENSION_NAME);
+#ifdef _WIN32
+				this->info.instance_extension_names.push_back(VK_KHR_WIN32_SURFACE_EXTENSION_NAME);
+#elif __ANDROID__
+				this->info.instance_extension_names.push_back(VK_KHR_ANDROID_SURFACE_EXTENSION_NAME);
+#else
+				this->info.instance_extension_names.push_back(VK_KHR_XCB_SURFACE_EXTENSION_NAME);
+#endif
+			}
 			VkResult setInstanceInfo(VkApplicationInfo app_info)
 			{
-				info.instance_extension_names.push_back("VK_KHR_xcb_surface");
 				VkInstanceCreateInfo inst_info = {};
 				inst_info.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
 				inst_info.pNext = NULL;

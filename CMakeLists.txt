@@ -61,10 +61,10 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
 	endif()
 endif()
 
-set(UTIL_FILES include/Obsidian2D/Util/VulkanInfo.h)
+set(UTIL_FILES include/Obsidian2D/Renderer/VulkanInfo.h)
 set(CORE_FILES include/Obsidian2D/Core/Engine.h)
 set(RENDERER_FILES include/Obsidian2D/Renderer/Window.h include/Obsidian2D/Renderer/XcbWindow.h)
 
 set(EXECUTABLE_OUTPUT_PATH bin)
 
-add_executable(core ${CORE_MAIN_FILE} ${UTIL_FILES} ${RENDERER_FILES} ${CORE_FILES})
+add_executable(core ${CORE_MAIN_FILE} ${CORE_FILES} ${UTIL_FILES} ${RENDERER_FILES} )

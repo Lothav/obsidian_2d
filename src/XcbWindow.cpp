@@ -11,6 +11,8 @@ void XcbWindow::bootstrap(){
 	VkResult set_global_layer = this->setGlobalLayerProperties(this->info);
 
 	VkApplicationInfo app_info = this->setApplicationInfo();
+	this->pushInstanceExtensions();
+
 	VkResult set_instance_info = this->setInstanceInfo(app_info);
 
 	if(set_instance_info == VK_SUCCESS && set_global_layer == VK_SUCCESS){
@@ -151,5 +153,5 @@ void XcbWindow::initSwapChainExtension() {
 
 	std::cout << res << std::endl;
 	//@TODO FIX THIS ERROR !!!! >> VK_ERROR_EXTENSION_NOT_PRESENT
-	//assert(res == VK_SUCCESS);
+	assert(res == VK_SUCCESS);
 }
