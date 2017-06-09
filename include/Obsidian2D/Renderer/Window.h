@@ -208,6 +208,20 @@ namespace Obsidian2D
 				res = vkAllocateCommandBuffers(this->info.device, &cmd, &this->info.cmd);
 				assert(res == VK_SUCCESS);
 			}
+			void executeBeginCommandBuffer() {
+				/* DEPENDS on init_command_buffer() */
+				VkResult U_ASSERT_ONLY res;
+
+				VkCommandBufferBeginInfo cmd_buf_info = {};
+				cmd_buf_info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+				cmd_buf_info.pNext = NULL;
+				cmd_buf_info.flags = 0;
+				cmd_buf_info.pInheritanceInfo = NULL;
+
+				res = vkBeginCommandBuffer(this->info.cmd, &cmd_buf_info);
+				assert(res == VK_SUCCESS);
+			}
+
 		public:
 			void destroyCommandBuffers()
 			{

@@ -24,6 +24,9 @@ void XcbWindow::bootstrap(){
 		this->setXCBConnection();
 		this->createWindow();
 		this->initSwapChainExtension();
+
+		this->executeBeginCommandBuffer();
+
 	} else {
 		//@TODO throw error
 	}
