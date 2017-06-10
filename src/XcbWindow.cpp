@@ -41,7 +41,8 @@ void XcbWindow::bootstrap(){
 		this->initDescriptorPool(false);
 		this->initDescriptorSet(false);
 		this->initPipelineCache();
-		this->initPipeline(depthPresent);
+		this->initPipeline((VkBool32)depthPresent);
+		this->drawCube();
 	} else {
 		//@TODO throw error
 	}
