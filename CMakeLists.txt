@@ -44,13 +44,13 @@ if(CUSTOM_GLSLANG_BIN_ROOT)
             "${GLSLANG_BINARY_ROOT}/hlsl"
             "${GLSLANG_BINARY_ROOT}/StandAlone")
 else()
-    set (GLSLANG_SEARCH_PATH "${EXTERNAL_SOURCE_ROOT}/glslang/${BUILDTGT_DIR}/install/lib" "${CMAKE_SOURCE_DIR}/../x86_64/lib/glslang" )
+    set (GLSLANG_SEARCH_PATH "${EXTERNAL_SOURCE_ROOT}/external/glslang/${BUILDTGT_DIR}/install/lib" "${CMAKE_SOURCE_DIR}/../x86_64/lib/glslang" )
 endif()
 
 if(CUSTOM_SPIRV_TOOLS_BIN_ROOT)
     set (SPIRV_TOOLS_SEARCH_PATH "${SPIRV_TOOLS_BINARY_ROOT}/source" )
 else()
-    set (SPIRV_TOOLS_SEARCH_PATH "${EXTERNAL_SOURCE_ROOT}/spirv-tools/${BUILDTGT_DIR}/source" "${CMAKE_SOURCE_DIR}/../x86_64/lib/spirv-tools" )
+    set (SPIRV_TOOLS_SEARCH_PATH "${EXTERNAL_SOURCE_ROOT}/external/spirv-tools/${BUILDTGT_DIR}/source" "${CMAKE_SOURCE_DIR}/../x86_64/lib/spirv-tools" )
 endif()
 
 find_program(GLSLANG_VALIDATOR NAMES glslangValidator

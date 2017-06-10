@@ -348,24 +348,24 @@ namespace Obsidian2D
 					swapchain_ci.pQueueFamilyIndices = queueFamilyIndices;
 				}
 
-				res = vkCreateSwapchainKHR(info.device, &swapchain_ci, NULL, &info.swap_chain);
+				res = vkCreateSwapchainKHR(this->info.device, &swapchain_ci, NULL, &this->info.swap_chain);
 				assert(res == VK_SUCCESS);
 
-				res = vkGetSwapchainImagesKHR(info.device, info.swap_chain, &info.swapchainImageCount, NULL);
+				res = vkGetSwapchainImagesKHR(this->info.device, this->info.swap_chain, &this->info.swapchainImageCount, NULL);
 				assert(res == VK_SUCCESS);
 
-				VkImage *swapchainImages = (VkImage *)malloc(info.swapchainImageCount * sizeof(VkImage));
+				VkImage *swapchainImages = (VkImage *)malloc(this->info.swapchainImageCount * sizeof(VkImage));
 				assert(swapchainImages);
-				res = vkGetSwapchainImagesKHR(info.device, info.swap_chain, &info.swapchainImageCount, swapchainImages);
+				res = vkGetSwapchainImagesKHR(this->info.device, this->info.swap_chain, &this->info.swapchainImageCount, swapchainImages);
 				assert(res == VK_SUCCESS);
 
-				for (uint32_t i = 0; i < info.swapchainImageCount; i++) {
+				for (uint32_t i = 0; i < this->info.swapchainImageCount; i++) {
 					swap_chain_buffer sc_buffer;
 
 					VkImageViewCreateInfo color_image_view = {};
 					color_image_view.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
 					color_image_view.pNext = NULL;
-					color_image_view.format = info.format;
+					color_image_view.format = this->info.format;
 					color_image_view.components.r = VK_COMPONENT_SWIZZLE_R;
 					color_image_view.components.g = VK_COMPONENT_SWIZZLE_G;
 					color_image_view.components.b = VK_COMPONENT_SWIZZLE_B;
@@ -382,12 +382,12 @@ namespace Obsidian2D
 
 					color_image_view.image = sc_buffer.image;
 
-					res = vkCreateImageView(info.device, &color_image_view, NULL, &sc_buffer.view);
-					info.buffers.push_back(sc_buffer);
+					res = vkCreateImageView(this->info.device, &color_image_view, NULL, &sc_buffer.view);
+					this->info.buffers.push_back(sc_buffer);
 					assert(res == VK_SUCCESS);
 				}
 				free(swapchainImages);
-				info.current_buffer = 0;
+				this->info.current_buffer = 0;
 
 				if (NULL != presentModes) {
 					free(presentModes);
@@ -747,6 +747,7 @@ namespace Obsidian2D
 					assert(res == VK_SUCCESS);
 				}
 			}
+
 			void initVertexBuffer(const void *vertexData, uint32_t dataSize, uint32_t dataStride, bool use_texture)
 			{
 				VkResult U_ASSERT_ONLY res;
@@ -848,7 +849,7 @@ namespace Obsidian2D
 				rp_begin.clearValueCount = 2;
 				rp_begin.pClearValues = clear_values;
 
-				vkCmdBeginRenderPass(info.cmd, &rp_begin, VK_SUBPASS_CONTENTS_INLINE);
+				vkCmdBeginRenderPass(this->info.cmd, &rp_begin, VK_SUBPASS_CONTENTS_INLINE);
 
 				vkCmdBindPipeline(this->info.cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, this->info.pipeline);
 				vkCmdBindDescriptorSets(this->info.cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, this->info.pipeline_layout, 0, 1,
@@ -884,7 +885,7 @@ namespace Obsidian2D
 				submit_info[0].pSignalSemaphores = NULL;
 
 				/* Queue the command buffer for execution */
-				res = vkQueueSubmit(info.graphics_queue, 1, submit_info, drawFence);
+				res = vkQueueSubmit(this->info.graphics_queue, 1, submit_info, drawFence);
 				assert(res == VK_SUCCESS);
 
 				/* Now present the image in the window */
@@ -905,7 +906,7 @@ namespace Obsidian2D
 				} while (res == VK_TIMEOUT);
 
 				assert(res == VK_SUCCESS);
-				res = vkQueuePresentKHR(info.present_queue, &present);
+				res = vkQueuePresentKHR(this->info.present_queue, &present);
 				assert(res == VK_SUCCESS);
 
 				wait_seconds(1);

@@ -54,8 +54,7 @@ namespace Obsidian2D
 			void init_scissors()
 			{
 #ifdef __ANDROID__
-				// Disable dynamic viewport on Android. Some drive has an issue with the dynamic scissors
-// feature.
+				// Disable dynamic viewport on Android. Some drive has an issue with the dynamic scissors feature.
 #else
 				this->info.scissor.extent.width =  (uint32_t)this->info.width;
 				this->info.scissor.extent.height = (uint32_t)this->info.height;
