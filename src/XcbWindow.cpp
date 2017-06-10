@@ -2,9 +2,9 @@
 #include <cstring>
 
 #include <iostream>
-#include <assert.h>
 #include "Obsidian2D/Renderer/XcbWindow.h"
 #include <bitset>
+#include "Obsidian2D/Util/cube_data.h"
 using namespace Obsidian2D::Renderer;
 
 void XcbWindow::bootstrap(){
@@ -37,6 +37,7 @@ void XcbWindow::bootstrap(){
 		this->initRenderpass(depthPresent);
 		this->initShaders();
 		this->initFramebuffers(depthPresent);
+		this->initVertexBuffer(g_vb_texture_Data, sizeof(g_vb_texture_Data), sizeof(g_vb_texture_Data[0]), false);
 	} else {
 		//@TODO throw error
 	}

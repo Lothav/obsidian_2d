@@ -751,6 +751,65 @@ namespace Obsidian2D
 					assert(res == VK_SUCCESS);
 				}
 			}
+			void initVertexBuffer(const void *vertexData, uint32_t dataSize, uint32_t dataStride, bool use_texture) {
+				VkResult U_ASSERT_ONLY res;
+				bool U_ASSERT_ONLY pass;
+
+				VkBufferCreateInfo buf_info = {};
+				buf_info.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
+				buf_info.pNext = NULL;
+				buf_info.usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT;
+				buf_info.size = dataSize;
+				buf_info.queueFamilyIndexCount = 0;
+				buf_info.pQueueFamilyIndices = NULL;
+				buf_info.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+				buf_info.flags = 0;
+				res = vkCreateBuffer(this->info.device, &buf_info, NULL, &this->info.vertex_buffer.buf);
+				assert(res == VK_SUCCESS);
+
+				VkMemoryRequirements mem_reqs;
+				vkGetBufferMemoryRequirements(this->info.device, this->info.vertex_buffer.buf, &mem_reqs);
+
+				VkMemoryAllocateInfo alloc_info = {};
+				alloc_info.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
+				alloc_info.pNext = NULL;
+				alloc_info.memoryTypeIndex = 0;
+
+				alloc_info.allocationSize = mem_reqs.size;
+				pass = memory_type_from_properties(this->info, mem_reqs.memoryTypeBits,
+												   VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+												   &alloc_info.memoryTypeIndex);
+				assert(pass && "No mappable, coherent memory");
+
+				res = vkAllocateMemory(info.device, &alloc_info, NULL, &(this->info.vertex_buffer.mem));
+				assert(res == VK_SUCCESS);
+				this->info.vertex_buffer.buffer_info.range = mem_reqs.size;
+				this->info.vertex_buffer.buffer_info.offset = 0;
+
+				uint8_t *pData;
+				res = vkMapMemory(this->info.device, this->info.vertex_buffer.mem, 0, mem_reqs.size, 0, (void **)&pData);
+				assert(res == VK_SUCCESS);
+
+				memcpy(pData, vertexData, dataSize);
+
+				vkUnmapMemory(this->info.device, this->info.vertex_buffer.mem);
+
+				res = vkBindBufferMemory(this->info.device, this->info.vertex_buffer.buf, this->info.vertex_buffer.mem, 0);
+				assert(res == VK_SUCCESS);
+
+				this->info.vi_binding.binding = 0;
+				this->info.vi_binding.inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
+				this->info.vi_binding.stride = dataStride;
+
+				this->info.vi_attribs[0].binding = 0;
+				this->info.vi_attribs[0].location = 0;
+				this->info.vi_attribs[0].format = VK_FORMAT_R32G32B32A32_SFLOAT;
+				this->info.vi_attribs[0].offset = 0;
+				this->info.vi_attribs[1].binding = 0;
+				this->info.vi_attribs[1].location = 1;
+				this->info.vi_attribs[1].format = use_texture ? VK_FORMAT_R32G32_SFLOAT : VK_FORMAT_R32G32B32A32_SFLOAT;
+				this->info.vi_attribs[1].offset = 16;
+			}
 
 		public:
 			void destroyCommandBuffers()
