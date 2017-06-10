@@ -8,6 +8,9 @@
 using namespace Obsidian2D::Renderer;
 
 void XcbWindow::bootstrap(){
+
+	const bool depthPresent = true;
+
 	VkResult set_global_layer = this->setGlobalLayerProperties(this->info);
 
 	VkApplicationInfo app_info = this->setApplicationInfo();
@@ -31,8 +34,9 @@ void XcbWindow::bootstrap(){
 		this->initDepthBuffer();
 		this->initUniformBuffer();
 		this->initDescriptorAndPipelineLayouts(false);
-		this->initRenderpass(true);
+		this->initRenderpass(depthPresent);
 		this->initShaders();
+		this->initFramebuffers(depthPresent);
 	} else {
 		//@TODO throw error
 	}

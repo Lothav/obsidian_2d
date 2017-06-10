@@ -726,6 +726,32 @@ namespace Obsidian2D
 				finalize_glslang();
 			}
 
+			void initFramebuffers(bool include_depth) {
+				VkResult U_ASSERT_ONLY res;
+				VkImageView attachments[2];
+				attachments[1] = this->info.depth.view;
+
+				VkFramebufferCreateInfo fb_info = {};
+				fb_info.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
+				fb_info.pNext = NULL;
+				fb_info.renderPass = this->info.render_pass;
+				fb_info.attachmentCount = include_depth ? 2 : 1;
+				fb_info.pAttachments = attachments;
+				fb_info.width = (uint32_t)this->info.width;
+				fb_info.height = (uint32_t)this->info.height;
+				fb_info.layers = 1;
+
+				uint32_t i;
+
+				this->info.framebuffers = (VkFramebuffer *)malloc(this->info.swapchainImageCount * sizeof(VkFramebuffer));
+
+				for (i = 0; i < this->info.swapchainImageCount; i++) {
+					attachments[0] = this->info.buffers[i].view;
+					res = vkCreateFramebuffer(this->info.device, &fb_info, NULL, &this->info.framebuffers[i]);
+					assert(res == VK_SUCCESS);
+				}
+			}
+
 		public:
 			void destroyCommandBuffers()
 			{
