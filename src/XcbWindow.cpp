@@ -41,7 +41,7 @@ void XcbWindow::bootstrap(){
 		this->initDescriptorPool(false);
 		this->initDescriptorSet(false);
 		this->initPipelineCache();
-
+		this->initPipeline(depthPresent);
 	} else {
 		//@TODO throw error
 	}
