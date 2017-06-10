@@ -671,7 +671,9 @@ namespace Obsidian2D
 				res = vkCreateRenderPass(this->info.device, &rp_info, NULL, &this->info.render_pass);
 				assert(res == VK_SUCCESS);
 			}
-			void initShaders() {
+
+			void initShaders()
+			{
 				VkResult U_ASSERT_ONLY res;
 				bool U_ASSERT_ONLY retVal;
 
@@ -726,7 +728,8 @@ namespace Obsidian2D
 				finalize_glslang();
 			}
 
-			void initFramebuffers(bool include_depth) {
+			void initFramebuffers(bool include_depth)
+			{
 				VkResult U_ASSERT_ONLY res;
 				VkImageView attachments[2];
 				attachments[1] = this->info.depth.view;
@@ -751,7 +754,8 @@ namespace Obsidian2D
 					assert(res == VK_SUCCESS);
 				}
 			}
-			void initVertexBuffer(const void *vertexData, uint32_t dataSize, uint32_t dataStride, bool use_texture) {
+			void initVertexBuffer(const void *vertexData, uint32_t dataSize, uint32_t dataStride, bool use_texture)
+			{
 				VkResult U_ASSERT_ONLY res;
 				bool U_ASSERT_ONLY pass;
 
@@ -809,6 +813,87 @@ namespace Obsidian2D
 				this->info.vi_attribs[1].location = 1;
 				this->info.vi_attribs[1].format = use_texture ? VK_FORMAT_R32G32_SFLOAT : VK_FORMAT_R32G32B32A32_SFLOAT;
 				this->info.vi_attribs[1].offset = 16;
+			}
+			void initDescriptorPool(bool use_texture)
+			{
+				/* DEPENDS on init_uniform_buffer() and
+				 * init_descriptor_and_pipeline_layouts() */
+
+				VkResult U_ASSERT_ONLY res;
+				VkDescriptorPoolSize type_count[2];
+				type_count[0].type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+				type_count[0].descriptorCount = 1;
+				if (use_texture) {
+					type_count[1].type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+					type_count[1].descriptorCount = 1;
+				}
+
+				VkDescriptorPoolCreateInfo descriptor_pool = {};
+				descriptor_pool.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
+				descriptor_pool.pNext = NULL;
+				descriptor_pool.maxSets = 1;
+				descriptor_pool.poolSizeCount = use_texture ? 2 : 1;
+				descriptor_pool.pPoolSizes = type_count;
+
+				res = vkCreateDescriptorPool(this->info.device, &descriptor_pool, NULL, &this->info.desc_pool);
+				assert(res == VK_SUCCESS);
+			}
+
+			void initDescriptorSet(bool use_texture)
+			{
+				/* DEPENDS on init_descriptor_pool() */
+
+				VkResult U_ASSERT_ONLY res;
+
+				VkDescriptorSetAllocateInfo alloc_info[1];
+				alloc_info[0].sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
+				alloc_info[0].pNext = NULL;
+				alloc_info[0].descriptorPool = this->info.desc_pool;
+				alloc_info[0].descriptorSetCount = 1;
+				alloc_info[0].pSetLayouts = this->info.desc_layout.data();
+
+				this->info.desc_set.resize(1);
+				res = vkAllocateDescriptorSets(this->info.device, alloc_info, this->info.desc_set.data());
+				assert(res == VK_SUCCESS);
+
+				VkWriteDescriptorSet writes[2];
+
+				writes[0] = {};
+				writes[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+				writes[0].pNext = NULL;
+				writes[0].dstSet = this->info.desc_set[0];
+				writes[0].descriptorCount = 1;
+				writes[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+				writes[0].pBufferInfo = &this->info.uniform_data.buffer_info;
+				writes[0].dstArrayElement = 0;
+				writes[0].dstBinding = 0;
+
+				if (use_texture) {
+					writes[1] = {};
+					writes[1].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+					writes[1].dstSet = this->info.desc_set[0];
+					writes[1].dstBinding = 1;
+					writes[1].descriptorCount = 1;
+					writes[1].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+					writes[1].pImageInfo = &this->info.texture_data.image_info;
+					writes[1].dstArrayElement = 0;
+				}
+
+				vkUpdateDescriptorSets(this->info.device, use_texture ? 2 : 1, writes, 0, NULL);
+			}
+
+			void initPipelineCache()
+			{
+				VkResult U_ASSERT_ONLY res;
+
+				VkPipelineCacheCreateInfo pipelineCache;
+				pipelineCache.sType = VK_STRUCTURE_TYPE_PIPELINE_CACHE_CREATE_INFO;
+				pipelineCache.pNext = NULL;
+				pipelineCache.initialDataSize = 0;
+				pipelineCache.pInitialData = NULL;
+				pipelineCache.flags = 0;
+				res = vkCreatePipelineCache(this->info.device, &pipelineCache, NULL, &this->info.pipelineCache);
+				assert(res == VK_SUCCESS);
 			}
 
 		public:
