@@ -17,8 +17,7 @@ static android_app *Android_application = nullptr;
 #elif (defined(VK_USE_PLATFORM_IOS_MVK) || defined(VK_USE_PLATFORM_MACOS_MVK))
 #	include <MoltenGLSLToSPIRVConverter/GLSLToSPIRVConverter.h>
 #else
-// @TODO include GLSLANG
-#	include "../../../external/glslang/SPIRV/GlslangToSpv.h"
+#	include "SPIRV/GlslangToSpv.h"
 #endif
 
 #include "Util.h"

@@ -8,7 +8,7 @@ set(CMAKE_BUILD_TYPE Debug)
 
 set(CORE_MAIN_FILE src/main.cpp src/XcbWindow.cpp)
 
-include_directories(include)
+include_directories(include external/glslang)
 
 #@TODO include GLS libs to WIN32
 if (CMAKE_COMPILER_IS_GNUCC OR CMAKE_C_COMPILER_ID MATCHES "Clang")
