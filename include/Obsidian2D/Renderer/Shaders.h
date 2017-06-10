@@ -18,7 +18,7 @@ static android_app *Android_application = nullptr;
 #	include <MoltenGLSLToSPIRVConverter/GLSLToSPIRVConverter.h>
 #else
 // @TODO include GLSLANG
-//#	include "glslang/SPIRV/GlslangToSpv.h"
+#	include "../../../external/glslang/SPIRV/GlslangToSpv.h"
 #endif
 
 #include "Obsidian2D/Util/Loggable.h"
