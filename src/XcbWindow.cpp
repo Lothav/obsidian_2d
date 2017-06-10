@@ -38,10 +38,9 @@ void XcbWindow::bootstrap(){
 		this->initShaders();
 		this->initFramebuffers(depthPresent);
 		this->initVertexBuffer(g_vb_texture_Data, sizeof(g_vb_texture_Data), sizeof(g_vb_texture_Data[0]), false);
-		this->initDescriptorPool(false);
-		this->initDescriptorSet(false);
-		this->initPipelineCache();
-		this->initPipeline((VkBool32)depthPresent);
+
+		this->bootstrapPipeline((VkBool32)depthPresent , false);
+
 		this->drawCube();
 	} else {
 		//@TODO throw error

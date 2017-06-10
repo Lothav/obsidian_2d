@@ -150,7 +150,7 @@ set(RENDERER_FILES
 		include/Obsidian2D/Renderer/VulkanInfo.h
 		include/Obsidian2D/Renderer/Window.h
 		include/Obsidian2D/Renderer/XcbWindow.h
-		include/Obsidian2D/Renderer/Shaders.h)
+		include/Obsidian2D/Renderer/Shaders.h include/Obsidian2D/Renderer/Pipeline.h include/Obsidian2D/Renderer/Util.h)
 
 set(EXECUTABLE_OUTPUT_PATH bin)
 
