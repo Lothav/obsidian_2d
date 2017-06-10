@@ -81,7 +81,6 @@ namespace Obsidian2D
 				this->height = height;
 			}
 			void bootstrap();
-			void destroyWindow();
 
 			::Obsidian2D::Core::WindowEvent poolEvent()
 			{
