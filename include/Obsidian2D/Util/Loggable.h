@@ -11,7 +11,7 @@ private:
 
 protected:
 	Loggable() {};
-	~Loggable() {}
+	virtual ~Loggable() {}
 
 	void log(const std::string& info)
 	{

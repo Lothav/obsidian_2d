@@ -21,22 +21,6 @@ namespace Obsidian2D
 	{
 		class Window : public Pipeline
 		{
-		private:
-			bool memory_type_from_properties(struct VulkanInfo &info, uint32_t typeBits, VkFlags requirements_mask, uint32_t *typeIndex) {
-				// Search memtypes to find first index with those properties
-				for (uint32_t i = 0; i < info.memory_properties.memoryTypeCount; i++) {
-					if ((typeBits & 1) == 1) {
-						// Type is available, does it match user properties?
-						if ((info.memory_properties.memoryTypes[i].propertyFlags & requirements_mask) == requirements_mask) {
-							*typeIndex = i;
-							return true;
-						}
-					}
-					typeBits >>= 1;
-				}
-				// No memory types matched, return failure
-				return false;
-			}
 		protected:
 			VkDevice device;
 
@@ -1136,25 +1120,12 @@ namespace Obsidian2D
 				wait_seconds(1);
 				/* VULKAN_KEY_END */
 				if (this->info.save_images) write_ppm("drawcube");
+
+				vkDestroySemaphore(info.device, imageAcquiredSemaphore, NULL);
+				vkDestroyFence(info.device, drawFence, NULL);
 			}
 
 		public:
-			void destroyCommandBuffers()
-			{
-				VkCommandBuffer cmd_bufs[1] = {this->info.cmd};
-				vkFreeCommandBuffers(this->info.device, this->info.cmd_pool, 1, cmd_bufs);
-				vkDestroyCommandPool(this->info.device, this->info.cmd_pool, NULL);
-			}
-
-			void destroyInstance()
-			{
-				vkDestroyInstance(this->info.inst, NULL);
-			}
-
-			void destroyDevice()
-			{
-				vkDestroyDevice(this->device, NULL);
-			}
 
 			void logExtensions()
 			{

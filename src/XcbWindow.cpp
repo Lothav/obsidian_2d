@@ -121,12 +121,6 @@ void XcbWindow::createWindow() {
 
 }
 
-void XcbWindow::destroyWindow() {
-	vkDestroySurfaceKHR(this->info.inst, this->info.surface, NULL);
-	xcb_destroy_window(this->info.connection, this->info.window);
-	xcb_disconnect(this->info.connection);
-}
-
 void XcbWindow::initSwapChainExtension() {
 	VkResult res;
 #ifdef _WIN32

@@ -68,22 +68,22 @@ namespace Obsidian2D
 				Obsidian2D::Core::App::Config config = app->getConfig();
 
 				//TODO: Create renderer base class and render blank screen
-				Obsidian2D::Renderer::XcbWindow* window = new Obsidian2D::Renderer::XcbWindow(800, 600);
-				
-				window->registerLogCallback([](const std::string& line) {
+				Obsidian2D::Renderer::XcbWindow* xcbWindow = new Obsidian2D::Renderer::XcbWindow(800, 600);
+
+				xcbWindow->registerLogCallback([](const std::string& line) {
 					Obsidian2D::Util::Logger::write("[Obsidian2D::Renderer::Window] " + line);
 				});
 
-				window->logExtensions();
-				
-				window->bootstrap();
+				xcbWindow->logExtensions();
+
+				xcbWindow->bootstrap();
 
 				/* Init defualt scene, register objects*/
 
 				/* Game Loop */
 				bool running = true;
 				while(running) {
-					while(WindowEvent e = window->poolEvent()) {
+					while(WindowEvent e = xcbWindow->poolEvent()) {
 						if(e == WindowEvent::Close) {
 							this->log("[Window Event] Close");
 							running = false;
@@ -99,11 +99,7 @@ namespace Obsidian2D
 				free(app);
 				app = nullptr;
 
-				window->destroyCommandBuffers();
-				window->destroyDevice();
-				window->destroyWindow();
-				window->destroyInstance();
-				free(window);
+				delete xcbWindow;
 
 				return Obsidian2D::Error::None;
 			}
