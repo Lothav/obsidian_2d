@@ -1,0 +1,30 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/luizorv/Downloads/VulkanSamples/external/glslang/OGLCompilersDLL/InitializeDll.h
+../glslang/OSDependent/osinclude.h
+/home/luizorv/Downloads/VulkanSamples/external/glslang/glslang/OSDependent/osinclude.h
+
+/home/luizorv/Downloads/VulkanSamples/external/glslang/glslang/OSDependent/Unix/ossource.cpp
+../osinclude.h
+/home/luizorv/Downloads/VulkanSamples/external/glslang/glslang/OSDependent/osinclude.h
+../../../OGLCompilersDLL/InitializeDll.h
+/home/luizorv/Downloads/VulkanSamples/external/glslang/OGLCompilersDLL/InitializeDll.h
+pthread.h
+-
+semaphore.h
+-
+assert.h
+-
+errno.h
+-
+stdint.h
+-
+
+/home/luizorv/Downloads/VulkanSamples/external/glslang/glslang/OSDependent/osinclude.h
+

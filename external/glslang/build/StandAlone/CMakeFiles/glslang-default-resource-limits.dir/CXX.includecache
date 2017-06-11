@@ -1,0 +1,28 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+..//glslang/Include/ResourceLimits.h
+
+/home/luizorv/Downloads/VulkanSamples/external/glslang/StandAlone/ResourceLimits.cpp
+cstdlib
+-
+cstring
+-
+sstream
+-
+cctype
+-
+ResourceLimits.h
+/home/luizorv/Downloads/VulkanSamples/external/glslang/StandAlone/ResourceLimits.h
+
+/home/luizorv/Downloads/VulkanSamples/external/glslang/StandAlone/ResourceLimits.h
+string
+-
+glslang/Include/ResourceLimits.h
+/home/luizorv/Downloads/VulkanSamples/external/glslang/StandAlone/glslang/Include/ResourceLimits.h
+
