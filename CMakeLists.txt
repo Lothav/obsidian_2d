@@ -6,7 +6,7 @@ set(CMAKE_CXX_FLAGS "-Wall -Wpedantic -lvulkan -lxcb")
 
 set(CMAKE_BUILD_TYPE Debug)
 
-set(CORE_MAIN_FILE src/main.cpp src/XcbWindow.cpp)
+set(CORE_MAIN_FILE src/main.cpp)
 
 include_directories(include external/glslang)
 
