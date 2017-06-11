@@ -7,7 +7,7 @@ namespace Obsidian2D
 {
 	namespace Core
 	{
-		class Registry : public Loggable
+		class Registry : public Obsidian2D::Util::Loggable
 		{
 		private:
 

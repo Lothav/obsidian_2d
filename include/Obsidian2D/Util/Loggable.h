@@ -4,27 +4,33 @@
 #include <functional>
 #include <iostream>
 
-class Loggable
+namespace Obsidian2D
 {
-private:
-	std::function<void(const std::string&)> logCallback = nullptr;
-
-protected:
-	Loggable() {};
-	virtual ~Loggable() {}
-
-	void log(const std::string& info)
+	namespace Util
 	{
-		if(this->logCallback != nullptr) {
-			this->logCallback(info);
-		} else {
-			std::cout << info << std::endl;
-		}
+		class Loggable
+		{
+		private:
+			std::function<void(const std::string&)> logCallback = nullptr;
+
+		protected:
+			Loggable() {};
+			virtual ~Loggable() {}
+
+			void log(const std::string& info)
+			{
+				if(this->logCallback != nullptr) {
+					this->logCallback(info);
+				} else {
+					std::cout << info << std::endl;
+				}
+			}
+		public:
+			void registerLogCallback(std::function<void(const std::string&)> lambda)
+			{
+				this->logCallback = lambda;
+			}
+		};
 	}
-public:
-	void registerLogCallback(std::function<void(const std::string&)> lambda)
-	{
-		this->logCallback = lambda;
-	}
-};
+}
 #endif // _OBSIDIAN2D_UTIL_LOGGABLE_

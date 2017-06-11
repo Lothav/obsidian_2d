@@ -26,7 +26,7 @@ namespace Obsidian2D
 {
 	namespace Core
 	{
-		class Engine : public Loggable
+		class Engine : public Obsidian2D::Util::Loggable
 		{
 		private:
 

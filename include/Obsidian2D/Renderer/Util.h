@@ -12,7 +12,7 @@ namespace Obsidian2D
 {
 	namespace Renderer
 	{
-		class Util : public Loggable
+		class Util : public Obsidian2D::Util::Loggable
 		{
 		protected:
 

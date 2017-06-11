@@ -7,7 +7,7 @@ namespace Obsidian2D
 {
 	namespace Core
 	{
-		class App : public Loggable
+		class App : public Obsidian2D::Util::Loggable
 		{
 		public:
 			//TODO: Check if i could do this in an App namespace or something better, like another file
