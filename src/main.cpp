@@ -3,7 +3,7 @@
 
 
 int main(int argc, char** argv) {
-	//Bootstrap
+	//Scoped Bootstrap
 	{
 		Obsidian2D::Core::Engine engine;
 		return engine.start(new App::App());
