@@ -14,6 +14,10 @@ namespace Obsidian2D
 			struct Config
 			{
 				std::string renderer = "default";
+				bool debug = true;
+
+				unsigned int windowWidth = 800;
+				unsigned int windowHeight = 600;
 			};
 
 		private:
