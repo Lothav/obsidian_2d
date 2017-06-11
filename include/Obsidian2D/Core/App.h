@@ -26,7 +26,7 @@ namespace Obsidian2D
 
 			}
 
-			void init()
+			virtual void init()
 			{
 				this->log("init()");
 			}
