@@ -1,5 +1,5 @@
-#ifndef _OBSIDIAN2D_LOGGER_
-#define _OBSIDIAN2D_LOGGER_
+#ifndef _OBSIDIAN2D_UTIL_LOGGER_
+#define _OBSIDIAN2D_UTIL_LOGGER_
 
 #include "Obsidian2D/Util/Time.h"
 
@@ -55,4 +55,4 @@ namespace Obsidian2D
 	}
 }
 
-#endif //_OBSIDIAN2D_LOGGER_
+#endif //_OBSIDIAN2D_UTIL_LOGGER_

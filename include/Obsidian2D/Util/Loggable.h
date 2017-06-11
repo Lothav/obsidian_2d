@@ -1,5 +1,5 @@
-#ifndef _OBSIDIAN2D_LOGGABLE_
-#define _OBSIDIAN2D_LOGGABLE_
+#ifndef _OBSIDIAN2D_UTIL_LOGGABLE_
+#define _OBSIDIAN2D_UTIL_LOGGABLE_
 
 #include <functional>
 #include <iostream>
@@ -27,4 +27,4 @@ public:
 		this->logCallback = lambda;
 	}
 };
-#endif // _OBSIDIAN2D_LOGGABLE_
+#endif // _OBSIDIAN2D_UTIL_LOGGABLE_
