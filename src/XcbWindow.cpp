@@ -160,7 +160,6 @@ void XcbWindow::initSwapChainExtension() {
 	createInfo.connection = this->info.connection;
 	createInfo.window = this->info.window;
 	res = vkCreateXcbSurfaceKHR(this->info.inst, &createInfo, NULL, &this->info.surface);
-	std::cout << "patch" << std::endl;
 #endif  // __ANDROID__  && _WIN32
 
 	assert(res == VK_SUCCESS);

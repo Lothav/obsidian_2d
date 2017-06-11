@@ -37,9 +37,6 @@ namespace Obsidian2D
 		public:
 			Engine()
 			{
-
-				//TODO: Make logger prefix which class/module in the hierarchy calls it
-
 				this->registerLogCallback([](const std::string& line) {
 					Obsidian2D::Util::Logger::write("[Obsidian2D::Core::Engine] " + line);
 				});
@@ -68,13 +65,16 @@ namespace Obsidian2D
 				Obsidian2D::Core::App::Config config = app->getConfig();
 
 				//TODO: Create renderer base class and render blank screen
-				Obsidian2D::Renderer::XcbWindow* xcbWindow = new Obsidian2D::Renderer::XcbWindow(800, 600);
+				Obsidian2D::Renderer::XcbWindow* xcbWindow = new Obsidian2D::Renderer::XcbWindow(config.windowWidth, config.windowHeight);
 
 				xcbWindow->registerLogCallback([](const std::string& line) {
 					Obsidian2D::Util::Logger::write("[Obsidian2D::Renderer::Window] " + line);
 				});
 
-				xcbWindow->logExtensions();
+				if(config.debug) {
+					xcbWindow->logExtensions();
+				}
+				
 
 				xcbWindow->bootstrap();
 
