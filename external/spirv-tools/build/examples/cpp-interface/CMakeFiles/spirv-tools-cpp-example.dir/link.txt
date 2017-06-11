@@ -1,0 +1,1 @@
+/usr/bin/c++  -O3 -DNDEBUG  -rdynamic CMakeFiles/spirv-tools-cpp-example.dir/main.cpp.o  -o spirv-tools-cpp-example ../../source/opt/libSPIRV-Tools-opt.a ../../source/libSPIRV-Tools.a 

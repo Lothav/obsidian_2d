@@ -1,0 +1,1 @@
+/usr/bin/c++  -O3 -DNDEBUG  -rdynamic CMakeFiles/spirv-stats.dir/stats/stats.cpp.o CMakeFiles/spirv-stats.dir/stats/stats_analyzer.cpp.o  -o spirv-stats ../source/libSPIRV-Tools.a 

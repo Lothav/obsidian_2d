@@ -1,0 +1,38 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+..//tools/io.h
+cstdint
+-
+cstdio
+-
+vector
+-
+
+../include/spirv-tools/libspirv.h
+stdbool.h
+-
+stddef.h
+-
+stdint.h
+-
+
+/home/luizorv/Downloads/VulkanSamples/external/spirv-tools/tools/dis/dis.cpp
+cstdio
+-
+cstring
+-
+string
+-
+vector
+-
+spirv-tools/libspirv.h
+/home/luizorv/Downloads/VulkanSamples/external/spirv-tools/tools/dis/spirv-tools/libspirv.h
+tools/io.h
+/home/luizorv/Downloads/VulkanSamples/external/spirv-tools/tools/dis/tools/io.h
+
