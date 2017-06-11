@@ -8,7 +8,6 @@
 
 #include "Obsidian2D/Renderer/Window.h"
 #include "Obsidian2D/Core/WindowEvent.h"
-#include "Obsidian2D/Util/cube_data.h"
 
 namespace Obsidian2D
 {
