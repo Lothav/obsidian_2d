@@ -10,8 +10,6 @@
 		#define UNLIKELY(x) x
 	#endif
 
-#include "Obsidian2D/Util/safeDelete.h"
-
 #include "Obsidian2D/Util/Time.h"
 
 #include "Obsidian2D/Util/Logger.h"
