@@ -9,7 +9,8 @@
 		#define LIKELY(x)   x
 		#define UNLIKELY(x) x
 	#endif
-	
+
+#include "Obsidian2D/Util/safeDelete.h"
 
 #include "Obsidian2D/Util/Time.h"
 
@@ -54,18 +55,17 @@ namespace Obsidian2D
 					Obsidian2D::Util::Logger::write("[Obsidian2D::Core::App] " + line);
 				});
 
-				//TODO: Check for consistent scenes like pause menu and stuff
-
-				//Pre initialization
-				app->init();
-
-				/* Register GameStates/Scenes */
-
+				
 				/* Register routes, configs, default scene */
 				Obsidian2D::Core::App::Config config = app->getConfig();
 
 				//TODO: Create renderer base class and render blank screen
 				Obsidian2D::Renderer::XcbWindow* xcbWindow = new Obsidian2D::Renderer::XcbWindow(config.windowWidth, config.windowHeight);
+
+				app->init();
+
+				/* Register GameStates/Scenes */
+
 
 				xcbWindow->registerLogCallback([](const std::string& line) {
 					Obsidian2D::Util::Logger::write("[Obsidian2D::Renderer::Window] " + line);
@@ -101,6 +101,7 @@ namespace Obsidian2D
 				app = nullptr;
 
 				delete xcbWindow;
+				xcbWindow = nullptr;
 
 				return Obsidian2D::Error::None;
 			}
