@@ -145,7 +145,7 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
 endif()
 
 set(UTIL_FILES include/Obsidian2D/Util/Loggable.h)
-set(CORE_FILES include/Obsidian2D/Core/Engine.h)
+set(CORE_FILES include/Obsidian2D/Core/Kernel.h)
 set(RENDERER_FILES
 		include/Obsidian2D/Renderer/VulkanInfo.h
 		include/Obsidian2D/Renderer/Window.h

@@ -9,17 +9,17 @@ namespace App {
 	private:
 	protected:
 	public:
-		App()
-		{
-			//Obsidian2D::Image square = Util::Shapes::Square(10, 10, Util::Color::White);
-		}
-
 		Obsidian2D::Core::App::Config getConfig()
 		{
 			auto config = Obsidian2D::Core::App::Config();
 			config.windowWidth  = 1200;
 			config.windowHeight = 800;
 			return config;
+		}
+
+		void init(Obsidian2D::Core::Registry* registry)
+		{
+			//Obsidian2D::Image square = Util::Shapes::Square(10, 10, Util::Color::White);
 		}
 	};
 }

@@ -2,6 +2,7 @@
 #define _OBSIDIAN2D_CORE_APP_
 
 #include "Obsidian2D/Util/Loggable.h"
+#include "Obsidian2D/Core/Registry.h"
 
 namespace Obsidian2D
 {
@@ -30,9 +31,9 @@ namespace Obsidian2D
 
 			}
 
-			virtual void init()
+			virtual void init(Obsidian2D::Core::Registry* registry)
 			{
-				this->log("init()");
+				this->log("base init()");
 			}
 
 			virtual Obsidian2D::Core::App::Config getConfig()

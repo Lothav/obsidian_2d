@@ -1,8 +1,8 @@
-#ifndef _OBSIDIAN2D_CORE_ENGINE_
-#define _OBSIDIAN2D_CORE_ENGINE_
+#ifndef _OBSIDIAN2D_CORE_KERNEL_
+#define _OBSIDIAN2D_CORE_KERNEL_
 	#define OBSIDIAN2D_VERSION 0.0.1
 
-	#ifdef __linux__ 
+	#ifdef __linux__
 		#define LIKELY(x)   __builtin_expect((x),1)
 		#define UNLIKELY(x) __builtin_expect((x),0)
 	#elif _WIN32
@@ -26,23 +26,26 @@ namespace Obsidian2D
 {
 	namespace Core
 	{
-		class Engine : public Obsidian2D::Util::Loggable
+		class Kernel : public Obsidian2D::Util::Loggable
 		{
 		private:
 
 		protected:
-			Registry registry;
+			Obsidian2D::Core::Registry* registry = nullptr;
 
 		public:
-			Engine()
+			Kernel()
 			{
+				this->registry = new Obsidian2D::Core::Registry();
+
 				this->registerLogCallback([](const std::string& line) {
-					Obsidian2D::Util::Logger::write("[Obsidian2D::Core::Engine] " + line);
+					Obsidian2D::Util::Logger::write("[Obsidian2D::Core::Kernel] " + line);
 				});
 
-				registry.registerLogCallback([](const std::string& line) {
+				registry->registerLogCallback([](const std::string& line) {
 					Obsidian2D::Util::Logger::write("[Obsidian2D::Core::Registry] " + line);
 				});
+
 			}
 
 			int start(Obsidian2D::Core::App* app)
@@ -53,14 +56,14 @@ namespace Obsidian2D
 					Obsidian2D::Util::Logger::write("[Obsidian2D::Core::App] " + line);
 				});
 
-				
-				/* Register routes, configs, default scene */
+
 				Obsidian2D::Core::App::Config config = app->getConfig();
 
 				//TODO: Create renderer base class and render blank screen
 				Obsidian2D::Renderer::XcbWindow* xcbWindow = new Obsidian2D::Renderer::XcbWindow(config.windowWidth, config.windowHeight);
 
-				app->init();
+				/* Register routes, configs, default scene */
+				app->init(this->registry);
 
 				/* Register GameStates/Scenes */
 
@@ -72,7 +75,7 @@ namespace Obsidian2D
 				if(config.debug) {
 					xcbWindow->logExtensions();
 				}
-				
+
 
 				xcbWindow->bootstrap();
 
@@ -94,7 +97,7 @@ namespace Obsidian2D
 				}
 
 				this->log("Cleaning up memory");
-				
+
 				delete app;
 				app = nullptr;
 
@@ -107,4 +110,4 @@ namespace Obsidian2D
 	}
 }
 
-#endif //_OBSIDIAN2D_CORE_ENGINE_
+#endif //_OBSIDIAN2D_CORE_KERNEL_
