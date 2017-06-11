@@ -96,7 +96,8 @@ namespace Obsidian2D
 				}
 
 				this->log("Cleaning up memory");
-				free(app);
+				
+				delete app;
 				app = nullptr;
 
 				delete xcbWindow;
