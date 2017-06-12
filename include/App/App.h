@@ -24,19 +24,19 @@ namespace App {
 			//Obsidian2D::Image square = Util::Shapes::Square(10, 10, Util::Color::White);
 		}
 
-		virtual void onInput()
+		void onInput()
 		{
 
 		}
 
-		virtual void onUpdate(Obsidian2D::Core::WindowEvent e)
+		void onUpdate(Obsidian2D::Core::WindowEvent e)
 		{
 
 		}
 
-		virtual void onExit()
+		void onExit()
 		{
-
+			this->log("Bye");
 		}
 	};
 }
