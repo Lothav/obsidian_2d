@@ -4,6 +4,8 @@
 #include "Obsidian2D/Util/Loggable.h"
 #include "Obsidian2D/Core/Registry.h"
 
+#include "Obsidian2D/Core/Scene.h"
+
 namespace Obsidian2D
 {
 	namespace Core
@@ -31,7 +33,7 @@ namespace Obsidian2D
 
 			}
 
-			virtual void init(Obsidian2D::Core::Registry* registry)
+			virtual void init(Obsidian2D::Core::Registry<Obsidian2D::Core::Scene>* registry)
 			{
 				this->log("base init()");
 			}

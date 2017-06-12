@@ -5,7 +5,7 @@
 int main(int argc, char** argv) {
 	//Scoped Bootstrap
 	{
-		Obsidian2D::Core::Kernel engine;
-		return engine.start(new App::App());
+		Obsidian2D::Core::Kernel kernel;
+		return kernel.start(new App::App());
 	}
 }

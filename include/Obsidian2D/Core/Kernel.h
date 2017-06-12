@@ -20,6 +20,8 @@
 #include "Obsidian2D/Core/Registry.h"
 #include "Obsidian2D/Core/App.h"
 
+#include "Obsidian2D/Core/Scene.h"
+
 #include "Obsidian2D/Renderer/XcbWindow.h"
 
 namespace Obsidian2D
@@ -31,18 +33,18 @@ namespace Obsidian2D
 		private:
 
 		protected:
-			Obsidian2D::Core::Registry* registry = nullptr;
+			Obsidian2D::Core::Registry<Scene>* sceneRegistry = nullptr;
 
 		public:
 			Kernel()
 			{
-				this->registry = new Obsidian2D::Core::Registry();
+				this->sceneRegistry = new Obsidian2D::Core::Registry<Scene>();
 
 				this->registerLogCallback([](const std::string& line) {
 					Obsidian2D::Util::Logger::write("[Obsidian2D::Core::Kernel] " + line);
 				});
 
-				registry->registerLogCallback([](const std::string& line) {
+				this->sceneRegistry->registerLogCallback([](const std::string& line) {
 					Obsidian2D::Util::Logger::write("[Obsidian2D::Core::Registry] " + line);
 				});
 
@@ -63,7 +65,7 @@ namespace Obsidian2D
 				Obsidian2D::Renderer::XcbWindow* xcbWindow = new Obsidian2D::Renderer::XcbWindow(config.windowWidth, config.windowHeight);
 
 				/* Register routes, configs, default scene */
-				app->init(this->registry);
+				app->init(this->sceneRegistry);
 
 				/* Register GameStates/Scenes */
 
