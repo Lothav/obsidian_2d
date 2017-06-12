@@ -4,6 +4,8 @@
 #include "Obsidian2D/Core/App.h"
 #include "Obsidian2D/Core/Registry.h"
 
+#include "Obsidian2D/Util/RectangleShape.h"
+
 namespace App {
 	class App: public Obsidian2D::Core::App
 	{
