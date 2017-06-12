@@ -5,13 +5,14 @@
 
 #include "Obsidian2D/Util/RectangleShape.h"
 
+
 namespace App {
 	class App: public Obsidian2D::Core::App
 	{
 	private:
 	protected:
 	public:
-		Obsidian2D::Core::App::Config getConfig()
+		App::Config getConfig()
 		{
 			auto config = Obsidian2D::Core::App::Config();
 			config.windowWidth  = 1200;
@@ -21,15 +22,18 @@ namespace App {
 
 		void init(Obsidian2D::Core::Registry<Obsidian2D::Core::Scene>* registry)
 		{
-			//Obsidian2D::Image square = Util::Shapes::Square(10, 10, Util::Color::White);
+
 		}
 
-		void onInput()
+		void onInput(Obsidian2D::Core::WindowEvent e)
 		{
-
+			this->log("Someone did something somewhere!");
+			if(e == Obsidian2D::Core::WindowEvent::Click) {
+				this->log("Click");
+			}
 		}
 
-		void onUpdate(Obsidian2D::Core::WindowEvent e)
+		void onUpdate()
 		{
 
 		}

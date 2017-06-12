@@ -85,7 +85,7 @@ namespace Obsidian2D
 				this->info.height = this->height;
 			#endif
 			}
-			
+
 			void setXCBConnection() // for Linux users :V
 			{
 				#if !(defined(_WIN32) || defined(__ANDROID__) || defined(VK_USE_PLATFORM_IOS_MVK) || defined(VK_USE_PLATFORM_MACOS_MVK))
@@ -139,7 +139,7 @@ namespace Obsidian2D
 				xcb_change_property(this->info.connection, XCB_PROP_MODE_REPLACE, this->info.window,
 					XCB_ATOM_WM_NAME, XCB_ATOM_STRING, 8, strlen(APP_NAME), APP_NAME);
 
-				xcb_flush(this->info.connection); 
+				xcb_flush(this->info.connection);
 
 				xcb_map_window(this->info.connection, this->info.window);
 
@@ -309,7 +309,13 @@ namespace Obsidian2D
 					} else if((e->response_type & ~0x80) == XCB_LEAVE_NOTIFY) {
 						return ::Obsidian2D::Core::WindowEvent::Blur;
 					} else if((e->response_type & ~0x80) == XCB_BUTTON_PRESS) {
+						return ::Obsidian2D::Core::WindowEvent::Click;
+					} else if((e->response_type & ~0x80) == XCB_BUTTON_RELEASE) {
+						//return ::Obsidian2D::Core::WindowEvent::ClickEnd;
+					} else if((e->response_type & ~0x80) == XCB_KEY_PRESS) {
 						return ::Obsidian2D::Core::WindowEvent::ButtonDown;
+					} else if((e->response_type & ~0x80) == XCB_KEY_RELEASE) {
+						return ::Obsidian2D::Core::WindowEvent::ButtonUp;
 					} else {
 						return ::Obsidian2D::Core::WindowEvent::Unknow;
 					}

@@ -49,7 +49,7 @@ namespace Obsidian2D
 
 			}
 
-			virtual void onUpdate(Obsidian2D::Core::WindowEvent e)
+			virtual void onUpdate()
 			{
 
 			}
