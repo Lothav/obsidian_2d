@@ -90,13 +90,15 @@ namespace Obsidian2D
 						if(e == WindowEvent::Close) {
 							this->log("[Window Event] Close");
 							running = false;
-						} else if(e == WindowEvent::ButtonDown) {
-							this->log("[Window Event] Click!");
 						} else {
-							this->log("[Window Event] Unknow");
+							//Send input to userspace
+							app->onInput(e);
 						}
 					}
 				}
+
+				//Tell userspace we are exiting, do what you gotta do
+				app->onExit();
 
 				this->log("Cleaning up memory");
 

@@ -3,6 +3,7 @@
 
 #include "Obsidian2D/Util/Loggable.h"
 #include "Obsidian2D/Core/Registry.h"
+#include "Obsidian2D/Core/WindowEvent.h"
 
 #include "Obsidian2D/Core/Scene.h"
 
@@ -42,6 +43,22 @@ namespace Obsidian2D
 			{
 				return Config();
 			}
+
+			virtual void onInput(Obsidian2D::Core::WindowEvent e)
+			{
+
+			}
+
+			virtual void onUpdate(Obsidian2D::Core::WindowEvent e)
+			{
+
+			}
+
+			virtual void onExit()
+			{
+
+			}
+
 		};
 	}
 }
