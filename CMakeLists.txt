@@ -144,13 +144,9 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
 	endif()
 endif()
 
-set(UTIL_FILES include/Obsidian2D/Util/Loggable.h)
-set(CORE_FILES include/Obsidian2D/Core/Kernel.h)
-set(RENDERER_FILES
-		include/Obsidian2D/Renderer/VulkanInfo.h
-		include/Obsidian2D/Renderer/Window.h
-		include/Obsidian2D/Renderer/XcbWindow.h
-		include/Obsidian2D/Renderer/Shaders.h include/Obsidian2D/Renderer/Pipeline.h include/Obsidian2D/Renderer/Util.h)
+file(GLOB_RECURSE UTIL_FILES include/Obsidian2D/Util/*.h)
+file(GLOB_RECURSE CORE_FILES include/Obsidian2D/Core/*.h)
+file(GLOB_RECURSE RENDERER_FILES include/Obsidian2D/Renderer/*.h)
 
 set(EXECUTABLE_OUTPUT_PATH bin)
 
