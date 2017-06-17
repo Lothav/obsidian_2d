@@ -337,7 +337,6 @@ namespace Obsidian2D
 
 
 
-
 						VkSemaphore imageAcquiredSemaphore;
 						VkSemaphoreCreateInfo imageAcquiredSemaphoreCreateInfo;
 						imageAcquiredSemaphoreCreateInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
@@ -350,6 +349,12 @@ namespace Obsidian2D
 						res = vkAcquireNextImageKHR(this->info.device, this->info.swap_chain, UINT64_MAX, imageAcquiredSemaphore, VK_NULL_HANDLE,
 													&this->info.current_buffer);
 						assert(res == VK_SUCCESS);
+
+
+						// @TODO FIX THIS!!!!
+						this->info.current_buffer = 0;
+
+
 
 						const VkCommandBuffer cmd_bufs[] = {this->info.cmd};
 						VkFenceCreateInfo fenceInfo;
@@ -392,7 +397,7 @@ namespace Obsidian2D
 							res = vkWaitForFences(this->info.device, 1, &drawFence, VK_TRUE, VK_SAMPLE_COUNT_1_BIT);
 						} while (res == VK_TIMEOUT);
 
-						assert(res == VK_SUCCESS);
+
 						res = vkQueuePresentKHR(this->info.present_queue, &present);
 						assert(res == VK_SUCCESS);
 
