@@ -318,24 +318,8 @@ namespace Obsidian2D
 						VkResult U_ASSERT_ONLY res;
 
 						y++;
-						this->info.View = glm::lookAt(glm::vec3(-5, y, -10),  // Camera is at (-5,3,-10), in World Space
-													  glm::vec3(0, 0, 0),     // and looks at the origin
-													  glm::vec3(0, -1, 0)     // Head is up (set to 0,-1,0 to look upside-down)
-						);
-						this->info.MVP = this->info.Clip * this->info.Projection * this->info.View * this->info.Model;
-
-						VkMemoryRequirements mem_reqs;
-						vkGetBufferMemoryRequirements(this->info.device, this->info.uniform_data.buf, &mem_reqs);
-
-						uint8_t *pData;
-						res = vkMapMemory(this->info.device, this->info.uniform_data.mem, 0, mem_reqs.size, 0, (void **)&pData);
-						assert(res == VK_SUCCESS);
-
-						memcpy(pData, &this->info.MVP, sizeof(this->info.MVP));
-
-						vkUnmapMemory(this->info.device, this->info.uniform_data.mem);
-
-
+						this->setCameraViewEye(glm::vec3(-5, y, -10));
+						this->updateCamera();
 
 						VkSemaphore imageAcquiredSemaphore;
 						VkSemaphoreCreateInfo imageAcquiredSemaphoreCreateInfo;

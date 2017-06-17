@@ -22,6 +22,14 @@ typedef struct _swap_chain_buffers {
 } swap_chain_buffer;
 
 
+typedef struct _view_camera {
+	glm::vec3 eye;
+	glm::vec3 center;
+	glm::vec3 up;
+} ViewCamera;
+
+
+
 #if defined(NDEBUG) && defined(__GNUC__)
 #define U_ASSERT_ONLY __attribute__((unused))
 #else
