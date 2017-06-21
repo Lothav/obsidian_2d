@@ -20,13 +20,13 @@ static android_app *Android_application = nullptr;
 #	include "SPIRV/GlslangToSpv.h"
 #endif
 
-#include "Util.h"
+#include "Layers.h"
 
 namespace Obsidian2D
 {
 	namespace Renderer
 	{
-		class Shaders : public Util
+		class Shaders : public Layers
 		{
 		private:
 

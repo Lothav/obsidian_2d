@@ -251,7 +251,8 @@ namespace Obsidian2D
 				free(surfFormats);
 			}
 		public:
-			XcbWindow(int32_t width, int32_t height){
+			XcbWindow(int32_t width, int32_t height)
+			{
 				this->width = width;
 				this->height = height;
 			}
@@ -260,14 +261,12 @@ namespace Obsidian2D
 			{
 				const bool depthPresent = true;
 
-				VkResult set_global_layer = this->setGlobalLayerProperties(this->info);
-
 				VkApplicationInfo app_info = this->setApplicationInfo();
 				this->pushBackExtensions();
 
 				VkResult set_instance_info = this->setInstanceInfo(app_info);
 
-				if(set_instance_info == VK_SUCCESS && set_global_layer == VK_SUCCESS){
+				if(set_instance_info == VK_SUCCESS){
 					uint32_t gpu_count = 1;
 					this->enumerateDevice(gpu_count);
 					this->createDevice();

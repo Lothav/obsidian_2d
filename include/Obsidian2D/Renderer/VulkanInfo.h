@@ -11,10 +11,6 @@
 #include "glm/glm.hpp"
 #include <glm/gtc/matrix_transform.hpp>
 
-typedef struct{
-	VkLayerProperties properties;
-	std::vector<VkExtensionProperties> extensions;
-} layer_properties;
 
 typedef struct _swap_chain_buffers {
 	VkImage image;
@@ -70,7 +66,6 @@ struct VulkanInfo {
 
 	std::vector<const char *> instance_layer_names;
 	std::vector<const char *> instance_extension_names;
-	std::vector<layer_properties> instance_layer_properties;
 	std::vector<VkExtensionProperties> instance_extension_properties;
 	VkInstance inst;
 
