@@ -95,6 +95,8 @@ namespace Obsidian2D
 							app->onInput(e);
 						}
 					}
+
+					app->onUpdate();
 				}
 
 				//Tell userspace we are exiting, do what you gotta do

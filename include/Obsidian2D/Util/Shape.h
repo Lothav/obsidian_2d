@@ -1,13 +1,13 @@
 #ifndef _OBSIDIAN2D_SHAPE_
 #define _OBSIDIAN2D_SHAPE_
 
-#include "Obsidian2D/Util/Vec2f.h"
+#include "Obsidian2D/Core/Movable.h"
 
 namespace Obsidian2D
 {
 	namespace Util
 	{
-		class Shape
+		class Shape : public Core::Movable
 		{
 		private:
 
