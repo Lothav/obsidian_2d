@@ -78,34 +78,34 @@ namespace Obsidian2D
 
 			void setWindowSize()
 			{
-			#ifdef __ANDROID__
+#ifdef __ANDROID__
 				AndroidGetWindowSize(&this->info.width, &this->info.height);
-			#else
+#else
 				this->info.width = this->width;
 				this->info.height = this->height;
-			#endif
+#endif
 			}
 
 			void setXCBConnection() // for Linux users :V
 			{
-				#if !(defined(_WIN32) || defined(__ANDROID__) || defined(VK_USE_PLATFORM_IOS_MVK) || defined(VK_USE_PLATFORM_MACOS_MVK))
+#if !(defined(_WIN32) || defined(__ANDROID__) || defined(VK_USE_PLATFORM_IOS_MVK) || defined(VK_USE_PLATFORM_MACOS_MVK))
 				// Do nothing on Android, Apple, or Windows.
-					const xcb_setup_t *setup;
-					xcb_screen_iterator_t iter;
-					int scr;
+				const xcb_setup_t *setup;
+				xcb_screen_iterator_t iter;
+				int scr;
 
-					this->info.connection = xcb_connect(NULL, &scr);
-					if (this->info.connection == NULL || xcb_connection_has_error(this->info.connection)) {
-						std::cout << "Unable to make an XCB connection\n";
-						exit(-1);
-					}
+				this->info.connection = xcb_connect(NULL, &scr);
+				if (this->info.connection == NULL || xcb_connection_has_error(this->info.connection)) {
+					std::cout << "Unable to make an XCB connection\n";
+					exit(-1);
+				}
 
-					setup = xcb_get_setup(this->info.connection);
-					iter = xcb_setup_roots_iterator(setup);
-					while (scr-- > 0) xcb_screen_next(&iter);
+				setup = xcb_get_setup(this->info.connection);
+				iter = xcb_setup_roots_iterator(setup);
+				while (scr-- > 0) xcb_screen_next(&iter);
 
-					this->info.screen = iter.data;
-				#endif
+				this->info.screen = iter.data;
+#endif
 			}
 			void createWindow()
 			{
@@ -122,8 +122,8 @@ namespace Obsidian2D
 								XCB_EVENT_MASK_KEY_PRESS | XCB_EVENT_MASK_ENTER_WINDOW | XCB_EVENT_MASK_LEAVE_WINDOW;
 
 				xcb_create_window(this->info.connection, XCB_COPY_FROM_PARENT, this->info.window, this->info.screen->root,
-								0, 0, (uint16_t)this->info.width, (uint16_t)this->info.height, 0,
-								XCB_WINDOW_CLASS_INPUT_OUTPUT, this->info.screen->root_visual, value_mask, value_list);
+								  0, 0, (uint16_t)this->info.width, (uint16_t)this->info.height, 0,
+								  XCB_WINDOW_CLASS_INPUT_OUTPUT, this->info.screen->root_visual, value_mask, value_list);
 
 				/* Magic code that will send notification when window is destroyed */
 				xcb_intern_atom_cookie_t cookie = xcb_intern_atom(this->info.connection, 1, 12, "WM_PROTOCOLS");
@@ -137,7 +137,7 @@ namespace Obsidian2D
 				free(reply);
 
 				xcb_change_property(this->info.connection, XCB_PROP_MODE_REPLACE, this->info.window,
-					XCB_ATOM_WM_NAME, XCB_ATOM_STRING, 8, strlen(APP_NAME), APP_NAME);
+									XCB_ATOM_WM_NAME, XCB_ATOM_STRING, 8, strlen(APP_NAME), APP_NAME);
 
 				xcb_flush(this->info.connection);
 
@@ -152,14 +152,14 @@ namespace Obsidian2D
 			void initSwapChainExtension()
 			{
 				VkResult res;
-			#ifdef _WIN32
+#ifdef _WIN32
 				VkWin32SurfaceCreateInfoKHR createInfo = {};
 				createInfo.sType = VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR;
 				createInfo.pNext = NULL;
 				createInfo.hinstance = this->info.connection;
 				createInfo.hwnd = this->info.window;
 				res = vkCreateWin32SurfaceKHR(this->info.inst, &createInfo, NULL, &this->info.surface);
-			#elif defined(__ANDROID__)
+#elif defined(__ANDROID__)
 				GET_INSTANCE_PROC_ADDR(this->info.inst, CreateAndroidSurfaceKHR);
 
 				VkAndroidSurfaceCreateInfoKHR createInfo;
@@ -168,28 +168,28 @@ namespace Obsidian2D
 				createInfo.flags = 0;
 				createInfo.window = AndroidGetApplicationWindow();
 				res = info.fpCreateAndroidSurfaceKHR(this->info.inst, &createInfo, nullptr, &this->info.surface);
-			#elif defined(VK_USE_PLATFORM_IOS_MVK)
+#elif defined(VK_USE_PLATFORM_IOS_MVK)
 				VkIOSSurfaceCreateInfoMVK createInfo = {};
 				createInfo.sType = VK_STRUCTURE_TYPE_IOS_SURFACE_CREATE_INFO_MVK;
 				createInfo.pNext = NULL;
 				createInfo.flags = 0;
 				createInfo.pView = this->info.window;
 				res = vkCreateIOSSurfaceMVK(this->info.inst, &createInfo, NULL, &this->info.surface);
-			#elif defined(VK_USE_PLATFORM_MACOS_MVK)
+#elif defined(VK_USE_PLATFORM_MACOS_MVK)
 				VkMacOSSurfaceCreateInfoMVK createInfo = {};
 				createInfo.sType = VK_STRUCTURE_TYPE_MACOS_SURFACE_CREATE_INFO_MVK;
 				createInfo.pNext = NULL;
 				createInfo.flags = 0;
 				createInfo.pView = this->info.window;
 				res = vkCreateMacOSSurfaceMVK(this->info.inst, &createInfo, NULL, &this->info.surface);
-			#else
+#else
 				VkXcbSurfaceCreateInfoKHR createInfo = {};
 				createInfo.sType = VK_STRUCTURE_TYPE_XCB_SURFACE_CREATE_INFO_KHR;
 				createInfo.pNext = NULL;
 				createInfo.connection = this->info.connection;
 				createInfo.window = this->info.window;
 				res = vkCreateXcbSurfaceKHR(this->info.inst, &createInfo, NULL, &this->info.surface);
-			#endif  // __ANDROID__  && _WIN32
+#endif  // __ANDROID__  && _WIN32
 
 				assert(res == VK_SUCCESS);
 
@@ -261,38 +261,32 @@ namespace Obsidian2D
 			{
 				const bool depthPresent = true;
 
-				VkApplicationInfo app_info = this->setApplicationInfo();
 				this->pushBackExtensions();
+				this->init();
 
-				VkResult set_instance_info = this->setInstanceInfo(app_info);
+				uint32_t gpu_count = 1;
+				this->enumerateDevice(gpu_count);
+				this->createDevice();
+				this->createCommandBuffer();
+				this->setWindowSize();
+				this->setXCBConnection();
+				this->createWindow();
+				this->initSwapChainExtension();
 
-				if(set_instance_info == VK_SUCCESS){
-					uint32_t gpu_count = 1;
-					this->enumerateDevice(gpu_count);
-					this->createDevice();
-					this->createCommandBuffer();
-					this->setWindowSize();
-					this->setXCBConnection();
-					this->createWindow();
-					this->initSwapChainExtension();
+				this->executeBeginCommandBuffer();
+				this->initDeviceQueue();
+				this->initSwapChain();
+				this->initDepthBuffer();
+				this->initUniformBuffer();
+				this->initDescriptorAndPipelineLayouts(false);
+				this->initRenderpass(depthPresent);
+				this->initShaders();
+				this->initFramebuffers(depthPresent);
+				this->initVertexBuffer(g_vb_texture_Data, sizeof(g_vb_texture_Data), sizeof(g_vb_texture_Data[0]), false);
 
-					this->executeBeginCommandBuffer();
-					this->initDeviceQueue();
-					this->initSwapChain();
-					this->initDepthBuffer();
-					this->initUniformBuffer();
-					this->initDescriptorAndPipelineLayouts(false);
-					this->initRenderpass(depthPresent);
-					this->initShaders();
-					this->initFramebuffers(depthPresent);
-					this->initVertexBuffer(g_vb_texture_Data, sizeof(g_vb_texture_Data), sizeof(g_vb_texture_Data[0]), false);
+				this->bootstrapPipeline((VkBool32)depthPresent , false);
 
-					this->bootstrapPipeline((VkBool32)depthPresent , false);
-
-					this->drawCube();
-				} else {
-					//@TODO throw error
-				}
+				this->drawCube();
 			}
 
 			int y = 3;

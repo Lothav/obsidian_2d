@@ -29,8 +29,25 @@ namespace Obsidian2D
 				return _instanceLayerProps;
 			}
 
-		private:
+			std::vector<const char*> getLayerNames()
+			{
+				std::cout << "Layers available:" << std::endl;
+				std::vector<const char *> _layer_names;
+				for(auto i : this->_instanceLayerProps){
+					std::cout << i.properties.layerName << std::endl;
+				}
 
+				_layer_names.push_back( "VK_LAYER_LUNARG_standard_validation" );
+
+				std::cout << "Using Layers:" << std::endl;
+				for(auto i : _layer_names) {
+					std::cout << i << std::endl;
+				}
+
+				return _layer_names;
+			}
+
+		private:
 
 			std::vector<LayerProperties> _instanceLayerProps;
 

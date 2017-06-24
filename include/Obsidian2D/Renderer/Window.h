@@ -146,17 +146,33 @@ namespace Obsidian2D
 		protected:
 			VkDevice device;
 
-			VkApplicationInfo setApplicationInfo()
+			void init()
 			{
-				VkApplicationInfo app_info = {};
-				app_info.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
-				app_info.pNext = NULL;
-				app_info.pApplicationName = APP_NAME;
-				app_info.applicationVersion = 1;
-				app_info.pEngineName = APP_NAME;
-				app_info.engineVersion = 1;
-				app_info.apiVersion = VK_API_VERSION_1_0;
-				return app_info;
+
+				std::vector<LayerProperties> laalal = this->getInstanceLayerProps();
+				std::vector<const char *> _layer_names = this->getLayerNames();
+
+				VkApplicationInfo _app_info = {};
+				_app_info.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
+				_app_info.pNext = NULL;
+				_app_info.pApplicationName = APP_NAME;
+				_app_info.applicationVersion = 1;
+				_app_info.pEngineName = APP_NAME;
+				_app_info.engineVersion = 1;
+				_app_info.apiVersion = VK_API_VERSION_1_0;
+
+				VkInstanceCreateInfo inst_info = {};
+				inst_info.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
+				inst_info.pNext = NULL;
+				inst_info.flags = 0;
+				inst_info.pApplicationInfo = &_app_info;
+				inst_info.enabledLayerCount = (uint32_t) _layer_names.size();
+				inst_info.ppEnabledLayerNames = _layer_names.size() ? _layer_names.data() : NULL;
+				inst_info.enabledExtensionCount = (uint32_t) this->info.instance_extension_names.size();
+				inst_info.ppEnabledExtensionNames = this->info.instance_extension_names.data();
+
+				VkResult res = vkCreateInstance(&inst_info, NULL, &this->info.inst);
+				assert(res == VK_SUCCESS);
 			}
 
 			void pushBackExtensions()
@@ -169,25 +185,7 @@ namespace Obsidian2D
 #else
 				this->info.instance_extension_names.push_back(VK_KHR_XCB_SURFACE_EXTENSION_NAME);
 #endif
-				info.device_extension_names.push_back(VK_KHR_SWAPCHAIN_EXTENSION_NAME);
-			}
-
-			VkResult setInstanceInfo(VkApplicationInfo app_info)
-			{
-				VkInstanceCreateInfo inst_info = {};
-				inst_info.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
-				inst_info.pNext = NULL;
-				inst_info.flags = 0;
-				inst_info.pApplicationInfo = &app_info;
-				inst_info.enabledLayerCount = (uint32_t)info.instance_layer_names.size();
-				inst_info.ppEnabledLayerNames = info.instance_layer_names.size() ? info.instance_layer_names.data() : NULL;
-				inst_info.enabledExtensionCount = (uint32_t) info.instance_extension_names.size();
-				inst_info.ppEnabledExtensionNames = info.instance_extension_names.data();
-
-				VkResult res = vkCreateInstance(&inst_info, NULL, &info.inst);
-				assert(res == VK_SUCCESS);
-
-				return res;
+				this->info.device_extension_names.push_back(VK_KHR_SWAPCHAIN_EXTENSION_NAME);
 			}
 
 			void enumerateDevice(uint32_t gpu_count)
