@@ -148,9 +148,13 @@ namespace Obsidian2D
 
 			void init()
 			{
-
 				std::vector<LayerProperties> laalal = this->getInstanceLayerProps();
 				std::vector<const char *> _layer_names = this->getLayerNames();
+
+				std::vector<const char *> _extension_names;
+				_extension_names.push_back(VK_KHR_SURFACE_EXTENSION_NAME);
+				//@TODO extension for win32 VK_KHR_WIN32_SURFACE_EXTENSION_NAME
+				_extension_names.push_back(VK_KHR_XCB_SURFACE_EXTENSION_NAME);
 
 				VkApplicationInfo _app_info = {};
 				_app_info.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
@@ -168,8 +172,8 @@ namespace Obsidian2D
 				inst_info.pApplicationInfo = &_app_info;
 				inst_info.enabledLayerCount = (uint32_t) _layer_names.size();
 				inst_info.ppEnabledLayerNames = _layer_names.size() ? _layer_names.data() : NULL;
-				inst_info.enabledExtensionCount = (uint32_t) this->info.instance_extension_names.size();
-				inst_info.ppEnabledExtensionNames = this->info.instance_extension_names.data();
+				inst_info.enabledExtensionCount = (uint32_t) _extension_names.size();
+				inst_info.ppEnabledExtensionNames = _extension_names.data();
 
 				VkResult res = vkCreateInstance(&inst_info, NULL, &this->info.inst);
 				assert(res == VK_SUCCESS);
@@ -177,14 +181,6 @@ namespace Obsidian2D
 
 			void pushBackExtensions()
 			{
-				this->info.instance_extension_names.push_back(VK_KHR_SURFACE_EXTENSION_NAME);
-#ifdef _WIN32
-				this->info.instance_extension_names.push_back(VK_KHR_WIN32_SURFACE_EXTENSION_NAME);
-#elif __ANDROID__
-				this->info.instance_extension_names.push_back(VK_KHR_ANDROID_SURFACE_EXTENSION_NAME);
-#else
-				this->info.instance_extension_names.push_back(VK_KHR_XCB_SURFACE_EXTENSION_NAME);
-#endif
 				this->info.device_extension_names.push_back(VK_KHR_SWAPCHAIN_EXTENSION_NAME);
 			}
 
