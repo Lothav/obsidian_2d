@@ -11,12 +11,10 @@
 #include "glm/glm.hpp"
 #include <glm/gtc/matrix_transform.hpp>
 
-
 typedef struct _swap_chain_buffers {
 	VkImage image;
 	VkImageView view;
 } swap_chain_buffer;
-
 
 typedef struct _view_camera {
 	glm::vec3 eye;
@@ -24,24 +22,11 @@ typedef struct _view_camera {
 	glm::vec3 up;
 } ViewCamera;
 
-
-
 #if defined(NDEBUG) && defined(__GNUC__)
 #define U_ASSERT_ONLY __attribute__((unused))
 #else
 #define U_ASSERT_ONLY
 #endif
-
-struct texture_object {
-	VkSampler sampler;
-
-	VkImage image;
-	VkImageLayout imageLayout;
-
-	VkDeviceMemory mem;
-	VkImageView view;
-	int32_t tex_width, tex_height;
-};
 
 struct VulkanInfo {
 #ifdef _WIN32
@@ -60,17 +45,11 @@ struct VulkanInfo {
 	xcb_intern_atom_reply_t *atom_wm_delete_window;
 #endif // _WIN32
 	VkSurfaceKHR surface;
-	bool prepared;
-	bool use_staging_buffer;
 	bool save_images;
 
-	std::vector<const char *> instance_layer_names;
-	std::vector<const char *> instance_extension_names;
-	std::vector<VkExtensionProperties> instance_extension_properties;
 	VkInstance inst;
 
 	std::vector<const char *> device_extension_names;
-	std::vector<VkExtensionProperties> device_extension_properties;
 	std::vector<VkPhysicalDevice> gpus;
 	VkDevice device;
 	VkQueue graphics_queue;
@@ -88,19 +67,16 @@ struct VulkanInfo {
 	uint32_t swapchainImageCount;
 	VkSwapchainKHR swap_chain;
 	std::vector<swap_chain_buffer> buffers;
-	VkSemaphore imageAcquiredSemaphore;
 
 	VkCommandPool cmd_pool;
 
 	struct {
 		VkFormat format;
-
 		VkImage image;
 		VkDeviceMemory mem;
 		VkImageView view;
 	} depth;
 
-	std::vector<struct texture_object> textures;
 
 	struct {
 		VkBuffer buf;
@@ -111,8 +87,6 @@ struct VulkanInfo {
 	struct {
 		VkDescriptorImageInfo image_info;
 	} texture_data;
-	VkDeviceMemory stagingMemory;
-	VkImage stagingImage;
 
 	struct {
 		VkBuffer buf;
@@ -122,13 +96,9 @@ struct VulkanInfo {
 	VkVertexInputBindingDescription vi_binding;
 	VkVertexInputAttributeDescription vi_attribs[2];
 
-	glm::mat4 Projection;
-	glm::mat4 View;
-	glm::mat4 Model;
-	glm::mat4 Clip;
 	glm::mat4 MVP;
 
-	VkCommandBuffer cmd; // Buffer for initialization commands
+	VkCommandBuffer cmd;
 	VkPipelineLayout pipeline_layout;
 	std::vector<VkDescriptorSetLayout> desc_layout;
 	VkPipelineCache pipelineCache;
@@ -139,11 +109,6 @@ struct VulkanInfo {
 
 	VkDescriptorPool desc_pool;
 	std::vector<VkDescriptorSet> desc_set;
-
-	PFN_vkCreateDebugReportCallbackEXT dbgCreateDebugReportCallback;
-	PFN_vkDestroyDebugReportCallbackEXT dbgDestroyDebugReportCallback;
-	PFN_vkDebugReportMessageEXT dbgBreakCallback;
-	std::vector<VkDebugReportCallbackEXT> debug_report_callbacks;
 
 	uint32_t current_buffer;
 	uint32_t queue_family_count;
