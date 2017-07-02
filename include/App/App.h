@@ -32,7 +32,7 @@ namespace App {
 		void onInput(Obsidian2D::Core::WindowEvent e)
 		{
 			if(e == Obsidian2D::Core::WindowEvent::Click) {
-				this->log("Click");
+				//this->log("Click");
 				this->rect.move({1.0f, 0.0f});
 			}
 		}
@@ -40,7 +40,7 @@ namespace App {
 		//onUpdate has to be accumulator aware for physics, maybe even two separate callbacks
 		void onUpdate()
 		{
-			this->log("Rect horizontal pos: " + std::to_string(this->rect.getPosition().x));
+			//this->log("Rect horizontal pos: " + std::to_string(this->rect.getPosition().x));
 		}
 
 		//This sould likely receive a struct with some complete application state info.
