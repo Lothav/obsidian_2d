@@ -36,18 +36,20 @@ namespace Obsidian2D
 				if (width > height) {
 					fov *= static_cast<float>(height) / static_cast<float>(width);
 				}
-				this->_projection = glm::perspective(fov, static_cast<float>(width) / static_cast<float>(height), 0.1f, 100.0f);
+				this->_projection = glm::perspective(fov, static_cast<float>(width) / static_cast<float>(height), 0.2f, 1.0f);
 
-
-				this->_view_camera.eye 	  = glm::vec3(-5, 3, -10); 	// Camera is at (-5,3,-10), in World Space
-				this->_view_camera.center = glm::vec3(0, 0, 0); 	// and looks at the origin
-				this->_view_camera.up     = glm::vec3(0, -1, 0);    // Head is up (set to 0,-1,0 to look upside-down)
+				this->_view_camera.eye 	  = glm::vec3(0, 0, -10); 	// Camera is at (-5,3,-10), in World Space
+				this->_view_camera.center = glm::vec3(0, 0,   0); 	// and looks at the origin
+				this->_view_camera.up     = glm::vec3(0, 1,   0);    // Head is up (set to 0,-1,0 to look upside-down)
 
 				this->_view = glm::lookAt( this->_view_camera.eye, this->_view_camera.center, this->_view_camera.up );
 
 				this->_model = glm::mat4(1.0f);
 				// Vulkan clip space has inverted Y and half Z.
-				this->_clip = glm::mat4(1.0f, 0.0f, 0.0f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.5f, 0.0f, 0.0f, 0.0f, 0.5f, 1.0f);
+				this->_clip = glm::mat4(1.0f, 0.0f, 0.0f, 0.0f,
+										0.0f, -1.0f, 0.0f, 0.0f,
+										0.0f, 0.0f, 0.5f, 0.5f,
+										0.0f, 0.0f, 0.0f, 1.0f);
 
 				this->updateMVP();
 			}

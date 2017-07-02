@@ -14,7 +14,7 @@ namespace App {
 
 			void onUpdate()
 			{
-				this->log("Opening update!");
+				//this->log("Opening update!");
 			}
 		};
 	}

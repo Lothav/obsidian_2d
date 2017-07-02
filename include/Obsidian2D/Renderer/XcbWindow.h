@@ -5,6 +5,7 @@
 #include <cstring>
 #include <iostream>
 #include <bitset>
+#include <xcb/xcb.h>
 
 #include "Obsidian2D/Renderer/Window.h"
 #include "Obsidian2D/Core/WindowEvent.h"
@@ -289,7 +290,9 @@ namespace Obsidian2D
 				this->drawCube();
 			}
 
-			int y = 3;
+			int y = 0, x =0;
+			int c_x = 0, c_y = 0;
+
 			::Obsidian2D::Core::WindowEvent poolEvent()
 			{
 				xcb_generic_event_t* e = nullptr;
@@ -310,9 +313,33 @@ namespace Obsidian2D
 
 						VkResult U_ASSERT_ONLY res;
 
-						y++;
-						this->setCameraViewEye(glm::vec3(-5, y, -10));
+						xcb_key_press_event_t * kp = (xcb_key_press_event_t *)e;
+
+						if( kp->detail == 'O'){
+							x--;
+						}else if(kp->detail == 'P'){
+							y++;
+						}else if(kp->detail == 'Q'){
+							x++;
+						}else if(kp->detail == 'j'){
+							y--;
+						}
+
+						if( kp->detail == 'W'){
+							c_x--;
+						}else if(kp->detail == 'X'){
+							c_y--;
+						}else if(kp->detail == 'Y'){
+							c_x++;
+						}else if(kp->detail == 'T'){
+							c_y++;
+						}
+
+						std::cout << kp->detail << std::endl;
+						this->setCameraViewCenter(glm::vec3(x, y, 0));
+						this->setCameraViewEye(glm::vec3(c_x, c_y, -10));
 						this->updateCamera();
+
 
 						VkSemaphore imageAcquiredSemaphore;
 						VkSemaphoreCreateInfo imageAcquiredSemaphoreCreateInfo;
