@@ -5,14 +5,15 @@
 
 #include "Obsidian2D/Util/RectangleShape.h"
 
+#include "App/Scenes/Opening.h"
+#include "App/Scenes/Menu.h"
+#include "App/Scenes/CharacterSelection.h"
 
 namespace App {
 	class App: public Obsidian2D::Core::App
 	{
 	private:
 	protected:
-		Obsidian2D::Util::RectangleShape rect;
-
 	public:
 		App::Config getConfig()
 		{
@@ -22,31 +23,14 @@ namespace App {
 			return config;
 		}
 
-		//Scenes should be registered here, and something like a resource pre-loading (Needs multithreading, pthread on posix?)
-		void init(Obsidian2D::Core::Registry<Obsidian2D::Core::Scene>* registry)
+		void init(Obsidian2D::Core::Registry<Obsidian2D::Core::Scene*>* sceneRegistry)
 		{
-			this->rect.setPosition({10.0f, 10.0f});
-		}
+			this->log("init()");
 
-		//Input has to consider source, in case of multiplayer
-		void onInput(Obsidian2D::Core::WindowEvent e)
-		{
-			if(e == Obsidian2D::Core::WindowEvent::Click) {
-				//this->log("Click");
-				this->rect.move({1.0f, 0.0f});
-			}
-		}
-
-		//onUpdate has to be accumulator aware for physics, maybe even two separate callbacks
-		void onUpdate()
-		{
-			//this->log("Rect horizontal pos: " + std::to_string(this->rect.getPosition().x));
-		}
-
-		//This sould likely receive a struct with some complete application state info.
-		void onExit()
-		{
-			this->log("Bye");
+			//Hack for init, should just set default someway
+			sceneRegistry->add("00_opening",             new Scenes::Opening());
+			sceneRegistry->add("01_menu",                new Scenes::Menu());
+			sceneRegistry->add("02_character_selection", new Scenes::CharacterSelection());
 		}
 	};
 }

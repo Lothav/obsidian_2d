@@ -15,23 +15,42 @@ namespace Obsidian2D
 		private:
 
 		protected:
-			std::map<std::string, T*> items;
+			std::map<std::string, T> items;
 
 		public:
-			void add(const std::string& name, T* item)
+			void add(const std::string& name, T item)
 			{
-				//Check if exists and shit
+				if(this->items.count(name)) {
+					this->remove(name);
+				}
+
 				this->items[name] = item;
 			}
 
-			void remove()
+			void remove(const std::string& name)
 			{
-				//Remove and stuff
+				if(this->items.count(name)) {
+					//Check if pointer or force pointer in template and delete it
+					this->items.erase(name);
+				}
 			}
 
-			T* get(const std::string& name)
+			T get(const std::string& name)
 			{
-				return this->items[name];
+				if(this->items.count(name)) {
+					return this->items[name]->second;
+				}
+
+				return nullptr;
+			}
+
+			T getFirst()
+			{
+				if(this->items.size()) {
+					return this->items.begin()->second;
+				}
+
+				return nullptr;
 			}
 		};
 	}

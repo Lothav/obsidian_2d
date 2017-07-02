@@ -33,21 +33,13 @@ namespace Obsidian2D
 		private:
 
 		protected:
-			Obsidian2D::Core::Registry<Scene>* sceneRegistry = nullptr;
 
 		public:
 			Kernel()
 			{
-				this->sceneRegistry = new Obsidian2D::Core::Registry<Scene>();
-
 				this->registerLogCallback([](const std::string& line) {
 					Obsidian2D::Util::Logger::write("[Obsidian2D::Core::Kernel] " + line);
 				});
-
-				this->sceneRegistry->registerLogCallback([](const std::string& line) {
-					Obsidian2D::Util::Logger::write("[Obsidian2D::Core::Registry] " + line);
-				});
-
 			}
 
 			int start(Obsidian2D::Core::App* app)
@@ -65,7 +57,7 @@ namespace Obsidian2D
 				Obsidian2D::Renderer::XcbWindow* xcbWindow = new Obsidian2D::Renderer::XcbWindow(config.windowWidth, config.windowHeight);
 
 				/* Register routes, configs, default scene */
-				app->init(this->sceneRegistry);
+				app->baseInit();
 
 				/* Register GameStates/Scenes */
 
@@ -92,15 +84,15 @@ namespace Obsidian2D
 							running = false;
 						} else {
 							//Send input to userspace
-							app->onInput(e);
+							app->baseOnInput(e);
 						}
 					}
 
-					app->onUpdate();
+					app->baseOnUpdate();
 				}
 
 				//Tell userspace we are exiting, do what you gotta do
-				app->onExit();
+				app->baseOnDestroy();
 
 				this->log("Cleaning up memory");
 

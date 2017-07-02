@@ -27,16 +27,32 @@ namespace Obsidian2D
 		private:
 
 		protected:
+			Obsidian2D::Core::Registry<Scene*>* sceneRegistry = nullptr;
+			Scene* currentScene = nullptr;
 
 		public:
 			App()
 			{
+				this->sceneRegistry = new Obsidian2D::Core::Registry<Scene*>();
+				this->sceneRegistry->registerLogCallback([](const std::string& line) {
+					Obsidian2D::Util::Logger::write("[Obsidian2D::Core::Registry] " + line);
+				});
+			}
+
+			void baseInit()
+			{
+				this->log("baseInit()");
+				this->init(this->sceneRegistry);
+
+				//std::cout << sceneRegistry->getFirst()// << std::endl;
+				this->currentScene = sceneRegistry->getFirst();
+				this->currentScene->init();
 
 			}
 
-			virtual void init(Obsidian2D::Core::Registry<Obsidian2D::Core::Scene>* registry)
+			virtual void init(Obsidian2D::Core::Registry<Obsidian2D::Core::Scene*>* sceneRegistry)
 			{
-				this->log("base init()");
+
 			}
 
 			virtual Obsidian2D::Core::App::Config getConfig()
@@ -44,9 +60,21 @@ namespace Obsidian2D
 				return Config();
 			}
 
+			void baseOnInput(Obsidian2D::Core::WindowEvent e)
+			{
+				this->onInput(e);
+				this->currentScene->onInput(e);
+			}
+
 			virtual void onInput(Obsidian2D::Core::WindowEvent e)
 			{
 
+			}
+
+			void baseOnUpdate()
+			{
+				this->onUpdate();
+				this->currentScene->onUpdate();
 			}
 
 			virtual void onUpdate()
@@ -54,7 +82,13 @@ namespace Obsidian2D
 
 			}
 
-			virtual void onExit()
+			void baseOnDestroy()
+			{
+				//Should destroy all
+				this->currentScene->onDestroy();
+			}
+
+			virtual void onDestroy()
 			{
 
 			}
