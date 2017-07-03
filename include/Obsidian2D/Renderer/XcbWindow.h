@@ -340,74 +340,7 @@ namespace Obsidian2D
 						this->setCameraViewEye(glm::vec3(c_x, c_y, -10));
 						this->updateCamera();
 
-
-						VkSemaphore imageAcquiredSemaphore;
-						VkSemaphoreCreateInfo imageAcquiredSemaphoreCreateInfo;
-						imageAcquiredSemaphoreCreateInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
-						imageAcquiredSemaphoreCreateInfo.pNext = NULL;
-						imageAcquiredSemaphoreCreateInfo.flags = 0;
-
-						res = vkCreateSemaphore(this->info.device, &imageAcquiredSemaphoreCreateInfo, NULL, &imageAcquiredSemaphore);
-						assert(res == VK_SUCCESS);
-
-						res = vkAcquireNextImageKHR(this->info.device, this->info.swap_chain, UINT64_MAX, imageAcquiredSemaphore, VK_NULL_HANDLE,
-													&this->info.current_buffer);
-						assert(res == VK_SUCCESS);
-
-
-						// @TODO FIX THIS!!!!
-						this->info.current_buffer = 0;
-
-
-
-						const VkCommandBuffer cmd_bufs[] = {this->info.cmd};
-						VkFenceCreateInfo fenceInfo;
-						VkFence drawFence;
-						fenceInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
-						fenceInfo.pNext = NULL;
-						fenceInfo.flags = 0;
-						vkCreateFence(this->info.device, &fenceInfo, NULL, &drawFence);
-
-						VkPipelineStageFlags pipe_stage_flags = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
-						VkSubmitInfo submit_info[1] = {};
-						submit_info[0].pNext = NULL;
-						submit_info[0].sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-						submit_info[0].waitSemaphoreCount = 1;
-						submit_info[0].pWaitSemaphores = &imageAcquiredSemaphore;
-						submit_info[0].pWaitDstStageMask = &pipe_stage_flags;
-						submit_info[0].commandBufferCount = 1;
-						submit_info[0].pCommandBuffers = cmd_bufs;
-						submit_info[0].signalSemaphoreCount = 0;
-						submit_info[0].pSignalSemaphores = NULL;
-
-						/* Queue the command buffer for execution */
-						res = vkQueueSubmit(this->info.graphics_queue, 1, submit_info, drawFence);
-						assert(res == VK_SUCCESS);
-
-						/* Now present the image in the window */
-
-						VkPresentInfoKHR present;
-						present.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
-						present.pNext = NULL;
-						present.swapchainCount = 1;
-						present.pSwapchains = &this->info.swap_chain;
-						present.pImageIndices = &this->info.current_buffer;
-						present.pWaitSemaphores = NULL;
-						present.waitSemaphoreCount = 0;
-						present.pResults = NULL;
-
-						/* Make sure command buffer is finished before presenting */
-						do {
-							res = vkWaitForFences(this->info.device, 1, &drawFence, VK_TRUE, VK_SAMPLE_COUNT_1_BIT);
-						} while (res == VK_TIMEOUT);
-
-
-						res = vkQueuePresentKHR(this->info.present_queue, &present);
-						assert(res == VK_SUCCESS);
-
-						vkDestroySemaphore(this->info.device, imageAcquiredSemaphore, NULL);
-						vkDestroyFence(this->info.device, drawFence, NULL);
-
+                        this->draw();
 
 						return ::Obsidian2D::Core::WindowEvent::ButtonDown;
 					} else if((e->response_type & ~0x80) == XCB_KEY_RELEASE) {

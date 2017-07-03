@@ -66,7 +66,7 @@ namespace Obsidian2D
         protected:
             VkDevice            device;
             VkSemaphore         imageAcquiredSemaphore;
-            VkSubmitInfo        submit_info[1] = {};
+            VkSubmitInfo        submit_info;
             VkFence             drawFence;
             VkPresentInfoKHR    present;
 
@@ -801,13 +801,6 @@ namespace Obsidian2D
                 res = vkCreateSemaphore(this->info.device, &imageAcquiredSemaphoreCreateInfo, NULL, &imageAcquiredSemaphore);
                 assert(res == VK_SUCCESS);
 
-                // Get the index of the next available swapchain image:
-                res = vkAcquireNextImageKHR(this->info.device, info.swap_chain, UINT64_MAX, imageAcquiredSemaphore, VK_NULL_HANDLE,
-                                            &this->info.current_buffer);
-                // TODO: Deal with the VK_SUBOPTIMAL_KHR and VK_ERROR_OUT_OF_DATE_KHR
-                // return codes
-                assert(res == VK_SUCCESS);
-
                 VkRenderPassBeginInfo rp_begin;
                 rp_begin.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
                 rp_begin.pNext = NULL;
@@ -845,21 +838,15 @@ namespace Obsidian2D
 
                 VkPipelineStageFlags pipe_stage_flags = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
 
-                submit_info[0].pNext = NULL;
-                submit_info[0].sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-                submit_info[0].waitSemaphoreCount = 1;
-                submit_info[0].pWaitSemaphores = &imageAcquiredSemaphore;
-                submit_info[0].pWaitDstStageMask = &pipe_stage_flags;
-                submit_info[0].commandBufferCount = 1;
-                submit_info[0].pCommandBuffers = cmd_bufs;
-                submit_info[0].signalSemaphoreCount = 0;
-                submit_info[0].pSignalSemaphores = NULL;
-
-                /* Queue the command buffer for execution */
-                res = vkQueueSubmit(this->info.graphics_queue, 1, submit_info, drawFence);
-                assert(res == VK_SUCCESS);
-
-                /* Now present the image in the window */
+                submit_info.pNext = NULL;
+                submit_info.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+                submit_info.waitSemaphoreCount = 1;
+                submit_info.pWaitSemaphores = &imageAcquiredSemaphore;
+                submit_info.pWaitDstStageMask = &pipe_stage_flags;
+                submit_info.commandBufferCount = 1;
+                submit_info.pCommandBuffers = cmd_bufs;
+                submit_info.signalSemaphoreCount = 1;
+                submit_info.pSignalSemaphores = &imageAcquiredSemaphore;
 
                 present.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
                 present.pNext = NULL;
@@ -871,17 +858,7 @@ namespace Obsidian2D
                 present.pResults = NULL;
 
                 /* Make sure command buffer is finished before presenting */
-                do {
-                    res = vkWaitForFences(this->info.device, 1, &drawFence, VK_TRUE, VK_SAMPLE_COUNT_1_BIT);
-                } while (res == VK_TIMEOUT);
-
-                assert(res == VK_SUCCESS);
-                res = vkQueuePresentKHR(this->info.present_queue, &present);
-                assert(res == VK_SUCCESS);
-
-                wait_seconds(1);
-                if (this->info.save_images) write_ppm("drawcube");
-
+                this->draw();
             }
 
             void draw()
@@ -891,12 +868,14 @@ namespace Obsidian2D
                                             imageAcquiredSemaphore, VK_NULL_HANDLE, &this->info.current_buffer);
                 assert(res == VK_SUCCESS);
 
-                res = vkQueueSubmit(this->info.graphics_queue, 1, submit_info, drawFence);
+                //@TODO: Segmentation Error here
+                res = vkQueueSubmit(this->info.graphics_queue, 1, &submit_info, drawFence);
                 assert(res == VK_SUCCESS);
 
-                res = vkWaitForFences(this->info.device, 1, &drawFence, VK_TRUE, VK_SAMPLE_COUNT_1_BIT);
+                do {
+                    res = vkWaitForFences(this->info.device, 1, &drawFence, VK_TRUE, VK_SAMPLE_COUNT_1_BIT);
+                } while (res == VK_TIMEOUT);
                 assert(res == VK_SUCCESS);
-
                 vkResetFences(this->info.device, 1, &drawFence);
 
                 res = vkQueuePresentKHR(this->info.present_queue, &present);
