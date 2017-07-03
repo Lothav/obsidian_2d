@@ -287,7 +287,7 @@ namespace Obsidian2D
 
 				this->bootstrapPipeline((VkBool32)depthPresent , false);
 
-				this->drawCube();
+				this->prepareDraw();
 			}
 
 			int y = 0, x =0;
