@@ -66,7 +66,6 @@ namespace Obsidian2D
         protected:
             VkDevice            device;
             VkSemaphore         imageAcquiredSemaphore;
-            VkSubmitInfo        submit_info;
             VkFence             drawFence;
             VkPresentInfoKHR    present;
 
@@ -836,18 +835,6 @@ namespace Obsidian2D
                 fenceInfo.flags = 0;
                 vkCreateFence(info.device, &fenceInfo, NULL, &drawFence);
 
-                VkPipelineStageFlags pipe_stage_flags = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
-
-                submit_info.pNext = NULL;
-                submit_info.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-                submit_info.waitSemaphoreCount = 1;
-                submit_info.pWaitSemaphores = &imageAcquiredSemaphore;
-                submit_info.pWaitDstStageMask = &pipe_stage_flags;
-                submit_info.commandBufferCount = 1;
-                submit_info.pCommandBuffers = cmd_bufs;
-                submit_info.signalSemaphoreCount = 1;
-                submit_info.pSignalSemaphores = &imageAcquiredSemaphore;
-
                 present.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
                 present.pNext = NULL;
                 present.swapchainCount = 1;
@@ -868,7 +855,20 @@ namespace Obsidian2D
                                             imageAcquiredSemaphore, VK_NULL_HANDLE, &this->info.current_buffer);
                 assert(res == VK_SUCCESS);
 
-                //@TODO: Segmentation Error here
+                VkPipelineStageFlags pipe_stage_flags = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+                const VkCommandBuffer cmd_bufs[] = {this->info.cmd};
+
+                VkSubmitInfo submit_info;
+                submit_info.pNext = NULL;
+                submit_info.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+                submit_info.waitSemaphoreCount = 1;
+                submit_info.pWaitSemaphores = &imageAcquiredSemaphore;
+                submit_info.pWaitDstStageMask = &pipe_stage_flags;
+                submit_info.commandBufferCount = 1;
+                submit_info.pCommandBuffers = cmd_bufs;
+                submit_info.signalSemaphoreCount = 1;
+                submit_info.pSignalSemaphores = &imageAcquiredSemaphore;
+
                 res = vkQueueSubmit(this->info.graphics_queue, 1, &submit_info, drawFence);
                 assert(res == VK_SUCCESS);
 
