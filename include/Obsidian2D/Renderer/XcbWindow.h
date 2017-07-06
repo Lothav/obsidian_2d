@@ -340,9 +340,7 @@ namespace Obsidian2D
 						this->setCameraViewEye(glm::vec3(c_x, c_y, -10));
 						this->updateCamera();
 
-                        while(1){
-                            this->draw();
-                        }
+						this->draw();
 
 						return ::Obsidian2D::Core::WindowEvent::ButtonDown;
 					} else if((e->response_type & ~0x80) == XCB_KEY_RELEASE) {

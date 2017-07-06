@@ -66,8 +66,8 @@ namespace Obsidian2D
         protected:
             VkDevice            device;
             VkSemaphore         imageAcquiredSemaphore;
-            VkFence             drawFence;
-            VkPresentInfoKHR    present;
+			VkSemaphore         renderSemaphore;
+			VkFence             drawFence;
 
             void init()
             {
@@ -800,6 +800,10 @@ namespace Obsidian2D
                 res = vkCreateSemaphore(this->info.device, &imageAcquiredSemaphoreCreateInfo, NULL, &imageAcquiredSemaphore);
                 assert(res == VK_SUCCESS);
 
+				res = vkCreateSemaphore(this->info.device, &imageAcquiredSemaphoreCreateInfo, NULL, &renderSemaphore);
+				assert(res == VK_SUCCESS);
+
+
                 VkRenderPassBeginInfo rp_begin;
                 rp_begin.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
                 rp_begin.pNext = NULL;
@@ -835,15 +839,6 @@ namespace Obsidian2D
                 fenceInfo.flags = 0;
                 vkCreateFence(info.device, &fenceInfo, NULL, &drawFence);
 
-                present.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
-                present.pNext = NULL;
-                present.swapchainCount = 1;
-                present.pSwapchains = &this->info.swap_chain;
-                present.pImageIndices = &this->info.current_buffer;
-                present.pWaitSemaphores = NULL;
-                present.waitSemaphoreCount = 0;
-                present.pResults = NULL;
-
                 /* Make sure command buffer is finished before presenting */
                 this->draw();
             }
@@ -855,7 +850,7 @@ namespace Obsidian2D
                                             imageAcquiredSemaphore, VK_NULL_HANDLE, &this->info.current_buffer);
                 assert(res == VK_SUCCESS);
 
-                VkPipelineStageFlags pipe_stage_flags = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+				VkPipelineStageFlags pipe_stage_flags = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
                 const VkCommandBuffer cmd_bufs[] = {this->info.cmd};
 
                 VkSubmitInfo submit_info;
@@ -867,7 +862,7 @@ namespace Obsidian2D
                 submit_info.commandBufferCount = 1;
                 submit_info.pCommandBuffers = cmd_bufs;
                 submit_info.signalSemaphoreCount = 1;
-                submit_info.pSignalSemaphores = &imageAcquiredSemaphore;
+                submit_info.pSignalSemaphores = &renderSemaphore;
 
                 res = vkQueueSubmit(this->info.graphics_queue, 1, &submit_info, drawFence);
                 assert(res == VK_SUCCESS);
@@ -877,6 +872,23 @@ namespace Obsidian2D
                 } while (res == VK_TIMEOUT);
                 assert(res == VK_SUCCESS);
                 vkResetFences(this->info.device, 1, &drawFence);
+
+
+				VkPresentInfoKHR present;
+				present.sType 				= VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
+				present.pNext 				= NULL;
+				present.swapchainCount 		= 1;
+				present.pSwapchains 		= &this->info.swap_chain;
+				present.pImageIndices 		= &this->info.current_buffer;
+				present.pWaitSemaphores 	= NULL;
+				present.waitSemaphoreCount 	= 0;
+				present.pResults = NULL;
+
+				if (renderSemaphore != VK_NULL_HANDLE)
+				{
+					present.pWaitSemaphores = &renderSemaphore;
+					present.waitSemaphoreCount = 1;
+				}
 
                 res = vkQueuePresentKHR(this->info.present_queue, &present);
                 assert(res == VK_SUCCESS);
