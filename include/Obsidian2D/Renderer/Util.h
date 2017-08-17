@@ -5,7 +5,24 @@
 #ifndef OBSIDIAN2D_CORE_UTIL_H
 #define OBSIDIAN2D_CORE_UTIL_H
 
+#if defined(NDEBUG) && defined(__GNUC__)
+#define U_ASSERT_ONLY __attribute__((unused))
+#else
+#define U_ASSERT_ONLY
+#endif
+
+#include <vulkan/vulkan.h>
+#include <xcb/xcb.h>
+#include <vector>
+#include "glm/glm.hpp"
+#include <glm/gtc/matrix_transform.hpp>
+
 #include "Obsidian2D/Util/Loggable.h"
+
+typedef struct _swap_chain_buffers {
+	VkImage image;
+	VkImageView view;
+} swap_chain_buffer;
 
 #endif //OBSIDIAN2D_CORE_UTIL_H
 namespace Obsidian2D
@@ -15,16 +32,23 @@ namespace Obsidian2D
 		class Util : public Obsidian2D::Util::Loggable
 		{
 		protected:
+			VkDevice 								device;
+			int32_t									width;
+			int32_t									height;
+			VkCommandBuffer 						command_buffer;
+			VkFormat 								format;
+			VkQueue 								graphics_queue, present_queue;
+			VkPhysicalDeviceMemoryProperties 		memory_properties;
+			std::vector<swap_chain_buffer> 			buffers;
+			uint32_t 								current_buffer = 0;
 
-			struct VulkanInfo info = {};
-
-			bool memory_type_from_properties(struct VulkanInfo &info, uint32_t typeBits, VkFlags requirements_mask, uint32_t *typeIndex)
+			bool memory_type_from_properties(VkPhysicalDeviceMemoryProperties memory_properties, uint32_t typeBits, VkFlags requirements_mask, uint32_t *typeIndex)
 			{
 				// Search memtypes to find first index with those properties
-				for (uint32_t i = 0; i < info.memory_properties.memoryTypeCount; i++) {
+				for (uint32_t i = 0; i < memory_properties.memoryTypeCount; i++) {
 					if ((typeBits & 1) == 1) {
 						// Type is available, does it match user properties?
-						if ((info.memory_properties.memoryTypes[i].propertyFlags & requirements_mask) == requirements_mask) {
+						if ((memory_properties.memoryTypes[i].propertyFlags & requirements_mask) == requirements_mask) {
 							*typeIndex = i;
 							return true;
 						}
@@ -41,13 +65,14 @@ namespace Obsidian2D
 				// Disable dynamic viewport on Android. Some drive has an issue with the dynamic viewport
 // feature.
 #else
-				this->info.viewport.height = (float)this->info.height;
-				this->info.viewport.width = (float)this->info.width;
-				this->info.viewport.minDepth = (float)0.0f;
-				this->info.viewport.maxDepth = (float)1.0f;
-				this->info.viewport.x = 0;
-				this->info.viewport.y = 0;
-				vkCmdSetViewport(info.cmd, 0, 1, &this->info.viewport);
+				VkViewport viewport;
+				viewport.height = (float)height;
+				viewport.width = (float)width;
+				viewport.minDepth = (float)0.0f;
+				viewport.maxDepth = (float)1.0f;
+				viewport.x = 0;
+				viewport.y = 0;
+				vkCmdSetViewport(command_buffer, 0, 1, &viewport);
 #endif
 			}
 
@@ -56,11 +81,12 @@ namespace Obsidian2D
 #ifdef __ANDROID__
 				// Disable dynamic viewport on Android. Some drive has an issue with the dynamic scissors feature.
 #else
-				this->info.scissor.extent.width =  (uint32_t)this->info.width;
-				this->info.scissor.extent.height = (uint32_t)this->info.height;
-				this->info.scissor.offset.x = 0;
-				this->info.scissor.offset.y = 0;
-				vkCmdSetScissor(this->info.cmd, 0, 1, &this->info.scissor);
+				VkRect2D scissor;
+				scissor.extent.width =  (uint32_t)width;
+				scissor.extent.height = (uint32_t)height;
+				scissor.offset.x = 0;
+				scissor.offset.y = 0;
+				vkCmdSetScissor(command_buffer, 0, 1, &scissor);
 #endif
 			}
 
@@ -71,7 +97,7 @@ namespace Obsidian2D
 #elif defined(__ANDROID__)
 				sleep(seconds);
 #else
-				sleep(seconds);
+				//sleep(seconds);
 #endif
 			}
 
@@ -80,8 +106,8 @@ namespace Obsidian2D
 			{
 				/* DEPENDS on info.cmd and info.queue initialized */
 
-				assert(this->info.cmd != VK_NULL_HANDLE);
-				assert(this->info.graphics_queue != VK_NULL_HANDLE);
+				assert(command_buffer != VK_NULL_HANDLE);
+				assert(graphics_queue != VK_NULL_HANDLE);
 
 				VkImageMemoryBarrier image_memory_barrier = {};
 				image_memory_barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
@@ -141,7 +167,7 @@ namespace Obsidian2D
 						break;
 				}
 
-				vkCmdPipelineBarrier(this->info.cmd, src_stages, dest_stages, 0, 0, NULL, 0, NULL, 1, &image_memory_barrier);
+				vkCmdPipelineBarrier(command_buffer, src_stages, dest_stages, 0, 0, NULL, 0, NULL, 1, &image_memory_barrier);
 			}
 
 			void write_ppm(const char *basename)
@@ -150,68 +176,73 @@ namespace Obsidian2D
 				VkResult res;
 
 				VkImageCreateInfo image_create_info = {};
-				image_create_info.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
-				image_create_info.pNext = NULL;
-				image_create_info.imageType = VK_IMAGE_TYPE_2D;
-				image_create_info.format = this->info.format;
-				image_create_info.extent.width =  (uint32_t) this->info.width;
-				image_create_info.extent.height = (uint32_t) this->info.height;
-				image_create_info.extent.depth = 1;
-				image_create_info.mipLevels = 1;
-				image_create_info.arrayLayers = 1;
-				image_create_info.samples = VK_SAMPLE_COUNT_1_BIT;
-				image_create_info.tiling = VK_IMAGE_TILING_LINEAR;
-				image_create_info.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-				image_create_info.usage = VK_IMAGE_USAGE_TRANSFER_DST_BIT;
-				image_create_info.queueFamilyIndexCount = 0;
-				image_create_info.pQueueFamilyIndices = NULL;
-				image_create_info.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
-				image_create_info.flags = 0;
+				image_create_info.sType 									 		= VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
+				image_create_info.pNext 									 		= NULL;
+				image_create_info.imageType 								 		= VK_IMAGE_TYPE_2D;
+				image_create_info.format 									 		= format;
+				image_create_info.extent.width 										= (uint32_t) width;
+				image_create_info.extent.height 									= (uint32_t) height;
+				image_create_info.extent.depth 										= 1;
+				image_create_info.mipLevels 								 		= 1;
+				image_create_info.arrayLayers 								 		= 1;
+				image_create_info.samples 									 		= VK_SAMPLE_COUNT_1_BIT;
+				image_create_info.tiling 									 		= VK_IMAGE_TILING_LINEAR;
+				image_create_info.initialLayout 							 		= VK_IMAGE_LAYOUT_UNDEFINED;
+				image_create_info.usage 									 		= VK_IMAGE_USAGE_TRANSFER_DST_BIT;
+				image_create_info.queueFamilyIndexCount 					 		= 0;
+				image_create_info.pQueueFamilyIndices 						 		= NULL;
+				image_create_info.sharingMode 								 		= VK_SHARING_MODE_EXCLUSIVE;
+				image_create_info.flags 									 		= 0;
 
 				VkMemoryAllocateInfo mem_alloc = {};
-				mem_alloc.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
-				mem_alloc.pNext = NULL;
-				mem_alloc.allocationSize = 0;
-				mem_alloc.memoryTypeIndex = 0;
+				mem_alloc.sType 													= VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
+				mem_alloc.pNext 													= NULL;
+				mem_alloc.allocationSize 											= 0;
+				mem_alloc.memoryTypeIndex 											= 0;
 
 				VkImage mappableImage;
 				VkDeviceMemory mappableMemory;
 
 				/* Create a mappable image */
-				res = vkCreateImage(this->info.device, &image_create_info, NULL, &mappableImage);
+				res = vkCreateImage(device, &image_create_info, NULL, &mappableImage);
 				assert(res == VK_SUCCESS);
 
 				VkMemoryRequirements mem_reqs;
-				vkGetImageMemoryRequirements(this->info.device, mappableImage, &mem_reqs);
+				vkGetImageMemoryRequirements(device, mappableImage, &mem_reqs);
 
 				mem_alloc.allocationSize = mem_reqs.size;
 
 				/* Find the memory type that is host mappable */
-				bool pass = memory_type_from_properties(info, mem_reqs.memoryTypeBits,
-														VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-														&mem_alloc.memoryTypeIndex);
+				bool pass = memory_type_from_properties(
+						memory_properties,
+						mem_reqs.memoryTypeBits,
+						VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+						&mem_alloc.memoryTypeIndex
+				);
 				assert(pass && "No mappable, coherent memory");
 
 				/* allocate memory */
-				res = vkAllocateMemory(this->info.device, &mem_alloc, NULL, &(mappableMemory));
+				res = vkAllocateMemory(device, &mem_alloc, NULL, &(mappableMemory));
 				assert(res == VK_SUCCESS);
 
 				/* bind memory */
-				res = vkBindImageMemory(this->info.device, mappableImage, mappableMemory, 0);
+				res = vkBindImageMemory(device, mappableImage, mappableMemory, 0);
 				assert(res == VK_SUCCESS);
 
 				VkCommandBufferBeginInfo cmd_buf_info = {};
-				cmd_buf_info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-				cmd_buf_info.pNext = NULL;
-				cmd_buf_info.flags = 0;
-				cmd_buf_info.pInheritanceInfo = NULL;
+				cmd_buf_info.sType 										= VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+				cmd_buf_info.pNext 										= NULL;
+				cmd_buf_info.flags 										= 0;
+				cmd_buf_info.pInheritanceInfo 							= NULL;
 
-				res = vkBeginCommandBuffer(this->info.cmd, &cmd_buf_info);
+				res = vkBeginCommandBuffer(command_buffer, &cmd_buf_info);
+				assert(res == VK_SUCCESS);
+
 				this->set_image_layout(mappableImage, VK_IMAGE_ASPECT_COLOR_BIT, VK_IMAGE_LAYOUT_UNDEFINED,
-								 VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT);
+									   VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT);
 
-				this->set_image_layout(this->info.buffers[this->info.current_buffer].image, VK_IMAGE_ASPECT_COLOR_BIT, VK_IMAGE_LAYOUT_PRESENT_SRC_KHR,
-								 VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT);
+				this->set_image_layout(buffers[current_buffer].image, VK_IMAGE_ASPECT_COLOR_BIT, VK_IMAGE_LAYOUT_PRESENT_SRC_KHR,
+									   VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT);
 
 				VkImageCopy copy_region;
 				copy_region.srcSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
@@ -228,26 +259,26 @@ namespace Obsidian2D
 				copy_region.dstOffset.x = 0;
 				copy_region.dstOffset.y = 0;
 				copy_region.dstOffset.z = 0;
-				copy_region.extent.width =  (uint32_t)this->info.width;
-				copy_region.extent.height = (uint32_t)this->info.height;
+				copy_region.extent.width =  (uint32_t)width;
+				copy_region.extent.height = (uint32_t)height;
 				copy_region.extent.depth = 1;
 
 				/* Put the copy command into the command buffer */
-				vkCmdCopyImage(this->info.cmd, this->info.buffers[this->info.current_buffer].image, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, mappableImage,
+				vkCmdCopyImage(command_buffer, buffers[current_buffer].image, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, mappableImage,
 							   VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &copy_region);
 
 				this->set_image_layout(mappableImage, VK_IMAGE_ASPECT_COLOR_BIT, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_GENERAL,
-								 VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_HOST_BIT);
+									   VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_HOST_BIT);
 
-				res = vkEndCommandBuffer(this->info.cmd);
+				res = vkEndCommandBuffer(command_buffer);
 				assert(res == VK_SUCCESS);
-				const VkCommandBuffer cmd_bufs[] = {this->info.cmd};
+				const VkCommandBuffer cmd_bufs[] = {command_buffer};
 				VkFenceCreateInfo fenceInfo;
 				VkFence cmdFence;
 				fenceInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
 				fenceInfo.pNext = NULL;
 				fenceInfo.flags = 0;
-				vkCreateFence(this->info.device, &fenceInfo, NULL, &cmdFence);
+				vkCreateFence(device, &fenceInfo, NULL, &cmdFence);
 
 				VkSubmitInfo submit_info[1] = {};
 				submit_info[0].pNext = NULL;
@@ -261,16 +292,16 @@ namespace Obsidian2D
 				submit_info[0].pSignalSemaphores = NULL;
 
 				/* Queue the command buffer for execution */
-				res = vkQueueSubmit(this->info.graphics_queue, 1, submit_info, cmdFence);
+				res = vkQueueSubmit(graphics_queue, 1, submit_info, cmdFence);
 				assert(res == VK_SUCCESS);
 
 				/* Make sure command buffer is finished before mapping */
 				do {
-					res = vkWaitForFences(this->info.device, 1, &cmdFence, VK_TRUE, 100000000);
+					res = vkWaitForFences(device, 1, &cmdFence, VK_TRUE, 100000000);
 				} while (res == VK_TIMEOUT);
 				assert(res == VK_SUCCESS);
 
-				vkDestroyFence(this->info.device, cmdFence, NULL);
+				vkDestroyFence(device, cmdFence, NULL);
 
 				filename.append(basename);
 				filename.append(".ppm");
@@ -280,16 +311,16 @@ namespace Obsidian2D
 				subres.mipLevel = 0;
 				subres.arrayLayer = 0;
 				VkSubresourceLayout sr_layout;
-				vkGetImageSubresourceLayout(this->info.device, mappableImage, &subres, &sr_layout);
+				vkGetImageSubresourceLayout(device, mappableImage, &subres, &sr_layout);
 
 				char *ptr;
-				res = vkMapMemory(this->info.device, mappableMemory, 0, mem_reqs.size, 0, (void **)&ptr);
+				res = vkMapMemory(device, mappableMemory, 0, mem_reqs.size, 0, (void **)&ptr);
 				assert(res == VK_SUCCESS);
 
 				ptr += sr_layout.offset;
-				vkUnmapMemory( this->info.device, mappableMemory);
-				vkDestroyImage(this->info.device, mappableImage, NULL);
-				vkFreeMemory(  this->info.device, mappableMemory, NULL);
+				vkUnmapMemory(device, mappableMemory);
+				vkDestroyImage(device, mappableImage, NULL);
+				vkFreeMemory(device, mappableMemory, NULL);
 			}
 
 

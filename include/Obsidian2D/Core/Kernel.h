@@ -67,7 +67,7 @@ namespace Obsidian2D
 				});
 
 				if(config.debug) {
-					xcbWindow->logExtensions();
+					//xcbWindow->logExtensions();
 				}
 
 

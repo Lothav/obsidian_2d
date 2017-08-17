@@ -1,14 +1,19 @@
 #ifndef OBSIDIAN2D_CORE_CAMERA_H
 #define OBSIDIAN2D_CORE_CAMERA_H
 
-#include "Obsidian2D/Renderer/VulkanInfo.h"
-#include "Pipeline.h"
+#include "Shaders.h"
+
+typedef struct _view_camera {
+	glm::vec3 eye;
+	glm::vec3 center;
+	glm::vec3 up;
+} ViewCamera;
 
 namespace Obsidian2D
 {
 	namespace Renderer
 	{
-		class Camera : public Pipeline
+		class Camera : public Shaders
 		{
 		private:
 
