@@ -1037,9 +1037,6 @@ namespace Obsidian2D
 				fenceInfo.pNext = NULL;
 				fenceInfo.flags = 0;
 				vkCreateFence(device, &fenceInfo, NULL, &drawFence);
-
-				/* Make sure command buffer is finished before presenting */
-				this->draw();
 			}
 
 			void draw()

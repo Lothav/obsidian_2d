@@ -301,6 +301,7 @@ namespace Obsidian2D
 						sizeof(g_vb_texture_Data),
 						sizeof(g_vb_texture_Data[0])
 				);
+				this->draw();
 			}
 
 			int y = 0, x =0;
