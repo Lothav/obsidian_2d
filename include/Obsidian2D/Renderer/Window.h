@@ -331,7 +331,7 @@ namespace Obsidian2D
 				}
 
 				struct {
-					VkFormat format;
+					VkFormat format = VK_FORMAT_UNDEFINED;
 					VkImage image;
 					VkDeviceMemory mem;
 					VkImageView view;
