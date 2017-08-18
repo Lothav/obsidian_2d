@@ -1,1 +1,0 @@
-/usr/bin/c++  -O3 -DNDEBUG  -rdynamic CMakeFiles/spirv-dis.dir/dis/dis.cpp.o  -o spirv-dis ../source/libSPIRV-Tools.a 
