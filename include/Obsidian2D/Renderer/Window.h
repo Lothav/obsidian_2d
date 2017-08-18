@@ -1029,8 +1029,7 @@ namespace Obsidian2D
 
 				vkCmdDraw(command_buffer, 12 * 3, 1, 0, 0);
 				vkCmdEndRenderPass(command_buffer);
-				res = vkEndCommandBuffer(command_buffer);
-				const VkCommandBuffer cmd_bufs[] = {command_buffer};
+				vkEndCommandBuffer(command_buffer);
 				VkFenceCreateInfo fenceInfo;
 
 				fenceInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;

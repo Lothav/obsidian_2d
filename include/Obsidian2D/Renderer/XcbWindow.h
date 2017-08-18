@@ -310,7 +310,7 @@ namespace Obsidian2D
 			::Obsidian2D::Core::WindowEvent poolEvent()
 			{
 				xcb_generic_event_t* e = nullptr;
-				xcb_intern_atom_reply_t *atom_wm_delete_window;
+				xcb_intern_atom_reply_t *atom_wm_delete_window = nullptr;
 
 				while ((e = xcb_poll_for_event(connection))) {
 					if ((e->response_type & ~0x80) == XCB_CLIENT_MESSAGE) {
@@ -326,8 +326,6 @@ namespace Obsidian2D
 					} else if((e->response_type & ~0x80) == XCB_BUTTON_RELEASE) {
 						//return ::Obsidian2D::Core::WindowEvent::ClickEnd;
 					} else if((e->response_type & ~0x80) == XCB_KEY_PRESS) {
-
-						VkResult U_ASSERT_ONLY res;
 
 						xcb_key_press_event_t * kp = (xcb_key_press_event_t *)e;
 
