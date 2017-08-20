@@ -32,15 +32,8 @@ namespace Obsidian2D
 		class Util : public Obsidian2D::Util::Loggable
 		{
 		protected:
-			VkDevice 								device;
 			int32_t									width;
 			int32_t									height;
-			std::vector<VkCommandBuffer>			command_buffer;
-			VkFormat 								format;
-			VkQueue 								graphics_queue, present_queue;
-			VkPhysicalDeviceMemoryProperties 		memory_properties;
-			std::vector<swap_chain_buffer> 			buffers;
-			uint32_t 								current_buffer = 0;
 
 			bool memory_type_from_properties(VkPhysicalDeviceMemoryProperties memory_properties, uint32_t typeBits, VkFlags requirements_mask, uint32_t *typeIndex)
 			{
