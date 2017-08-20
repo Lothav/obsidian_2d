@@ -285,7 +285,7 @@ namespace Obsidian2D
 
 			void bootstrap()
 			{
-				const bool depthPresent = false;
+				const bool depthPresent = true;
 
 				this->createInstance();
 				this->createLogicalDeviceAndCommandBuffer();

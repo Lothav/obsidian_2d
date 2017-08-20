@@ -33,7 +33,7 @@ namespace Obsidian2D
 			VkPhysicalDeviceProperties 				gpu_props;
 			VkSemaphore         					imageAcquiredSemaphore;
 			VkSemaphore         					renderSemaphore;
-			VkFence             					drawFence;
+			std::vector<VkFence>					drawFence;
 			VkSwapchainKHR swap_chain;
 
 		protected:
@@ -134,15 +134,17 @@ namespace Obsidian2D
 				res = vkCreateCommandPool(device, &cmd_pool_info, NULL, &_command_pool);
 				assert(res == VK_SUCCESS);
 
+				command_buffer.resize(3);
+
 				/* Create the command buffer from the command pool */
 				VkCommandBufferAllocateInfo cmd = {};
 				cmd.sType 				= VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
 				cmd.pNext 			 	= NULL;
 				cmd.commandPool 	 	= _command_pool;
 				cmd.level 			 	= VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-				cmd.commandBufferCount  = 1;
+				cmd.commandBufferCount  = 3;
 
-				res = vkAllocateCommandBuffers(device, &cmd, &command_buffer);
+				res = vkAllocateCommandBuffers(device, &cmd, command_buffer.data());
 				assert(res == VK_SUCCESS);
 			}
 
@@ -165,8 +167,6 @@ namespace Obsidian2D
 				cmd_buf_info.flags 							= 0;
 				cmd_buf_info.pInheritanceInfo 				= NULL;
 
-				res = vkBeginCommandBuffer(command_buffer, &cmd_buf_info);
-				assert(res == VK_SUCCESS);
 
 				vkGetDeviceQueue(device, graphics_queue_family_index, 0, &graphics_queue);
 				if (graphics_queue_family_index == present_queue_family_index) {
@@ -183,12 +183,11 @@ namespace Obsidian2D
 				res = vkGetPhysicalDeviceSurfaceCapabilitiesKHR(gpu_vector[0], surface, &surfCapabilities);
 				assert(res == VK_SUCCESS);
 
-				uint32_t presentModeCount;
-				res = vkGetPhysicalDeviceSurfacePresentModesKHR(gpu_vector[0], surface, &presentModeCount, NULL);
+				res = vkGetPhysicalDeviceSurfacePresentModesKHR(gpu_vector[0], surface, &queue_family_count, NULL);
 				assert(res == VK_SUCCESS);
-				VkPresentModeKHR *presentModes = (VkPresentModeKHR *)malloc(presentModeCount * sizeof(VkPresentModeKHR));
+				VkPresentModeKHR *presentModes = (VkPresentModeKHR *)malloc(queue_family_count * sizeof(VkPresentModeKHR));
 				assert(presentModes);
-				res = vkGetPhysicalDeviceSurfacePresentModesKHR(gpu_vector[0], surface, &presentModeCount, presentModes);
+				res = vkGetPhysicalDeviceSurfacePresentModesKHR(gpu_vector[0], surface, &queue_family_count, presentModes);
 				assert(res == VK_SUCCESS);
 
 				VkExtent2D swapchainExtent;
@@ -223,7 +222,7 @@ namespace Obsidian2D
 				// Asking for minImageCount images ensures that we can acquire
 				// 1 presentable image as long as we present it before attempting
 				// to acquire another.
-				uint32_t desiredNumberOfSwapChainImages = surfCapabilities.minImageCount;
+				uint32_t desiredNumberOfSwapChainImages = surfCapabilities.minImageCount +1 ;
 
 				VkSurfaceTransformFlagBitsKHR preTransform;
 				if (surfCapabilities.supportedTransforms & VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR) {
@@ -315,7 +314,7 @@ namespace Obsidian2D
 					color_image_view.viewType 							= VK_IMAGE_VIEW_TYPE_2D;
 					color_image_view.flags 								= 0;
 
-					sc_buffer.image = swapchainImages[0];
+					sc_buffer.image = swapchainImages[i];
 					color_image_view.image = sc_buffer.image;
 
 					res = vkCreateImageView(device, &color_image_view, NULL, &sc_buffer.view);
@@ -324,7 +323,6 @@ namespace Obsidian2D
 				}
 
 				free(swapchainImages);
-				current_buffer = 0;
 
 				if (NULL != presentModes) {
 					free(presentModes);
@@ -517,10 +515,10 @@ namespace Obsidian2D
 				/* Next take layout bindings and use them to create a descriptor set layout
 				 */
 				VkDescriptorSetLayoutCreateInfo descriptor_layout = {};
-				descriptor_layout.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
-				descriptor_layout.pNext = NULL;
-				descriptor_layout.bindingCount = use_texture ? 2 : 1;
-				descriptor_layout.pBindings = layout_bindings;
+				descriptor_layout.sType 								= VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
+				descriptor_layout.pNext 								= NULL;
+				descriptor_layout.bindingCount 							= use_texture ? 2 : 1;
+				descriptor_layout.pBindings 							= layout_bindings;
 
 				std::vector<VkDescriptorSetLayout> desc_layout;
 
@@ -684,8 +682,6 @@ namespace Obsidian2D
 					res = vkCreateFramebuffer(device, &fb_info, NULL, &framebuffers[i]);
 					assert(res == VK_SUCCESS);
 				}
-
-
 
 				VkBufferCreateInfo vertex_buf_info = {};
 				vertex_buf_info.sType 									= VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
@@ -1007,7 +1003,6 @@ namespace Obsidian2D
 				rp_begin.sType 											= VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
 				rp_begin.pNext 											= NULL;
 				rp_begin.renderPass 									= render_pass;
-				rp_begin.framebuffer 									= framebuffers[current_buffer];
 				rp_begin.renderArea.offset.x 							= 0;
 				rp_begin.renderArea.offset.y 							= 0;
 				rp_begin.renderArea.extent.width 						= (uint32_t)width;
@@ -1015,27 +1010,38 @@ namespace Obsidian2D
 				rp_begin.clearValueCount 								= 2;
 				rp_begin.pClearValues 									= clear_values;
 
-				vkCmdBeginRenderPass(command_buffer, &rp_begin, VK_SUBPASS_CONTENTS_INLINE);
-
-				vkCmdBindPipeline(command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, vkPipeline);
-				vkCmdBindDescriptorSets(command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline_layout, 0, 1,
-										desc_set.data(), 0, NULL);
-
-				const VkDeviceSize offsets[1] = {0};
-				vkCmdBindVertexBuffers(command_buffer, 0, 1, &vertex_buffer.buf, offsets);
-
-				this->init_viewports();
-				this->init_scissors();
-
-				vkCmdDraw(command_buffer, 12 * 3, 1, 0, 0);
-				vkCmdEndRenderPass(command_buffer);
-				vkEndCommandBuffer(command_buffer);
 				VkFenceCreateInfo fenceInfo;
-
 				fenceInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
 				fenceInfo.pNext = NULL;
 				fenceInfo.flags = 0;
-				vkCreateFence(device, &fenceInfo, NULL, &drawFence);
+
+				drawFence.resize(command_buffer.size());
+				for (i = 0; i < command_buffer.size(); i++){
+					rp_begin.framebuffer = framebuffers[i];
+
+					res = vkBeginCommandBuffer(command_buffer[i], &cmd_buf_info);
+					assert(res == VK_SUCCESS);
+
+					vkCreateFence(device, &fenceInfo, NULL, &drawFence[i]);
+
+					vkCmdBeginRenderPass(command_buffer[i], &rp_begin, VK_SUBPASS_CONTENTS_INLINE);
+					vkCmdBindPipeline(command_buffer[i], VK_PIPELINE_BIND_POINT_GRAPHICS, vkPipeline);
+					vkCmdBindDescriptorSets(command_buffer[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline_layout, 0, 1,
+											desc_set.data(), 0, NULL);
+
+					const VkDeviceSize offsets[1] = {0};
+					vkCmdBindVertexBuffers(command_buffer[i], 0, 1, &vertex_buffer.buf, offsets);
+
+					this->init_viewports(command_buffer[i]);
+					this->init_scissors(command_buffer[i]);
+
+					vkCmdDraw(command_buffer[i], 12 * 3, 1, 0, 0);
+					vkCmdEndRenderPass(command_buffer[i]);
+					res = vkEndCommandBuffer(command_buffer[i]);
+					assert(res == VK_SUCCESS);
+					current_buffer = 0;
+
+				}
 			}
 
 			void draw()
@@ -1047,7 +1053,6 @@ namespace Obsidian2D
 				assert(res == VK_SUCCESS);
 
 				VkPipelineStageFlags pipe_stage_flags = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
-				const VkCommandBuffer cmd_bufs[] = {command_buffer};
 
 				VkSubmitInfo submit_info;
 				submit_info.pNext                   = NULL;
@@ -1056,18 +1061,18 @@ namespace Obsidian2D
 				submit_info.pWaitSemaphores         = &imageAcquiredSemaphore;
 				submit_info.pWaitDstStageMask       = &pipe_stage_flags;
 				submit_info.commandBufferCount      = 1;
-				submit_info.pCommandBuffers         = cmd_bufs;
+				submit_info.pCommandBuffers         = &command_buffer[current_buffer];
 				submit_info.signalSemaphoreCount    = 1;
 				submit_info.pSignalSemaphores       = &renderSemaphore;
 
-				res = vkQueueSubmit(graphics_queue, 1, &submit_info, drawFence);
+				res = vkQueueSubmit(graphics_queue, 1, &submit_info, drawFence[current_buffer]);
 				assert(res == VK_SUCCESS);
 
 				do {
-					res = vkWaitForFences(device, 1, &drawFence, VK_TRUE, VK_SAMPLE_COUNT_1_BIT);
+					res = vkWaitForFences(device, 1, &drawFence[current_buffer], VK_TRUE, VK_SAMPLE_COUNT_1_BIT);
 				} while (res == VK_TIMEOUT);
 				assert(res == VK_SUCCESS);
-				vkResetFences(device, 1, &drawFence);
+				vkResetFences(device, 1, &drawFence[current_buffer]);
 
 
 				VkPresentInfoKHR present;
