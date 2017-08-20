@@ -222,7 +222,11 @@ namespace Obsidian2D
 				// Asking for minImageCount images ensures that we can acquire
 				// 1 presentable image as long as we present it before attempting
 				// to acquire another.
-				uint32_t desiredNumberOfSwapChainImages = surfCapabilities.minImageCount +1 ;
+				uint32_t desiredNumberOfSwapChainImages = surfCapabilities.minImageCount + 1;
+				if ((surfCapabilities.maxImageCount > 0) && (desiredNumberOfSwapChainImages > surfCapabilities.maxImageCount))
+				{
+					desiredNumberOfSwapChainImages = surfCapabilities.maxImageCount;
+				}
 
 				VkSurfaceTransformFlagBitsKHR preTransform;
 				if (surfCapabilities.supportedTransforms & VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR) {
