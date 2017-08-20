@@ -37,7 +37,7 @@ namespace Obsidian2D
 				vkFreeMemory(device, vertex_buffer.mem, NULL);
 
 				// Destroy frame buffer
-				for (uint32_t i = 0; i < swapchainImageCount; i++) {
+				for (i = 0; i < swapchainImageCount; i++) {
 					vkDestroyFramebuffer(device, framebuffers[i], NULL);
 				}
 				free(framebuffers);
@@ -583,9 +583,9 @@ namespace Obsidian2D
 				res = vkCreateImageView(device, &view_info, NULL, &depth.view);
 				assert(res == VK_SUCCESS);
 
-				this->initCamera(width, height);
+				this->initCamera();
 
-				glm::mat4 MVP;
+				glm::mat4 MVP = this->getMVP();
 				uint8_t *pData;
 				VkBufferCreateInfo buf_info = {};
 

@@ -16,14 +16,17 @@ struct Vertex {
 	float posX, posY, posZ, posW;  // Position data
 	float r, g, b, a;              // Color
 };
+#define UV(_u_, _v_) (_u_), (_v_)
 
 static const VertexUV g_vb_texture_Data[] = {
-		{XYZ1(-1, -1, 1)},
-		{XYZ1( 1, -1, 1)},
-		{XYZ1( 1,  1, 1)},
-		{XYZ1(-1, -1, 1)},
-		{XYZ1( 1,  1, 1)},
-		{XYZ1(-1,  1, 1)}
+		// left face
+		{XYZ1(-1, -1, -1), UV(1.f, 0.f)},  // lft-top-front
+		{XYZ1(-1, 1, 1), UV(0.f, 1.f)},    // lft-btm-back
+		{XYZ1(-1, -1, 1), UV(0.f, 0.f)},   // lft-top-back
+		{XYZ1(-1, 1, 1), UV(0.f, 1.f)},    // lft-btm-back
+		{XYZ1(-1, -1, -1), UV(1.f, 0.f)},  // lft-top-front
+		{XYZ1(-1, 1, -1), UV(1.f, 1.f)},   // lft-btm-front
+
 };
 
 namespace Obsidian2D
@@ -43,6 +46,9 @@ namespace Obsidian2D
 			xcb_screen_t* 							screen;
 			xcb_window_t 							window;
 			xcb_connection_t*						connection;
+
+			std::array<int, 3>						camera_center;
+			std::array<int, 3>						camera_eye;
 
 			void setConnection()
 			{
@@ -136,11 +142,12 @@ namespace Obsidian2D
 				this->createWindow();
 				this->createSurface();
 				this->initGraphicPipeline(depthPresent, g_vb_texture_Data);
+
+				camera_center = this->getCameraDefaultCenter();
+				camera_eye = this->getCameraDefaultEye();
+
 				this->draw();
 			}
-
-			int y = 0, x =0;
-			int c_x = 0, c_y = 0;
 
 			::Obsidian2D::Core::WindowEvent poolEvent()
 			{
@@ -165,28 +172,36 @@ namespace Obsidian2D
 						xcb_key_press_event_t * kp = (xcb_key_press_event_t *)e;
 
 						if( kp->detail == 'O'){
-							x--;
+							camera_center[0]--;
 						}else if(kp->detail == 'P'){
-							y++;
+							camera_center[1]++;
 						}else if(kp->detail == 'Q'){
-							x++;
+							camera_center[0]++;
 						}else if(kp->detail == 'j'){
-							y--;
+							camera_center[1]--;
+						}else if(kp->detail == 'Z'){
+							camera_center[2]--;
+						}else if(kp->detail == '['){
+							camera_center[2]++;
 						}
 
 						if( kp->detail == 'W'){
-							c_x--;
+							camera_center[0]--;
 						}else if(kp->detail == 'X'){
-							c_y--;
+							camera_center[1]--;
 						}else if(kp->detail == 'Y'){
-							c_x++;
+							camera_center[0]++;
 						}else if(kp->detail == 'T'){
-							c_y++;
+							camera_center[1]++;
+						}else if(kp->detail == 'S'){
+							camera_center[2]--;
+						}else if(kp->detail == 'U'){
+							camera_center[2]++;
 						}
 
 						std::cout << kp->detail << std::endl;
-						this->setCameraViewCenter(glm::vec3(x, y, 0));
-						this->setCameraViewEye(glm::vec3(c_x, c_y, -10));
+						this->setCameraViewCenter(glm::vec3(camera_center[0], camera_center[1], camera_center[2]));
+						this->setCameraViewEye(glm::vec3(camera_eye[0], camera_eye[1], camera_eye[2]));
 						this->updateCamera();
 
 						this->draw();

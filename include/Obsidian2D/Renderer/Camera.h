@@ -26,7 +26,11 @@ namespace Obsidian2D
 
 			glm::mat4 _mvp; // Model View Projection
 
-			void* _buffer_address = nullptr;
+			void* _buffer_address 						= nullptr;
+
+			const std::array<int, 3> _default_eye		= {-16, -32, -26};
+			const std::array<int, 3> _default_center	= {-3,   8,   1};
+			const std::array<int, 3> _default_up 		= { 0,  -1,   0};
 
 			void updateMVP()
 			{
@@ -35,17 +39,17 @@ namespace Obsidian2D
 
 		public:
 
-			void initCamera(int width, int height)
+			void initCamera()
 			{
 				float fov = glm::radians(45.0f);
 				if (width > height) {
 					fov *= static_cast<float>(height) / static_cast<float>(width);
 				}
-				this->_projection = glm::perspective(fov, static_cast<float>(width) / static_cast<float>(height), 0.2f, 1.0f);
+				this->_projection = glm::perspective(fov, static_cast<float>(width) / static_cast<float>(height), 0.1f, 100.0f);
 
-				this->_view_camera.eye 	  = glm::vec3(0, 0, -10); 	// Camera is at (-5,3,-10), in World Space
-				this->_view_camera.center = glm::vec3(0, 0,   0); 	// and looks at the origin
-				this->_view_camera.up     = glm::vec3(0, 1,   0);    // Head is up (set to 0,-1,0 to look upside-down)
+				this->_view_camera.eye 	  =  glm::vec3(_default_eye[0], _default_eye[1], _default_eye[2]);
+				this->_view_camera.center =  glm::vec3(_default_center[0], _default_center[1], _default_center[2]);
+				this->_view_camera.up     =  glm::vec3( _default_up[0], _default_up[1], _default_up[2]);
 
 				this->_view = glm::lookAt( this->_view_camera.eye, this->_view_camera.center, this->_view_camera.up );
 
@@ -53,8 +57,8 @@ namespace Obsidian2D
 				// Vulkan clip space has inverted Y and half Z.
 				this->_clip = glm::mat4(1.0f, 0.0f, 0.0f, 0.0f,
 										0.0f, -1.0f, 0.0f, 0.0f,
-										0.0f, 0.0f, 0.5f, 0.5f,
-										0.0f, 0.0f, 0.0f, 1.0f);
+										0.0f, 0.0f, 0.5f, 0.0f,
+										0.0f, 0.0f, 0.5f, 1.0f);
 
 				this->updateMVP();
 			}
@@ -84,6 +88,21 @@ namespace Obsidian2D
 				this->_view = glm::lookAt( this->_view_camera.eye, this->_view_camera.center, this->_view_camera.up );
 				this->updateMVP();
 			}
+
+			glm::mat4 getMVP()
+			{
+				return this->_mvp;
+			}
+
+			std::array<int, 3> getCameraDefaultEye()
+			{
+				return _default_eye;
+			};
+
+			std::array<int, 3> getCameraDefaultCenter()
+			{
+				return _default_center;
+			};
 
 			void updateCamera()
 			{
