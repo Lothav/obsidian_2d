@@ -34,12 +34,9 @@ namespace Obsidian2D
 		{
 		public:
 
-			~XcbWindow(){
-
-				vkDestroySurfaceKHR(instance, surface, NULL);
+			~XcbWindow() {
 				xcb_destroy_window(connection, window);
 				xcb_disconnect(connection);
-
 			}
 		private:
 

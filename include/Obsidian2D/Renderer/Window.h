@@ -26,6 +26,8 @@ namespace Obsidian2D
 
 			~Window()
 			{
+				uint32_t i;
+
 				vkDestroyPipeline(device, vkPipeline, NULL);
 				vkDestroyPipelineCache(device, pPipelineCache, NULL);
 				vkDestroyDescriptorPool(device, desc_pool, NULL);
@@ -61,7 +63,7 @@ namespace Obsidian2D
 				vkFreeMemory(device, depth.mem, NULL);
 
 				// Destroy Swap Chain
-				for (uint32_t i = 0; i < swapchainImageCount; i++) {
+				for (i = 0; i < swapchainImageCount; i++) {
 					vkDestroyImageView(device, buffers[i].view, NULL);
 				}
 				vkDestroySwapchainKHR(device, swap_chain, NULL);
@@ -69,7 +71,15 @@ namespace Obsidian2D
 				vkFreeCommandBuffers(device, _command_pool, 1, command_buffer.data());
 				vkDestroyCommandPool(device, _command_pool, NULL);
 
+				vkDestroySemaphore(device, imageAcquiredSemaphore, nullptr);
+				vkDestroySemaphore(device, renderSemaphore, nullptr);
+
+				for(i = 0; i < drawFence.size(); i++){
+					vkDestroyFence(device, drawFence[i], nullptr);
+				}
+
 				vkDestroyDevice(this->device, NULL);
+				vkDestroySurfaceKHR(instance, surface, NULL);
 				vkDestroyInstance(instance, NULL);
 			}
 
