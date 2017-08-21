@@ -28,9 +28,9 @@ namespace Obsidian2D
 
 			void* _buffer_address 						= nullptr;
 
-			const std::array<int, 3> _default_eye		= {-16, -32, -26};
-			const std::array<int, 3> _default_center	= {-3,   8,   1};
-			const std::array<int, 3> _default_up 		= { 0,  -1,   0};
+			const std::array<int, 3> _default_eye		= {0, 0, -10};
+			const std::array<int, 3> _default_center	= {0, 0, 0};
+			const std::array<int, 3> _default_up 		= {0, -1, 0 };
 
 			void updateMVP()
 			{

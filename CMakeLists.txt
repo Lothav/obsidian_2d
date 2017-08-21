@@ -81,7 +81,4 @@ file(GLOB_RECURSE RENDERER_FILES include/Obsidian2D/Renderer/*.h)
 
 set(EXECUTABLE_OUTPUT_PATH bin)
 
-set (PTHREAD "pthread")
-
 add_executable(core ${CORE_MAIN_FILE} ${CORE_FILES} ${UTIL_FILES} ${RENDERER_FILES} )
-target_link_libraries(core ${PTHREAD})

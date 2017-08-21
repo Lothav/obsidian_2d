@@ -13,21 +13,11 @@
 #include "Obsidian2D/Core/WindowEvent.h"
 #include <unistd.h>
 
-struct Vertex {
-	float posX, posY, posZ, posW;  // Position data
-	float r, g, b, a;              // Color
-};
-#define UV(_u_, _v_) (_u_), (_v_)
-
-static const VertexUV g_vb_texture_Data[] = {
-		// left face
-		{XYZ1(-1, -1, -1), UV(1.f, 0.f)},  // lft-top-front
-		{XYZ1(-1, 1, 1), UV(0.f, 1.f)},    // lft-btm-back
-		{XYZ1(-1, -1, 1), UV(0.f, 0.f)},   // lft-top-back
-		{XYZ1(-1, 1, 1), UV(0.f, 1.f)},    // lft-btm-back
-		{XYZ1(-1, -1, -1), UV(1.f, 0.f)},  // lft-top-front
-		{XYZ1(-1, 1, -1), UV(1.f, 1.f)},   // lft-btm-front
-
+std::vector<Vertex> g_vb_texture_Data =
+{
+	{ {  1.0f,  1.0f, 0.0f }, { 1.0f, 0.0f, 0.0f } },
+	{ { -1.0f,  1.0f, 0.0f }, { 0.0f, 1.0f, 0.0f } },
+	{ {  0.0f, -1.0f, 0.0f }, { 0.0f, 0.0f, 1.0f } }
 };
 
 namespace Obsidian2D

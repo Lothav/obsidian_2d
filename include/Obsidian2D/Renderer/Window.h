@@ -8,10 +8,19 @@
 #include "Camera.h"
 #define APP_NAME "Obsidian2D"
 
+struct Vertex {
+	float position[3];
+	float color[3];
+};
 struct VertexUV {
 	float posX, posY, posZ, posW;  // Position data
 	float u, v;                    // texture u,v
 };
+/*struct Vertex {
+	float posX, posY, posZ, posW;  // Position data
+	float r, g, b, a;              // Color
+};*/
+#define UV(_u_, _v_) (_u_), (_v_)
 
 namespace Obsidian2D
 {
@@ -242,7 +251,7 @@ namespace Obsidian2D
 				assert(res == VK_SUCCESS);
 			}
 
-			void initGraphicPipeline (const bool depthPresent, const VertexUV* vertexData)
+			void initGraphicPipeline (const bool depthPresent, std::vector<Vertex> vertexData)
 			{
 				VkResult U_ASSERT_ONLY 	res;
 
@@ -255,8 +264,7 @@ namespace Obsidian2D
 				res = vkCreateWin32SurfaceKHR(inst, &createInfo, NULL, &surface);*/
 #endif  // __ANDROID__  && _WIN32
 
-				uint32_t dataSize = sizeof(vertexData);
-				uint32_t dataStride = sizeof(vertexData[0]);
+				uint32_t dataSize = static_cast<uint32_t>(vertexData.size()) * sizeof(Vertex);
 				VkImageUsageFlags usageFlags = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT;
 
 				VkBool32 *pSupportsPresent = (VkBool32 *)malloc(queue_family_count * sizeof(VkBool32));
@@ -740,7 +748,7 @@ namespace Obsidian2D
 
 				// If no shaders were submitted, just return
 				if (!(this->initialVertShaderText || this->initialFragShaderText)) return;
-				
+
 				// Vertex shader
 				shaderStages[0].sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
 				// Set pipeline stage for this shader
@@ -821,8 +829,7 @@ namespace Obsidian2D
 
 				res = vkMapMemory(device, vertex_buffer.mem, 0, mem_reqs.size, 0, (void **)&pData);
 				assert(res == VK_SUCCESS);
-
-				memcpy(pData, vertexData, dataSize);
+				memcpy(pData, vertexData.data(), dataSize);
 
 				vkUnmapMemory(device, vertex_buffer.mem);
 
@@ -832,7 +839,7 @@ namespace Obsidian2D
 				VkVertexInputBindingDescription vi_binding;
 				vi_binding.binding 										= 0;
 				vi_binding.inputRate 									= VK_VERTEX_INPUT_RATE_VERTEX;
-				vi_binding.stride 										= dataStride;
+				vi_binding.stride 										= sizeof(Vertex);
 
 				VkVertexInputAttributeDescription vi_attribs[2];
 				vi_attribs[0].binding 									= 0;
