@@ -245,7 +245,6 @@ namespace Obsidian2D
 			void initGraphicPipeline (const bool depthPresent, const VertexUV* vertexData)
 			{
 				VkResult U_ASSERT_ONLY 	res;
-				bool U_ASSERT_ONLY 		retVal;
 
 #ifdef _WIN32
 		/*		VkWin32SurfaceCreateInfoKHR createInfo = {};
@@ -742,7 +741,7 @@ namespace Obsidian2D
 				// If no shaders were submitted, just return
 				if (!(this->initialVertShaderText || this->initialFragShaderText)) return;
 
-				init_glslang();
+				/*init_glslang();
 				VkShaderModuleCreateInfo moduleCreateInfo;
 
 				if (this->initialVertShaderText) {
@@ -788,8 +787,28 @@ namespace Obsidian2D
 					assert(res == VK_SUCCESS);
 				}
 
-				finalize_glslang();
+				finalize_glslang();*/
 
+
+				// Vertex shader
+				shaderStages[0].sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+				// Set pipeline stage for this shader
+				shaderStages[0].stage = VK_SHADER_STAGE_VERTEX_BIT;
+				// Load binary SPIR-V shader
+				shaderStages[0].module = loadSPIRVShader(getAssetPath() + "shaders/triangle/triangle.vert.spv", device);
+				// Main entry point for the shader
+				shaderStages[0].pName = "main";
+				assert(shaderStages[0].module != VK_NULL_HANDLE);
+
+				// Fragment shader
+				shaderStages[1].sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+				// Set pipeline stage for this shader
+				shaderStages[1].stage = VK_SHADER_STAGE_FRAGMENT_BIT;
+				// Load binary SPIR-V shader
+				shaderStages[1].module = loadSPIRVShader(getAssetPath() + "shaders/triangle/triangle.frag.spv", device);
+				// Main entry point for the shader
+				shaderStages[1].pName = "main";
+				assert(shaderStages[1].module != VK_NULL_HANDLE);
 
 				VkImageView img_attachments[2];
 				img_attachments[1] = depth.view;

@@ -11,6 +11,7 @@
 
 #include "Obsidian2D/Renderer/Window.h"
 #include "Obsidian2D/Core/WindowEvent.h"
+#include <unistd.h>
 
 struct Vertex {
 	float posX, posY, posZ, posW;  // Position data
