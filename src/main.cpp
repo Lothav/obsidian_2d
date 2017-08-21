@@ -1,4 +1,5 @@
 #include <iostream>
+#include "gameloop.h"
 
 void printArgs(int argc, char** argv) {
     for(int i = 0; i < argc; i++) {
@@ -9,5 +10,6 @@ void printArgs(int argc, char** argv) {
 
 int main(int argc, char** argv) {
     printArgs(argc, argv);
+    run();
     return 0;
 }
