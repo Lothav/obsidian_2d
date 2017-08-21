@@ -122,7 +122,8 @@ namespace Obsidian2D
 					moduleCreateInfo.pCode = (uint32_t*)shaderCode;
 
 					VkShaderModule shaderModule;
-					vkCreateShaderModule(device, &moduleCreateInfo, NULL, &shaderModule);
+					VkResult res = vkCreateShaderModule(device, &moduleCreateInfo, NULL, &shaderModule);
+					assert(res == VK_SUCCESS);
 
 					delete[] shaderCode;
 

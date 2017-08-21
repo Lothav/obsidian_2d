@@ -740,56 +740,7 @@ namespace Obsidian2D
 
 				// If no shaders were submitted, just return
 				if (!(this->initialVertShaderText || this->initialFragShaderText)) return;
-
-				/*init_glslang();
-				VkShaderModuleCreateInfo moduleCreateInfo;
-
-				if (this->initialVertShaderText) {
-					std::vector<unsigned int> vtx_spv;
-					shaderStages[0].sType 								= VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
-					shaderStages[0].pNext 								= NULL;
-					shaderStages[0].pSpecializationInfo 				= NULL;
-					shaderStages[0].flags 								= 0;
-					shaderStages[0].stage 								= VK_SHADER_STAGE_VERTEX_BIT;
-					shaderStages[0].pName 								= "main";
-
-					retVal = GLSLtoSPV(VK_SHADER_STAGE_VERTEX_BIT, this->initialVertShaderText, vtx_spv);
-					assert(retVal);
-
-					moduleCreateInfo.sType 								= VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
-					moduleCreateInfo.pNext 								= NULL;
-					moduleCreateInfo.flags 								= 0;
-					moduleCreateInfo.codeSize							= vtx_spv.size() * sizeof(unsigned int);
-					moduleCreateInfo.pCode 								= vtx_spv.data();
-					res = vkCreateShaderModule(device, &moduleCreateInfo, NULL, &shaderStages[0].module);
-					assert(res == VK_SUCCESS);
-				}
-
-				if (this->initialFragShaderText) {
-					std::vector<unsigned int> frag_spv;
-					shaderStages[1].sType 								= VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
-					shaderStages[1].pNext 								= NULL;
-					shaderStages[1].pSpecializationInfo 				= NULL;
-					shaderStages[1].flags 								= 0;
-					shaderStages[1].stage 								= VK_SHADER_STAGE_FRAGMENT_BIT;
-					shaderStages[1].pName 								= "main";
-
-					retVal = GLSLtoSPV(VK_SHADER_STAGE_FRAGMENT_BIT, this->initialFragShaderText, frag_spv);
-					assert(retVal);
-
-					moduleCreateInfo.sType 								= VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
-					moduleCreateInfo.pNext 								= NULL;
-					moduleCreateInfo.flags 								= 0;
-					moduleCreateInfo.codeSize 							= frag_spv.size() * sizeof(unsigned int);
-					moduleCreateInfo.pCode 								= frag_spv.data();
-
-					res = vkCreateShaderModule(device, &moduleCreateInfo, NULL, &shaderStages[1].module);
-					assert(res == VK_SUCCESS);
-				}
-
-				finalize_glslang();*/
-
-
+				
 				// Vertex shader
 				shaderStages[0].sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
 				// Set pipeline stage for this shader
