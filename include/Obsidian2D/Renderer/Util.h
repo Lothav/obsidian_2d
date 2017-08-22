@@ -4,6 +4,7 @@
 
 #ifndef OBSIDIAN2D_CORE_UTIL_H
 #define OBSIDIAN2D_CORE_UTIL_H
+#include "./vulkan/vulkan.h"
 
 #if defined(NDEBUG) && defined(__GNUC__)
 #define U_ASSERT_ONLY __attribute__((unused))

@@ -149,7 +149,7 @@ namespace Obsidian2D
 
 				_instance_extension_names.push_back(VK_KHR_SURFACE_EXTENSION_NAME);
 				//@TODO extension for win32 VK_KHR_WIN32_SURFACE_EXTENSION_NAME
-				_instance_extension_names.push_back(VK_KHR_XCB_SURFACE_EXTENSION_NAME);
+				_instance_extension_names.push_back("VK_KHR_xcb_surface");
 
 				VkApplicationInfo _app_info = {};
 				_app_info.sType 				= VK_STRUCTURE_TYPE_APPLICATION_INFO;
@@ -745,9 +745,6 @@ namespace Obsidian2D
 
 				res = vkCreateRenderPass(device, &rp_info, NULL, &render_pass);
 				assert(res == VK_SUCCESS);
-
-				// If no shaders were submitted, just return
-				if (!(this->initialVertShaderText || this->initialFragShaderText)) return;
 
 				// Vertex shader
 				shaderStages[0].sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;

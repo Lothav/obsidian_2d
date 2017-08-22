@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.5)
 project(Obsidian2D)
 
-set(CMAKE_CXX_FLAGS "-lvulkan -lxcb")
+set(CMAKE_CXX_FLAGS "-lxcb")
 
 set(CMAKE_BUILD_TYPE Debug)
 
@@ -19,6 +19,8 @@ if (CMAKE_COMPILER_IS_GNUCC OR CMAKE_C_COMPILER_ID MATCHES "Clang")
     endif()
 endif()
 
+find_library(Vulkan_LIBRARY NAMES vulkan HINTS  "${CMAKE_SOURCE_DIR}/include/Obsidian2d/Renderer/vulkan" REQUIRED)
+
 if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
 
 	set(FALLBACK_CONFIG_DIRS "/etc/xdg" CACHE STRING
@@ -26,7 +28,8 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
 	set(FALLBACK_DATA_DIRS "/usr/local/share:/usr/share" CACHE STRING
 			"Search path to use when XDG_DATA_DIRS is unset or empty or the current process is SUID/SGID. Default is freedesktop compliant.")
 
-	include(FindPkgConfig)
+    add_definitions(-DVK_USE_PLATFORM_XCB_KHR)
+    include(FindPkgConfig)
 	option(BUILD_WSI_XCB_SUPPORT "Build XCB WSI support" ON)
 endif()
 
@@ -35,3 +38,4 @@ file(GLOB_RECURSE HEADER_FILES include/*)
 set(EXECUTABLE_OUTPUT_PATH bin)
 
 add_executable(core ${CORE_MAIN_FILE} ${HEADER_FILES})
+target_link_libraries(core ${Vulkan_LIBRARY})

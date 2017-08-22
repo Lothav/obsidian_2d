@@ -1,7 +1,7 @@
 #ifndef OBSIDIAN2D_CORE_CAMERA_H
 #define OBSIDIAN2D_CORE_CAMERA_H
 
-#include "Shaders.h"
+#include "Layers.h"
 
 typedef struct _view_camera {
 	glm::vec3 eye;
@@ -13,7 +13,7 @@ namespace Obsidian2D
 {
 	namespace Renderer
 	{
-		class Camera : public Shaders
+		class Camera : public Layers
 		{
 		private:
 
