@@ -38,9 +38,8 @@ public:
         animation.loadSequence("stand/v2/right_up", 0.3f);
 
         animation.setAnimation("stand/v2/right_down");
-
-
     };
+
     ~Player() {};
 
     bool input(sf::Event event)

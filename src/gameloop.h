@@ -1,11 +1,10 @@
 #include <chrono>
-#include <SFML/Graphics.hpp>
 #include <cmath>
 
+#include <SFML/Graphics.hpp>
+
 #include "SoundManager.h"
-
 #include "Player.h"
-
 
 #define MS_PER_UPDATE 16
 
@@ -20,7 +19,7 @@ void run()
 
     unsigned long long previous = getCurrentTime();
     unsigned long long lag = 0;
-  
+
     bool running = true;
 
     Player player;
