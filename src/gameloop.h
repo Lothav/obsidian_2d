@@ -3,6 +3,7 @@
 #include <cmath>
 
 #include "Animation.h"
+#include "SoundManager.h"
 
 #define MS_PER_UPDATE 16
 
@@ -14,10 +15,10 @@ static unsigned long long getCurrentTime()
 void run()
 {
     //Flush to stdout as soon as possible for debug;
-    std::cout.setf( std::ios_base::unitbuf );
+    std::cout.setf(std::ios_base::unitbuf);
 
     auto window = new sf::RenderWindow(sf::VideoMode(1920, 1080), "Obsidian2D", sf::Style::Fullscreen, sf::ContextSettings(24,8,16));
-    
+
     unsigned long long previous = getCurrentTime();
     unsigned long long lag = 0;
 
@@ -29,7 +30,6 @@ void run()
     std::vector<Animation::AnimationFrame> walkLeftUp = Animation::getSequence("assets/characters/cowboy/walk/left_up", 31);
     std::vector<Animation::AnimationFrame> walkUp = Animation::getSequence("assets/characters/cowboy/walk/up", 31);
     std::vector<Animation::AnimationFrame> walkRightUp = Animation::getSequence("assets/characters/cowboy/walk/right_up", 31);
-
 
     std::vector<Animation::AnimationFrame> standRight = Animation::getSequence("assets/characters/cowboy/stand/v2/right", 31);
     std::vector<Animation::AnimationFrame> standRightDown = Animation::getSequence("assets/characters/cowboy/stand/v2/right_down", 31);
@@ -69,6 +69,9 @@ void run()
     int timeHack = 0;
     bool standing = false;
     float moveDiff = 0;
+
+    SoundManager sm = SoundManager();
+    sm.playMusic("assets/sounds/crows.ogg", true);
 
     while (running)
     {
@@ -133,11 +136,15 @@ void run()
                 standing = true;
             }
 
-
+            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num1)) {
+                sm.playSound("assets/sounds/357_magnum.ogg", true);
+            } else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num2)) {
+                sm.playMusic("assets/sounds/beretta_m12.ogg", true);
+            }
 
             lag -= MS_PER_UPDATE;
             //std::cout << "#";
-            
+
             if(!standing || (standing && !(++timeHack%4)))
                 animationIndex++;
 
@@ -158,7 +165,6 @@ void run()
 
         crates.setPosition(ground.getPosition());
         window->draw(crates);
-
 
         ground.move({-128, 75 + (moveDiff * 15.f)});
         window->draw(ground);
@@ -208,7 +214,6 @@ void run()
         window->draw(ground);
         ground.move({128, 75});
         window->draw(ground);
-
 
         sprite.setPosition(playerPosition);
         window->draw(sprite);
