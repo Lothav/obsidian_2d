@@ -7,7 +7,7 @@ set(CMAKE_CXX_FLAGS "-std=c++1z -lsfml-graphics -lsfml-window -lsfml-system -Wal
 
 set(MAIN_FILE src/main.cpp)
 
-set(EXECUTABLE_OUTPUT_PATH build)
+set(EXECUTABLE_OUTPUT_PATH bin)
 
 file(COPY assets DESTINATION ${EXECUTABLE_OUTPUT_PATH})
 

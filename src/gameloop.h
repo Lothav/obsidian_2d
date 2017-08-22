@@ -55,12 +55,6 @@ void run()
     background.setTexture(backgroundTexture);
     background.setScale({3, 3});
 
-    sf::Texture luizTexture;
-    luizTexture.loadFromFile("assets/luiz.png");
-    sf::Sprite luiz;
-    luiz.setTexture(luizTexture);
-    luiz.setPosition({1920/2, 1080/2});
-
     sf::Texture cratesTexture;
     cratesTexture.loadFromFile("assets/tiles/dungeon/woodenCrates_E.png");
     sf::Sprite crates;
@@ -154,14 +148,6 @@ void run()
             sprite.setTexture((*currentAnimation)[animationIndex].texture);
             background.move({-0.1f, -0.1f});
             moveDiff = static_cast<float>(sin(current * 0.005));
-            luiz.setPosition({1920/2 + moveDiff*100.f, 1080/2 + moveDiff*40.f});
-
-            if(sf::Keyboard::isKeyPressed(sf::Keyboard::K)) {
-                if(sprite.getGlobalBounds().intersects(luiz.getGlobalBounds())) {
-                    luiz.setColor(sf::Color(255, 150, 150));
-                    playerPosition = {0, 0};
-                }
-            }
         }
 
         window->draw(background);
@@ -226,10 +212,6 @@ void run()
 
         sprite.setPosition(playerPosition);
         window->draw(sprite);
-
-        if(sf::Keyboard::isKeyPressed(sf::Keyboard::K)) {
-            window->draw(luiz);
-        }
 
         window->display();
         //std::cout << ".";
