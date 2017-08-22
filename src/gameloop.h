@@ -1,8 +1,7 @@
 #include <chrono>
 #include <SFML/Graphics.hpp>
 #include <cmath>
-
-#include "Animation.h"
+#include "Player.h"
 
 #define MS_PER_UPDATE 16
 
@@ -13,41 +12,14 @@ static unsigned long long getCurrentTime()
 
 void run()
 {
-    //Flush to stdout as soon as possible for debug;
-    std::cout.setf( std::ios_base::unitbuf );
+    auto window = new sf::RenderWindow(sf::VideoMode(1280, 720), "Obsidian2D", sf::Style::Default, sf::ContextSettings(24,8,16));
 
-    auto window = new sf::RenderWindow(sf::VideoMode(1920, 1080), "Obsidian2D", sf::Style::Fullscreen, sf::ContextSettings(24,8,16));
-    
     unsigned long long previous = getCurrentTime();
     unsigned long long lag = 0;
 
-    std::vector<Animation::AnimationFrame> walkRight = Animation::getSequence("assets/characters/cowboy/walk/right", 31);
-    std::vector<Animation::AnimationFrame> walkRightDown = Animation::getSequence("assets/characters/cowboy/walk/right_down", 31);
-    std::vector<Animation::AnimationFrame> walkDown = Animation::getSequence("assets/characters/cowboy/walk/down", 31);
-    std::vector<Animation::AnimationFrame> walkLeftDown = Animation::getSequence("assets/characters/cowboy/walk/left_down", 31);
-    std::vector<Animation::AnimationFrame> walkLeft = Animation::getSequence("assets/characters/cowboy/walk/left", 31);
-    std::vector<Animation::AnimationFrame> walkLeftUp = Animation::getSequence("assets/characters/cowboy/walk/left_up", 31);
-    std::vector<Animation::AnimationFrame> walkUp = Animation::getSequence("assets/characters/cowboy/walk/up", 31);
-    std::vector<Animation::AnimationFrame> walkRightUp = Animation::getSequence("assets/characters/cowboy/walk/right_up", 31);
-
-
-    std::vector<Animation::AnimationFrame> standRight = Animation::getSequence("assets/characters/cowboy/stand/v2/right", 31);
-    std::vector<Animation::AnimationFrame> standRightDown = Animation::getSequence("assets/characters/cowboy/stand/v2/right_down", 31);
-    std::vector<Animation::AnimationFrame> standDown = Animation::getSequence("assets/characters/cowboy/stand/v2/down", 31);
-    std::vector<Animation::AnimationFrame> standLeftDown = Animation::getSequence("assets/characters/cowboy/stand/v2/left_down", 31);
-    std::vector<Animation::AnimationFrame> standLeft = Animation::getSequence("assets/characters/cowboy/stand/v2/left", 31);
-    std::vector<Animation::AnimationFrame> standLeftUp = Animation::getSequence("assets/characters/cowboy/stand/v2/left_up", 31);
-    std::vector<Animation::AnimationFrame> standUp = Animation::getSequence("assets/characters/cowboy/stand/v2/up", 31);
-    std::vector<Animation::AnimationFrame> standRightUp = Animation::getSequence("assets/characters/cowboy/stand/v2/right_up", 31);
-
-    std::vector<Animation::AnimationFrame>* currentAnimation = &walkRight;
-    std::vector<Animation::AnimationFrame>* standAnimation = &standRight;
-    unsigned int animationIndex = 0;
-
     bool running = true;
-    sf::Sprite sprite;
 
-    sf::Vector2f playerPosition;
+    Player player;
 
     sf::Texture backgroundTexture;
     backgroundTexture.loadFromFile("assets/bg.png");
@@ -66,8 +38,6 @@ void run()
     sf::Sprite ground;
     ground.setTexture(groundTexture);
 
-    int timeHack = 0;
-    bool standing = false;
     float moveDiff = 0;
 
     while (running)
@@ -83,71 +53,19 @@ void run()
             if (event.type == sf::Event::Closed) {
                 window->close();
                 running = false;
-            } else if (event.type == sf::Event::KeyPressed) {
-
             }
+
+            player.input(event);
         }
 
         while (lag >= MS_PER_UPDATE)
         {
-            standing = false;
-            if(sf::Keyboard::isKeyPressed(sf::Keyboard::Right) && sf::Keyboard::isKeyPressed(sf::Keyboard::Down)) {
-                currentAnimation = &walkRightDown;
-                standAnimation   = &standRightDown;
-
-                playerPosition.x += 2.f;
-                playerPosition.y += 2.f;
-            } else if(sf::Keyboard::isKeyPressed(sf::Keyboard::Right) && sf::Keyboard::isKeyPressed(sf::Keyboard::Up)) {
-                currentAnimation = &walkRightUp;
-                standAnimation   = &standRightUp;
-                playerPosition.x += 2.f;
-                playerPosition.y -= 2.f;
-            } else if(sf::Keyboard::isKeyPressed(sf::Keyboard::Left) && sf::Keyboard::isKeyPressed(sf::Keyboard::Down)) {
-                currentAnimation = &walkLeftDown;
-                standAnimation   = &standLeftDown;
-                playerPosition.x -= 2.f;
-                playerPosition.y += 2.f;
-            } else if(sf::Keyboard::isKeyPressed(sf::Keyboard::Left) && sf::Keyboard::isKeyPressed(sf::Keyboard::Up)) {
-                currentAnimation = &walkLeftUp;
-                standAnimation   = &standLeftUp;
-                playerPosition.x -= 2.f;
-                playerPosition.y -= 2.f;
-            } else if(sf::Keyboard::isKeyPressed(sf::Keyboard::Left)) {
-                currentAnimation = &walkLeft;
-                standAnimation   = &standLeft;
-                playerPosition.x -= 3.f;
-            } else if(sf::Keyboard::isKeyPressed(sf::Keyboard::Up)) {
-                currentAnimation = &walkUp;
-                standAnimation   = &standUp;
-                playerPosition.y -= 3.f;
-            } else if(sf::Keyboard::isKeyPressed(sf::Keyboard::Down)) {
-                currentAnimation = &walkDown;
-                standAnimation   = &standDown;
-                playerPosition.y += 3.f;
-            } else if(sf::Keyboard::isKeyPressed(sf::Keyboard::Right)) {
-                currentAnimation = &walkRight;
-                standAnimation   = &standRight;
-                playerPosition.x += 3.f;
-            } else {
-                currentAnimation = standAnimation;
-                standing = true;
-            }
-
-
-
-            lag -= MS_PER_UPDATE;
-            //std::cout << "#";
-            
-            if(!standing || (standing && !(++timeHack%4)))
-                animationIndex++;
-
-            if(animationIndex > 30) {
-                animationIndex = 0;
-            }
-
-            sprite.setTexture((*currentAnimation)[animationIndex].texture);
             background.move({-0.1f, -0.1f});
             moveDiff = static_cast<float>(sin(current * 0.005));
+
+            player.update(elapsed);
+
+            lag -= MS_PER_UPDATE;
         }
 
         window->draw(background);
@@ -209,11 +127,7 @@ void run()
         ground.move({128, 75});
         window->draw(ground);
 
-
-        sprite.setPosition(playerPosition);
-        window->draw(sprite);
-
+        window->draw(player.getSprite());
         window->display();
-        //std::cout << ".";
     }
 }
