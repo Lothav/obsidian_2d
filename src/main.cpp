@@ -7,7 +7,6 @@ void printArgs(int argc, char** argv) {
     }
 }
 
-
 int main(int argc, char** argv) {
     printArgs(argc, argv);
     run();

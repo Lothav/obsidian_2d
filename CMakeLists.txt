@@ -4,7 +4,7 @@ project(Obsidian2D CXX)
 set(CMAKE_VERBOSE_MAKEFILE ON)
 set(CMAKE_CXX_COMPILER "clang++-4.0")
 
-set(CMAKE_CXX_FLAGS "-std=c++1z -lsfml-graphics -lsfml-window -lsfml-system -Wall -Wpedantic -Wextra -fno-strict-aliasing -fno-builtin-memcmp -fno-rtti -fno-exceptions")
+set(CMAKE_CXX_FLAGS "-std=c++14 -lsfml-graphics -lsfml-window -lsfml-system -Wall -Wpedantic -Wextra -fno-strict-aliasing -fno-builtin-memcmp -fno-rtti -fno-exceptions")
 
 if (CMAKE_BUILD_TYPE MATCHES "Debug")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g")
