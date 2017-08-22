@@ -1,8 +1,14 @@
+#ifndef _SoundManagerClass_
+#define _SoundManagerClass_
+
 #include <SFML/Audio/SoundBuffer.hpp>
 #include <SFML/Audio/Sound.hpp>
 #include <SFML/Audio/Music.hpp>
 
-class SoundManager {
+class SoundManager
+{
+private:
+protected:
 
 public:
     void playSound(const std::string &path, bool loop = false)
@@ -29,3 +35,5 @@ public:
         music->play();
     }
 };
+
+#endif //_SoundManagerClass_
