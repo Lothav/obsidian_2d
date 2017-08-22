@@ -11,6 +11,7 @@ class SoundManager
 {
 private:
     std::unordered_map<std::string, sf::SoundBuffer> soundBuffers;
+    std::unordered_map<uint8_t, sf::Sound*> sounds;
     uint8_t soundId = 1;
 
 protected:
@@ -42,7 +43,21 @@ public:
         sound->setLoop(loop);
         sound->play();
 
-        return soundId++;
+        uint8_t id = soundId++;
+        sounds.insert({id, sound});
+
+        return id;
+    }
+
+    bool stopSound(const uint8_t& id)
+    {
+        if (sounds.count(id) > 0)
+        {
+            sounds.at(id)->stop();
+            return true;
+        }
+
+        return false;
     }
 
     void playMusic(const std::string& path, bool loop = false)
