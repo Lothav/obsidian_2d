@@ -9,18 +9,30 @@ class Animation
 {
 private:
 protected:
+    std::string basePath;
+
     std::map<std::string, std::vector<sf::Texture>> animations;
-    uint8_t currentAnimationIndex = 0;
+    std::map<std::string, float> animationsSpeedModifier;
+    float currentAnimationIndex = 0;
+
+    std::string currentAnimation;
 
 public:
 
-    void loadSequence(std::string path, unsigned int frameCount)
+    void setBasePath(const std::string& basePath)
+    {
+        this->basePath = basePath;
+    }
+
+    void loadSequence(const std::string& path, float speedModifier = 1, unsigned int frameCount = 31)
     {
         std::vector<sf::Texture> animation;
 
         for(unsigned int i = 0; i < frameCount; i++) {
             sf::Texture texture;
-            std::string _path = path;
+            std::string _path = basePath;
+            _path.append("/");
+            _path.append(path);
             _path.append("/");
             if(i < 100) {
                 _path.append("0");
@@ -36,6 +48,28 @@ public:
         }
 
         this->animations[path] = animation;
+        this->animationsSpeedModifier[path] = speedModifier;
+    }
+
+    void setAnimation(const std::string& key)
+    {
+        if(this->currentAnimation != key) {
+            this->currentAnimation = key;
+            this->currentAnimationIndex = 0;
+        }
+    }
+
+    void nextFrame()
+    {
+        this->currentAnimationIndex += this->animationsSpeedModifier[this->currentAnimation];
+        if(this->currentAnimationIndex >= this->animations[this->currentAnimation].size()) {
+            this->currentAnimationIndex = 0;
+        }
+    }
+
+    const sf::Texture& getCurrentFrame()
+    {
+        return this->animations[this->currentAnimation][static_cast<int>(this->currentAnimationIndex)];
     }
 };
 

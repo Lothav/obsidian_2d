@@ -13,7 +13,7 @@ static unsigned long long getCurrentTime()
 void run()
 {
     auto window = new sf::RenderWindow(sf::VideoMode(1280, 720), "Obsidian2D", sf::Style::Default, sf::ContextSettings(24,8,16));
-    
+
     unsigned long long previous = getCurrentTime();
     unsigned long long lag = 0;
 
@@ -127,6 +127,7 @@ void run()
         ground.move({128, 75});
         window->draw(ground);
 
+        window->draw(player.getSprite());
         window->display();
     }
 }

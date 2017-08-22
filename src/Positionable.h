@@ -6,9 +6,11 @@
 class Positionable
 {
 private:
-    vec2f position;
 
 protected:
+    vec2f position;
+    vec2f lastMove;
+
     Positionable() {};
     ~Positionable() {}
 
@@ -21,13 +23,20 @@ public:
 
     void move(const vec2f& positionDelta)
     {
+        this->lastMove = positionDelta;
+
         this->position.x += positionDelta.x;
         this->position.y += positionDelta.y;
     }
 
-    vec2f getPosition()
+    const vec2f& getPosition()
     {
         return this->position;
+    }
+
+    const vec2f& getLastMove()
+    {
+        return this->lastMove;
     }
 
 };

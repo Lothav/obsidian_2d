@@ -9,28 +9,37 @@ class Player : public Positionable
 private:
 protected:
     Animation animation;
+
+    sf::Sprite sprite;
+
 public:
     Player()
     {
+        animation.setBasePath("assets/characters/cowboy");
+
         //Walk
-        animation.loadSequence("assets/characters/cowboy/walk/right", 31);
-        animation.loadSequence("assets/characters/cowboy/walk/right_down", 31);
-        animation.loadSequence("assets/characters/cowboy/walk/down", 31);
-        animation.loadSequence("assets/characters/cowboy/walk/left_down", 31);
-        animation.loadSequence("assets/characters/cowboy/walk/left", 31);
-        animation.loadSequence("assets/characters/cowboy/walk/left_up", 31);
-        animation.loadSequence("assets/characters/cowboy/walk/up", 31);
-        animation.loadSequence("assets/characters/cowboy/walk/right_up", 31);
+        animation.loadSequence("walk/right");
+        animation.loadSequence("walk/right_down");
+        animation.loadSequence("walk/down");
+        animation.loadSequence("walk/left_down");
+        animation.loadSequence("walk/left");
+        animation.loadSequence("walk/left_up");
+        animation.loadSequence("walk/up");
+        animation.loadSequence("walk/right_up");
 
         //stand
-        animation.loadSequence("assets/characters/cowboy/stand/v2/right", 31);
-        animation.loadSequence("assets/characters/cowboy/stand/v2/right_down", 31);
-        animation.loadSequence("assets/characters/cowboy/stand/v2/down", 31);
-        animation.loadSequence("assets/characters/cowboy/stand/v2/left_down", 31);
-        animation.loadSequence("assets/characters/cowboy/stand/v2/left", 31);
-        animation.loadSequence("assets/characters/cowboy/stand/v2/left_up", 31);
-        animation.loadSequence("assets/characters/cowboy/stand/v2/up", 31);
-        animation.loadSequence("assets/characters/cowboy/stand/v2/right_up", 31);
+        animation.loadSequence("stand/v2/right", 0.3f);
+        animation.loadSequence("stand/v2/right_down", 0.3f);
+        animation.loadSequence("stand/v2/down", 0.3f);
+        animation.loadSequence("stand/v2/left_down", 0.3f);
+        animation.loadSequence("stand/v2/left", 0.3f);
+        animation.loadSequence("stand/v2/left_up", 0.3f);
+        animation.loadSequence("stand/v2/up", 0.3f);
+        animation.loadSequence("stand/v2/right_up", 0.3f);
+
+        animation.setAnimation("stand/v2/right_down");
+
+
     };
     ~Player() {};
 
@@ -42,22 +51,59 @@ public:
     bool update(unsigned long long elapsedTime)
     {
         if(sf::Keyboard::isKeyPressed(sf::Keyboard::Right) && sf::Keyboard::isKeyPressed(sf::Keyboard::Down)) {
-            player.move({2.f, 2.f});
+            this->move({2.f, 2.f});
+            animation.setAnimation("walk/right_down");
         } else if(sf::Keyboard::isKeyPressed(sf::Keyboard::Right) && sf::Keyboard::isKeyPressed(sf::Keyboard::Up)) {
-            player.move({2.f, -2.f});
+            this->move({2.f, -2.f});
+            animation.setAnimation("walk/right_up");
         } else if(sf::Keyboard::isKeyPressed(sf::Keyboard::Left) && sf::Keyboard::isKeyPressed(sf::Keyboard::Down)) {
-            player.move({-2.f, 2.f});
+            this->move({-2.f, 2.f});
+            animation.setAnimation("walk/left_down");
         } else if(sf::Keyboard::isKeyPressed(sf::Keyboard::Left) && sf::Keyboard::isKeyPressed(sf::Keyboard::Up)) {
-            player.move({-2.f, -2.f});
+            this->move({-2.f, -2.f});
+            animation.setAnimation("walk/left_up");
         } else if(sf::Keyboard::isKeyPressed(sf::Keyboard::Left)) {
-            player.move({3.f, 0.f});
+            this->move({-3.f, 0.f});
+            animation.setAnimation("walk/left");
         } else if(sf::Keyboard::isKeyPressed(sf::Keyboard::Up)) {
-            player.move({0.f, -3.f});
+            this->move({0.f, -3.f});
+            animation.setAnimation("walk/up");
         } else if(sf::Keyboard::isKeyPressed(sf::Keyboard::Down)) {
-            player.move({0.f, 3.f});
+            this->move({0.f, 3.f});
+            animation.setAnimation("walk/down");
         } else if(sf::Keyboard::isKeyPressed(sf::Keyboard::Right)) {
-            player.move({3.f, 0.f});
+            this->move({3.f, 0.f});
+            animation.setAnimation("walk/right");
+        } else {
+            vec2f lastMove = this->getLastMove();
+            if(lastMove.x > 0 && lastMove.y > 0) {
+                animation.setAnimation("stand/v2/right_down");
+            } else if(lastMove.x > 0 && lastMove.y < 0) {
+                animation.setAnimation("stand/v2/right_up");
+            } else if(lastMove.x < 0 && lastMove.y > 0) {
+                animation.setAnimation("stand/v2/left_down");
+            } else if(lastMove.x < 0 && lastMove.y < 0) {
+                animation.setAnimation("stand/v2/left_up");
+            } else if(lastMove.x < 0 ) {
+                animation.setAnimation("stand/v2/left");
+            } else if(lastMove.y < 0) {
+                animation.setAnimation("stand/v2/up");
+            } else if(lastMove.y > 0) {
+                animation.setAnimation("stand/v2/down");
+            } else if(lastMove.x > 0) {
+                animation.setAnimation("stand/v2/right");
+            }
         }
+
+        animation.nextFrame();
+        return false;
+    }
+
+    const sf::Sprite& getSprite()
+    {
+        this->sprite.setTexture(this->animation.getCurrentFrame());
+        this->sprite.setPosition({this->getPosition().x, this->getPosition().y});
+        return this->sprite;
     }
 };
 
