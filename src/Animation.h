@@ -1,20 +1,25 @@
+#ifndef _AnimationClass_
+#define _AnimationClass_
+
 #include <SFML/Graphics.hpp>
 #include <string>
-#include <vector>
+#include <map>
 
-namespace Animation
+class Animation
 {
-    struct AnimationFrame
-    {
-        sf::Texture texture;
-    };
+private:
+protected:
+    std::map<std::string, std::vector<sf::Texture>> animations;
+    uint8_t currentAnimationIndex = 0;
 
-    std::vector<AnimationFrame> getSequence(std::string path, unsigned int frameCount)
+public:
+
+    void loadSequence(std::string path, unsigned int frameCount)
     {
-        std::vector<AnimationFrame> animation;
+        std::vector<sf::Texture> animation;
 
         for(unsigned int i = 0; i < frameCount; i++) {
-            AnimationFrame frame;
+            sf::Texture texture;
             std::string _path = path;
             _path.append("/");
             if(i < 100) {
@@ -25,11 +30,13 @@ namespace Animation
             }
             _path.append(std::to_string(i));
             _path.append(".png");
-            frame.texture.loadFromFile(_path);
-            frame.texture.setSmooth(1);
-            animation.push_back(frame);
+            texture.loadFromFile(_path);
+            texture.setSmooth(1);
+            animation.push_back(texture);
         }
 
-        return animation;
+        this->animations[path] = animation;
     }
 };
+
+#endif //_AnimationClass_
