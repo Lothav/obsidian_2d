@@ -3,7 +3,14 @@ project(Obsidian2D CXX)
 
 set(CMAKE_VERBOSE_MAKEFILE ON)
 set(CMAKE_CXX_COMPILER "clang++-4.0")
-set(CMAKE_CXX_FLAGS "-std=c++1z -lsfml-graphics -lsfml-window -lsfml-system -Wall -Wpedantic -Wextra -fvisibility=hidden -fno-strict-aliasing -fno-builtin-memcmp -fno-rtti -fno-exceptions -O3")
+
+set(CMAKE_CXX_FLAGS "-std=c++1z -lsfml-graphics -lsfml-window -lsfml-system -Wall -Wpedantic -Wextra -fno-strict-aliasing -fno-builtin-memcmp -fno-rtti -fno-exceptions")
+
+if (CMAKE_BUILD_TYPE MATCHES "Debug")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g")
+elseif(CMAKE_BUILD_TYPE MATCHES "Release")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fvisibility=hidden -O3")
+endif()
 
 set(MAIN_FILE src/main.cpp)
 
