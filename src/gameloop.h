@@ -17,7 +17,7 @@ void run()
     //Flush to stdout as soon as possible for debug;
     std::cout.setf(std::ios_base::unitbuf);
 
-    auto window = new sf::RenderWindow(sf::VideoMode(1920, 1080), "Obsidian2D", sf::Style::Fullscreen, sf::ContextSettings(24,8,16));
+    auto window = new sf::RenderWindow(sf::VideoMode(1280, 720), "Obsidian2D", sf::Style::Default, sf::ContextSettings(24,8,16));
 
     unsigned long long previous = getCurrentTime();
     unsigned long long lag = 0;
