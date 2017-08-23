@@ -42,6 +42,7 @@ public:
             sf::SoundBuffer* buffer = new sf::SoundBuffer();
             if (!buffer->loadFromFile(path))
             {
+                delete buffer;
                 return 0;
             }
 
@@ -87,6 +88,7 @@ public:
 
         if (!music->openFromFile(path))
         {
+            delete music;
             return 0;
         }
 
