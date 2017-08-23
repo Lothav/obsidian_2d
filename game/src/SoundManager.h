@@ -12,6 +12,7 @@ class SoundManager
 private:
 
     static std::unordered_map<std::string, sf::SoundBuffer> soundBuffers;
+
     static std::unordered_map<uint8_t, sf::Sound*> sounds;
     static uint8_t soundId;
 
