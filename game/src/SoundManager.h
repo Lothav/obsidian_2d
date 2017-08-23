@@ -7,7 +7,24 @@
 
 #include <unordered_map>
 
-namespace o2d {
+class SoundManager
+{
+private:
+
+    static std::unordered_map<std::string, sf::SoundBuffer*> soundBuffers;
+
+    static std::unordered_map<uint8_t, SoundManager::Sound*> sounds;
+    static uint8_t soundId;
+
+    static std::unordered_map<uint8_t, SoundManager::Music*> musics;
+    static uint8_t musicId;
+
+protected:
+
+    SoundManager () {}
+    ~SoundManager() {}
+
+public:
     struct Sound
     {
         uint8_t id;
@@ -21,26 +38,6 @@ namespace o2d {
         sf::Music* music;
         bool loop;
     };
-}
-
-class SoundManager
-{
-private:
-
-    static std::unordered_map<std::string, sf::SoundBuffer*> soundBuffers;
-
-    static std::unordered_map<uint8_t, o2d::Sound*> sounds;
-    static uint8_t soundId;
-
-    static std::unordered_map<uint8_t, o2d::Music*> musics;
-    static uint8_t musicId;
-
-protected:
-
-    SoundManager () {}
-    ~SoundManager() {}
-
-public:
 
     static void cleanUp()
     {
@@ -82,7 +79,7 @@ public:
 
         uint8_t id = soundId++;
 
-        o2d::Sound* s = new o2d::Sound;
+        SoundManager::Sound* s = new SoundManager::Sound;
         s->id = id;
         s->loop = loop;
         s->sound = sound;
@@ -129,7 +126,7 @@ public:
 
         uint8_t id = musicId++;
 
-        o2d::Music* m = new o2d::Music;
+        SoundManager::Music* m = new SoundManager::Music;
         m->id = id;
         m->loop = loop;
         m->music = music;
@@ -163,8 +160,8 @@ public:
 };
 
 std::unordered_map<std::string, sf::SoundBuffer*> SoundManager::soundBuffers;
-std::unordered_map<uint8_t, o2d::Sound*> SoundManager::sounds;
-std::unordered_map<uint8_t, o2d::Music*> SoundManager::musics;
+std::unordered_map<uint8_t, SoundManager::Sound*> SoundManager::sounds;
+std::unordered_map<uint8_t, SoundManager::Music*> SoundManager::musics;
 
 uint8_t SoundManager::soundId = 1;
 uint8_t SoundManager::musicId = 1;
