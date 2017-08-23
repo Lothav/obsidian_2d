@@ -4,6 +4,8 @@
 #include <SFML/Graphics.hpp>
 
 #include "Player.h"
+#include "SoundManager.h"
+
 
 #define MS_PER_UPDATE 16
 
@@ -41,6 +43,9 @@ void run()
     ground.setTexture(groundTexture);
 
     float moveDiff = 0;
+
+    SoundManager sm;
+    sm.playMusic("assets/sounds/bg_01.ogg", true);
 
     while (running)
     {
