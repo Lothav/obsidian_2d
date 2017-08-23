@@ -9,21 +9,6 @@
 
 class SoundManager
 {
-private:
-
-    static std::unordered_map<std::string, sf::SoundBuffer*> soundBuffers;
-
-    static std::unordered_map<uint8_t, SoundManager::Sound*> sounds;
-    static uint8_t soundId;
-
-    static std::unordered_map<uint8_t, SoundManager::Music*> musics;
-    static uint8_t musicId;
-
-protected:
-
-    SoundManager () {}
-    ~SoundManager() {}
-
 public:
     struct Sound
     {
@@ -157,6 +142,21 @@ public:
 
         return false;
     }
+
+private:
+
+    static std::unordered_map<std::string, sf::SoundBuffer*> soundBuffers;
+
+    static std::unordered_map<uint8_t, SoundManager::Sound*> sounds;
+    static uint8_t soundId;
+
+    static std::unordered_map<uint8_t, SoundManager::Music*> musics;
+    static uint8_t musicId;
+
+protected:
+
+    SoundManager () {}
+    ~SoundManager() {}
 };
 
 std::unordered_map<std::string, sf::SoundBuffer*> SoundManager::soundBuffers;
