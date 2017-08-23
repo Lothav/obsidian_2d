@@ -14,6 +14,9 @@ private:
     std::unordered_map<uint8_t, sf::Sound*> sounds;
     uint8_t soundId = 1;
 
+    std::unordered_map<uint8_t, sf::Music*> musics;
+    uint8_t musicId = 1;
+
 protected:
 
 public:
@@ -22,6 +25,7 @@ public:
     ~SoundManager()
     {
         for (auto it = soundBuffers.begin(); it != soundBuffers.end(); soundBuffers.erase(it++)) {}
+        for (auto it = sounds.begin(); it != sounds.end(); sounds.erase(it++)) {}
     }
 
     uint8_t playSound(const std::string& path, bool loop = false)
@@ -60,15 +64,55 @@ public:
         return false;
     }
 
-    void playMusic(const std::string& path, bool loop = false)
+    bool releaseSound(const uint8_t& id)
+    {
+        if (sounds.count(id) > 0)
+        {
+            sounds.at(id)->play();
+            return true;
+        }
+
+        return false;
+    }
+
+    uint8_t playMusic(const std::string& path, bool loop = false)
     {
         sf::Music* music = new sf::Music();
 
         if (!music->openFromFile(path))
-            return;
+        {
+            return 0;
+        }
 
         music->setLoop(loop);
         music->play();
+
+        uint8_t id = musicId++;
+        musics.insert({id, music});
+
+        return id;
+    }
+
+    bool stopMusic(const uint8_t& id)
+    {
+        if (musics.count(id) > 0)
+        {
+            musics.at(id)->stop();
+            return true;
+        }
+
+        return false;
+    }
+
+    bool releaseMusic(const uint8_t& id)
+    {
+        if (musics.count(id) > 0)
+        {
+            musics.at(id)->play();
+            return true;
+        }
+
+        return false;
     }
 };
 

@@ -43,9 +43,6 @@ void run()
 
     float moveDiff = 0;
 
-    SoundManager sm = SoundManager();
-    sm.playMusic("assets/sounds/crows.ogg", true);
-
     while (running)
     {
         unsigned long long current = getCurrentTime();
