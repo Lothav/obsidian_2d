@@ -24,8 +24,13 @@ public:
 
     ~SoundManager()
     {
-        for (auto it = soundBuffers.begin(); it != soundBuffers.end(); soundBuffers.erase(it++)) {}
-        for (auto it = sounds.begin(); it != sounds.end(); sounds.erase(it++)) {}
+        for (auto it = sounds.begin(); it != sounds.end(); sounds.erase(it++)) {
+            delete it->second;
+        }
+
+        for (auto it = musics.begin(); it != musics.end(); musics.erase(it++)) {
+            delete it->second;
+        }
     }
 
     uint8_t playSound(const std::string& path, bool loop = false)
