@@ -36,20 +36,20 @@ public:
     uint8_t playSound(const std::string& path, bool loop = false)
     {
         bool loaded = soundBuffers.count(path) > 0;
-        sf::SoundBuffer* buffer = new sf::SoundBuffer();
 
         if (!loaded)
         {
+            sf::SoundBuffer* buffer = new sf::SoundBuffer();
             if (!buffer->loadFromFile(path))
             {
                 return 0;
             }
-        } else {
-            buffer = &soundBuffers.at(path);
+
+            soundBuffers.insert({path, *buffer});
         }
 
         sf::Sound* sound = new sf::Sound();
-        sound->setBuffer(*buffer);
+        sound->setBuffer(soundBuffers[path]);
         sound->setLoop(loop);
         sound->play();
 
