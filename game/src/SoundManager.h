@@ -7,16 +7,32 @@
 
 #include <unordered_map>
 
+namespace o2d {
+    struct Sound
+    {
+        uint8_t id;
+        sf::Sound* sound;
+        bool loop;
+    };
+
+    struct Music
+    {
+        uint8_t id;
+        sf::Music* music;
+        bool loop;
+    };
+}
+
 class SoundManager
 {
 private:
 
     static std::unordered_map<std::string, sf::SoundBuffer*> soundBuffers;
 
-    static std::unordered_map<uint8_t, sf::Sound*> sounds;
+    static std::unordered_map<uint8_t, o2d::Sound*> sounds;
     static uint8_t soundId;
 
-    static std::unordered_map<uint8_t, sf::Music*> musics;
+    static std::unordered_map<uint8_t, o2d::Music*> musics;
     static uint8_t musicId;
 
 protected:
@@ -33,10 +49,12 @@ public:
         }
 
         for (auto it = sounds.begin(); it != sounds.end(); sounds.erase(it++)) {
+            delete it->second->sound;
             delete it->second;
         }
 
         for (auto it = musics.begin(); it != musics.end(); musics.erase(it++)) {
+            delete it->second->music;
             delete it->second;
         }
     }
@@ -63,7 +81,13 @@ public:
         sound->play();
 
         uint8_t id = soundId++;
-        sounds.insert({id, sound});
+
+        o2d::Sound* s = new o2d::Sound;
+        s->id = id;
+        s->loop = loop;
+        s->sound = sound;
+
+        sounds.insert({id, s});
 
         return id;
     }
@@ -72,7 +96,7 @@ public:
     {
         if (sounds.count(id) > 0)
         {
-            sounds.at(id)->stop();
+            sounds[id]->sound->stop();
             return true;
         }
 
@@ -83,7 +107,7 @@ public:
     {
         if (sounds.count(id) > 0)
         {
-            sounds.at(id)->play();
+            sounds[id]->sound->play();
             return true;
         }
 
@@ -104,7 +128,13 @@ public:
         music->play();
 
         uint8_t id = musicId++;
-        musics.insert({id, music});
+
+        o2d::Music* m = new o2d::Music;
+        m->id = id;
+        m->loop = loop;
+        m->music = music;
+
+        musics.insert({id, m});
 
         return id;
     }
@@ -113,7 +143,7 @@ public:
     {
         if (musics.count(id) > 0)
         {
-            musics.at(id)->stop();
+            musics[id]->music->stop();
             return true;
         }
 
@@ -124,7 +154,7 @@ public:
     {
         if (musics.count(id) > 0)
         {
-            musics.at(id)->play();
+            musics[id]->music->play();
             return true;
         }
 
@@ -133,8 +163,8 @@ public:
 };
 
 std::unordered_map<std::string, sf::SoundBuffer*> SoundManager::soundBuffers;
-std::unordered_map<uint8_t, sf::Sound*> SoundManager::sounds;
-std::unordered_map<uint8_t, sf::Music*> SoundManager::musics;
+std::unordered_map<uint8_t, o2d::Sound*> SoundManager::sounds;
+std::unordered_map<uint8_t, o2d::Music*> SoundManager::musics;
 
 uint8_t SoundManager::soundId = 1;
 uint8_t SoundManager::musicId = 1;
