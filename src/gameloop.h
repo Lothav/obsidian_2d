@@ -1,11 +1,9 @@
 #include <chrono>
-#include <SFML/Graphics.hpp>
 #include <cmath>
 
-#include "SoundManager.h"
+#include <SFML/Graphics.hpp>
 
 #include "Player.h"
-
 
 #define MS_PER_UPDATE 16
 
@@ -20,7 +18,7 @@ void run()
 
     unsigned long long previous = getCurrentTime();
     unsigned long long lag = 0;
-  
+
     bool running = true;
 
     Player player;
@@ -43,9 +41,6 @@ void run()
     ground.setTexture(groundTexture);
 
     float moveDiff = 0;
-
-    SoundManager sm = SoundManager();
-    sm.playMusic("assets/sounds/crows.ogg", true);
 
     while (running)
     {
