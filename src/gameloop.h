@@ -44,8 +44,7 @@ void run()
 
     float moveDiff = 0;
 
-    SoundManager sm;
-    sm.playMusic("assets/sounds/bg_01.ogg", true);
+    SoundManager::playMusic("assets/sounds/bg_01.ogg", true);
 
     while (running)
     {

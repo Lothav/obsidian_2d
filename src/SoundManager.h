@@ -10,19 +10,22 @@
 class SoundManager
 {
 private:
-    std::unordered_map<std::string, sf::SoundBuffer> soundBuffers;
-    std::unordered_map<uint8_t, sf::Sound*> sounds;
-    uint8_t soundId = 1;
 
-    std::unordered_map<uint8_t, sf::Music*> musics;
-    uint8_t musicId = 1;
+    static std::unordered_map<std::string, sf::SoundBuffer> soundBuffers;
+    static std::unordered_map<uint8_t, sf::Sound*> sounds;
+    static uint8_t soundId;
+
+    static std::unordered_map<uint8_t, sf::Music*> musics;
+    static uint8_t musicId;
 
 protected:
+    SoundManager () {}
+    ~SoundManager() {}
 
 public:
-    SoundManager () {}
 
-    ~SoundManager()
+
+    static void cleanUp()
     {
         for (auto it = sounds.begin(); it != sounds.end(); sounds.erase(it++)) {
             delete it->second;
@@ -33,7 +36,7 @@ public:
         }
     }
 
-    uint8_t playSound(const std::string& path, bool loop = false)
+    static uint8_t playSound(const std::string& path, bool loop = false)
     {
         bool loaded = soundBuffers.count(path) > 0;
 
@@ -60,7 +63,7 @@ public:
         return id;
     }
 
-    bool stopSound(const uint8_t& id)
+    static bool stopSound(const uint8_t& id)
     {
         if (sounds.count(id) > 0)
         {
@@ -71,7 +74,7 @@ public:
         return false;
     }
 
-    bool releaseSound(const uint8_t& id)
+    static bool releaseSound(const uint8_t& id)
     {
         if (sounds.count(id) > 0)
         {
@@ -82,7 +85,7 @@ public:
         return false;
     }
 
-    uint8_t playMusic(const std::string& path, bool loop = false)
+    static uint8_t playMusic(const std::string& path, bool loop = false)
     {
         sf::Music* music = new sf::Music();
 
@@ -101,7 +104,7 @@ public:
         return id;
     }
 
-    bool stopMusic(const uint8_t& id)
+    static bool stopMusic(const uint8_t& id)
     {
         if (musics.count(id) > 0)
         {
@@ -112,7 +115,7 @@ public:
         return false;
     }
 
-    bool releaseMusic(const uint8_t& id)
+    static bool releaseMusic(const uint8_t& id)
     {
         if (musics.count(id) > 0)
         {
@@ -123,5 +126,12 @@ public:
         return false;
     }
 };
+
+std::unordered_map<std::string, sf::SoundBuffer> SoundManager::soundBuffers;
+std::unordered_map<uint8_t, sf::Sound*> SoundManager::sounds;
+std::unordered_map<uint8_t, sf::Music*> SoundManager::musics;
+
+uint8_t SoundManager::soundId = 1;
+uint8_t SoundManager::musicId = 1;
 
 #endif //_SoundManagerClass_
