@@ -12,10 +12,10 @@ elseif(CMAKE_BUILD_TYPE MATCHES "Release")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fvisibility=hidden -O3")
 endif()
 
-set(MAIN_FILE src/main.cpp)
+set(MAIN_FILE game/src/main.cpp)
 
 set(EXECUTABLE_OUTPUT_PATH bin)
 
-file(COPY assets DESTINATION ${EXECUTABLE_OUTPUT_PATH})
+file(COPY game/assets DESTINATION ${EXECUTABLE_OUTPUT_PATH})
 
 add_executable(game ${MAIN_FILE})
