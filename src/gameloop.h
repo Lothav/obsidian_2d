@@ -3,7 +3,6 @@
 
 #include <SFML/Graphics.hpp>
 
-#include "SoundManager.h"
 #include "Player.h"
 
 #define MS_PER_UPDATE 16
