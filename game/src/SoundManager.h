@@ -11,7 +11,7 @@ class SoundManager
 {
 private:
 
-    static std::unordered_map<std::string, sf::SoundBuffer> soundBuffers;
+    static std::unordered_map<std::string, sf::SoundBuffer*> soundBuffers;
 
     static std::unordered_map<uint8_t, sf::Sound*> sounds;
     static uint8_t soundId;
@@ -20,14 +20,18 @@ private:
     static uint8_t musicId;
 
 protected:
+
     SoundManager () {}
     ~SoundManager() {}
 
 public:
 
-
     static void cleanUp()
     {
+        for (auto it = soundBuffers.begin(); it != soundBuffers.end(); soundBuffers.erase(it++)) {
+            delete it->second;
+        }
+
         for (auto it = sounds.begin(); it != sounds.end(); sounds.erase(it++)) {
             delete it->second;
         }
@@ -50,11 +54,11 @@ public:
                 return 0;
             }
 
-            soundBuffers.insert({path, *buffer});
+            soundBuffers.insert({path, buffer});
         }
 
         sf::Sound* sound = new sf::Sound();
-        sound->setBuffer(soundBuffers[path]);
+        sound->setBuffer(*soundBuffers[path]);
         sound->setLoop(loop);
         sound->play();
 
@@ -128,7 +132,7 @@ public:
     }
 };
 
-std::unordered_map<std::string, sf::SoundBuffer> SoundManager::soundBuffers;
+std::unordered_map<std::string, sf::SoundBuffer*> SoundManager::soundBuffers;
 std::unordered_map<uint8_t, sf::Sound*> SoundManager::sounds;
 std::unordered_map<uint8_t, sf::Music*> SoundManager::musics;
 
