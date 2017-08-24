@@ -37,7 +37,7 @@ namespace Obsidian2D
 					std::cout << i.properties.layerName << std::endl;
 				}
 
-				//_layer_names.push_back( "VK_LAYER_LUNARG_standard_validation" );
+				_layer_names.push_back( "VK_LAYER_LUNARG_standard_validation" );
 				//_layer_names.push_back( "VK_LAYER_LUNARG_swapchain" );
 
 				std::cout << "Using Layers:" << std::endl;

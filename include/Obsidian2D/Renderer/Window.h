@@ -23,6 +23,19 @@ namespace Obsidian2D
 			{
 				uint32_t i;
 
+                if (swap_chain != VK_NULL_HANDLE)
+                {
+                    for (i = 0; i < swapchainImageCount; i++)
+                    {
+                        vkDestroyImageView(device, buffers[i].view, nullptr);
+                    }
+                }
+                if (surface != VK_NULL_HANDLE)
+                {
+                    vkDestroySwapchainKHR(device, swap_chain, nullptr);
+                    vkDestroySurfaceKHR(instance, surface, nullptr);
+                }
+
 				vkDestroyPipeline(device, vkPipeline, NULL);
 				vkDestroyPipelineCache(device, pPipelineCache, NULL);
 				vkDestroyDescriptorPool(device, desc_pool, NULL);
@@ -45,7 +58,7 @@ namespace Obsidian2D
 				vkDestroyRenderPass(device, render_pass, NULL);
 
 				// Destroy descriptor and pipeline layouts
-				for (int i = 0; i < 1; i++) vkDestroyDescriptorSetLayout(device, desc_layout[i], NULL);
+				for (i = 0; i < 1; i++) vkDestroyDescriptorSetLayout(device, desc_layout[i], NULL);
 				vkDestroyPipelineLayout(device, pipeline_layout, NULL);
 
 				// Destroy uniform buffer
@@ -57,14 +70,7 @@ namespace Obsidian2D
 				vkDestroyImage(device, depth.image, NULL);
 				vkFreeMemory(device, depth.mem, NULL);
 
-				// Destroy Swap Chain
-				for (i = 0; i < swapchainImageCount; i++) {
-					vkDestroyImageView(device, buffers[i].view, NULL);
-				}
-				vkDestroySwapchainKHR(device, swap_chain, NULL);
-
-				vkFreeCommandBuffers(device, _command_pool, 1, command_buffer.data());
-				vkDestroyCommandPool(device, _command_pool, NULL);
+				vkFreeCommandBuffers(device, _command_pool, (u_int32_t)command_buffer.size(), command_buffer.data());
 
 				vkDestroySemaphore(device, imageAcquiredSemaphore, nullptr);
 				vkDestroySemaphore(device, renderSemaphore, nullptr);
@@ -73,8 +79,8 @@ namespace Obsidian2D
 					vkDestroyFence(device, drawFence[i], nullptr);
 				}
 
-				vkDestroyDevice(this->device, NULL);
-				vkDestroySurfaceKHR(instance, surface, NULL);
+                vkDestroyCommandPool(device, _command_pool, NULL);
+                vkDestroyDevice(this->device, NULL);
 				vkDestroyInstance(instance, NULL);
 			}
 
@@ -1122,7 +1128,7 @@ namespace Obsidian2D
 					this->init_viewports(command_buffer[i]);
 					this->init_scissors(command_buffer[i]);
 
-					vkCmdDraw(command_buffer[i], 12 * 3, 1, 0, 0);
+					vkCmdDraw(command_buffer[i], 3, 1, 0, 0);
 					vkCmdEndRenderPass(command_buffer[i]);
 					res = vkEndCommandBuffer(command_buffer[i]);
 					assert(res == VK_SUCCESS);
