@@ -30,11 +30,11 @@ namespace Obsidian2D
 
 			const std::array<int, 3> _default_eye		= {0, 0, -10};
 			const std::array<int, 3> _default_center	= {0, 0, 0};
-			const std::array<int, 3> _default_up 		= {0, -1, 0 };
+			const std::array<int, 3> _default_up 		= {0, 0, 1};
 
 			void updateMVP()
 			{
-				this->_mvp = this->_clip * this->_projection * this->_view * this->_model;
+				this->_mvp = /*this->_clip **/ this->_projection * this->_view * this->_model;
 			}
 
 		public:
@@ -102,6 +102,11 @@ namespace Obsidian2D
 			std::array<int, 3> getCameraDefaultCenter()
 			{
 				return _default_center;
+			};
+
+			std::array<int, 3> getCameraDefaultUp()
+			{
+				return _default_up;
 			};
 
 			void updateCamera()

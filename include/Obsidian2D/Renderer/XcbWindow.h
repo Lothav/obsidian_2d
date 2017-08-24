@@ -15,9 +15,47 @@
 
 std::vector<Vertex> g_vb_texture_Data =
 {
-	{ {  1.0f,  1.0f, 0.0f }, { 1.0f, 0.0f, 0.0f } },
-	{ { -1.0f,  1.0f, 0.0f }, { 0.0f, 1.0f, 0.0f } },
-	{ {  0.0f, -1.0f, 0.0f }, { 0.0f, 0.0f, 1.0f } }
+		{XYZ1(-1, -1, -1), UV(1.f, 0.f)},  // lft-top-front
+		{XYZ1(-1, 1, 1), UV(0.f, 1.f)},    // lft-btm-back
+		{XYZ1(-1, -1, 1), UV(0.f, 0.f)},   // lft-top-back
+		{XYZ1(-1, 1, 1), UV(0.f, 1.f)},    // lft-btm-back
+		{XYZ1(-1, -1, -1), UV(1.f, 0.f)},  // lft-top-front
+		{XYZ1(-1, 1, -1), UV(1.f, 1.f)},   // lft-btm-front
+		// front face
+		{XYZ1(-1, -1, -1), UV(0.f, 0.f)},  // lft-top-front
+		{XYZ1(1, -1, -1), UV(1.f, 0.f)},   // rgt-top-front
+		{XYZ1(1, 1, -1), UV(1.f, 1.f)},    // rgt-btm-front
+		{XYZ1(-1, -1, -1), UV(0.f, 0.f)},  // lft-top-front
+		{XYZ1(1, 1, -1), UV(1.f, 1.f)},    // rgt-btm-front
+		{XYZ1(-1, 1, -1), UV(0.f, 1.f)},   // lft-btm-front
+		// top face
+		{XYZ1(-1, -1, -1), UV(0.f, 1.f)},  // lft-top-front
+		{XYZ1(1, -1, 1), UV(1.f, 0.f)},    // rgt-top-back
+		{XYZ1(1, -1, -1), UV(1.f, 1.f)},   // rgt-top-front
+		{XYZ1(-1, -1, -1), UV(0.f, 1.f)},  // lft-top-front
+		{XYZ1(-1, -1, 1), UV(0.f, 0.f)},   // lft-top-back
+		{XYZ1(1, -1, 1), UV(1.f, 0.f)},    // rgt-top-back
+		// bottom face
+		{XYZ1(-1, 1, -1), UV(0.f, 0.f)},  // lft-btm-front
+		{XYZ1(1, 1, 1), UV(1.f, 1.f)},    // rgt-btm-back
+		{XYZ1(-1, 1, 1), UV(0.f, 1.f)},   // lft-btm-back
+		{XYZ1(-1, 1, -1), UV(0.f, 0.f)},  // lft-btm-front
+		{XYZ1(1, 1, -1), UV(1.f, 0.f)},   // rgt-btm-front
+		{XYZ1(1, 1, 1), UV(1.f, 1.f)},    // rgt-btm-back
+		// right face
+		{XYZ1(1, 1, -1), UV(0.f, 1.f)},   // rgt-btm-front
+		{XYZ1(1, -1, 1), UV(1.f, 0.f)},   // rgt-top-back
+		{XYZ1(1, 1, 1), UV(1.f, 1.f)},    // rgt-btm-back
+		{XYZ1(1, -1, 1), UV(1.f, 0.f)},   // rgt-top-back
+		{XYZ1(1, 1, -1), UV(0.f, 1.f)},   // rgt-btm-front
+		{XYZ1(1, -1, -1), UV(0.f, 0.f)},  // rgt-top-front
+		// back face
+		{XYZ1(-1, 1, 1), UV(1.f, 1.f)},   // lft-btm-back
+		{XYZ1(1, 1, 1), UV(0.f, 1.f)},    // rgt-btm-back
+		{XYZ1(-1, -1, 1), UV(1.f, 0.f)},  // lft-top-back
+		{XYZ1(-1, -1, 1), UV(1.f, 0.f)},  // lft-top-back
+		{XYZ1(1, 1, 1), UV(0.f, 1.f)},    // rgt-btm-back
+		{XYZ1(1, -1, 1), UV(0.f, 0.f)},   // rgt-top-back
 };
 
 namespace Obsidian2D
@@ -38,8 +76,9 @@ namespace Obsidian2D
 			xcb_window_t 							window;
 			xcb_connection_t*						connection;
 
-			std::array<int, 3>						camera_center;
 			std::array<int, 3>						camera_eye;
+			std::array<int, 3>						camera_center;
+			std::array<int, 3>						camera_up;
 
 			void setConnection()
 			{
@@ -136,6 +175,7 @@ namespace Obsidian2D
 
 				camera_center = this->getCameraDefaultCenter();
 				camera_eye = this->getCameraDefaultEye();
+				camera_up = this->getCameraDefaultUp();
 
 				this->draw();
 			}
@@ -190,9 +230,24 @@ namespace Obsidian2D
 							camera_center[2]++;
 						}
 
+						if( kp->detail == 'r'){
+							camera_up[0]++;
+						}else if(kp->detail == 'q'){
+							camera_up[0]--;
+						}else if(kp->detail == 'o'){
+							camera_up[1]++;
+						}else if(kp->detail == 't'){
+							camera_up[1]--;
+						}else if(kp->detail == 'u'){
+							camera_up[2]--;
+						}else if(kp->detail == 'p'){
+							camera_up[2]++;
+						}
+
 						std::cout << kp->detail << std::endl;
 						this->setCameraViewCenter(glm::vec3(camera_center[0], camera_center[1], camera_center[2]));
 						this->setCameraViewEye(glm::vec3(camera_eye[0], camera_eye[1], camera_eye[2]));
+						this->setCameraViewUp(glm::vec3(camera_up[0], camera_up[1], camera_up[2]));
 						this->updateCamera();
 
 						this->draw();
