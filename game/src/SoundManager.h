@@ -31,13 +31,11 @@ public:
         }
 
         for (auto it = sounds.begin(); it != sounds.end(); sounds.erase(it++)) {
-            delete it->second->sound;
-            delete it->second;
+            delete it->second.sound;
         }
 
         for (auto it = musics.begin(); it != musics.end(); musics.erase(it++)) {
-            delete it->second->music;
-            delete it->second;
+            delete it->second.music;
         }
     }
 
@@ -64,10 +62,10 @@ public:
 
         uint8_t id = soundId++;
 
-        SoundManager::Sound* s = new SoundManager::Sound;
-        s->id = id;
-        s->loop = loop;
-        s->sound = sound;
+        SoundManager::Sound s;
+        s.id = id;
+        s.loop = loop;
+        s.sound = sound;
 
         sounds.insert({id, s});
 
@@ -78,7 +76,7 @@ public:
     {
         if (sounds.count(id) > 0)
         {
-            sounds[id]->sound->stop();
+            sounds[id].sound->stop();
             return true;
         }
 
@@ -89,7 +87,7 @@ public:
     {
         if (sounds.count(id) > 0)
         {
-            sounds[id]->sound->play();
+            sounds[id].sound->play();
             return true;
         }
 
@@ -111,10 +109,10 @@ public:
 
         uint8_t id = musicId++;
 
-        SoundManager::Music* m = new SoundManager::Music;
-        m->id = id;
-        m->loop = loop;
-        m->music = music;
+        SoundManager::Music m;
+        m.id = id;
+        m.loop = loop;
+        m.music = music;
 
         musics.insert({id, m});
 
@@ -125,7 +123,7 @@ public:
     {
         if (musics.count(id) > 0)
         {
-            musics[id]->music->stop();
+            musics[id].music->stop();
             return true;
         }
 
@@ -136,7 +134,7 @@ public:
     {
         if (musics.count(id) > 0)
         {
-            musics[id]->music->play();
+            musics[id].music->play();
             return true;
         }
 
@@ -147,10 +145,10 @@ private:
 
     static std::unordered_map<std::string, sf::SoundBuffer*> soundBuffers;
 
-    static std::unordered_map<uint8_t, SoundManager::Sound*> sounds;
+    static std::unordered_map<uint8_t, SoundManager::Sound> sounds;
     static uint8_t soundId;
 
-    static std::unordered_map<uint8_t, SoundManager::Music*> musics;
+    static std::unordered_map<uint8_t, SoundManager::Music> musics;
     static uint8_t musicId;
 
 protected:
@@ -160,8 +158,8 @@ protected:
 };
 
 std::unordered_map<std::string, sf::SoundBuffer*> SoundManager::soundBuffers;
-std::unordered_map<uint8_t, SoundManager::Sound*> SoundManager::sounds;
-std::unordered_map<uint8_t, SoundManager::Music*> SoundManager::musics;
+std::unordered_map<uint8_t, SoundManager::Sound> SoundManager::sounds;
+std::unordered_map<uint8_t, SoundManager::Music> SoundManager::musics;
 
 uint8_t SoundManager::soundId = 1;
 uint8_t SoundManager::musicId = 1;
