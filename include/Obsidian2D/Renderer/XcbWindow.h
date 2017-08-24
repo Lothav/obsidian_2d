@@ -15,41 +15,6 @@
 
 std::vector<Vertex> g_vb_texture_Data =
 {
-		{XYZ1(-1, -1, -1), UV(1.f, 0.f)},  // lft-top-front
-		{XYZ1(-1, 1, 1), UV(0.f, 1.f)},    // lft-btm-back
-		{XYZ1(-1, -1, 1), UV(0.f, 0.f)},   // lft-top-back
-		{XYZ1(-1, 1, 1), UV(0.f, 1.f)},    // lft-btm-back
-		{XYZ1(-1, -1, -1), UV(1.f, 0.f)},  // lft-top-front
-		{XYZ1(-1, 1, -1), UV(1.f, 1.f)},   // lft-btm-front
-		// front face
-		{XYZ1(-1, -1, -1), UV(0.f, 0.f)},  // lft-top-front
-		{XYZ1(1, -1, -1), UV(1.f, 0.f)},   // rgt-top-front
-		{XYZ1(1, 1, -1), UV(1.f, 1.f)},    // rgt-btm-front
-		{XYZ1(-1, -1, -1), UV(0.f, 0.f)},  // lft-top-front
-		{XYZ1(1, 1, -1), UV(1.f, 1.f)},    // rgt-btm-front
-		{XYZ1(-1, 1, -1), UV(0.f, 1.f)},   // lft-btm-front
-		// top face
-		{XYZ1(-1, -1, -1), UV(0.f, 1.f)},  // lft-top-front
-		{XYZ1(1, -1, 1), UV(1.f, 0.f)},    // rgt-top-back
-		{XYZ1(1, -1, -1), UV(1.f, 1.f)},   // rgt-top-front
-		{XYZ1(-1, -1, -1), UV(0.f, 1.f)},  // lft-top-front
-		{XYZ1(-1, -1, 1), UV(0.f, 0.f)},   // lft-top-back
-		{XYZ1(1, -1, 1), UV(1.f, 0.f)},    // rgt-top-back
-		// bottom face
-		{XYZ1(-1, 1, -1), UV(0.f, 0.f)},  // lft-btm-front
-		{XYZ1(1, 1, 1), UV(1.f, 1.f)},    // rgt-btm-back
-		{XYZ1(-1, 1, 1), UV(0.f, 1.f)},   // lft-btm-back
-		{XYZ1(-1, 1, -1), UV(0.f, 0.f)},  // lft-btm-front
-		{XYZ1(1, 1, -1), UV(1.f, 0.f)},   // rgt-btm-front
-		{XYZ1(1, 1, 1), UV(1.f, 1.f)},    // rgt-btm-back
-		// right face
-		{XYZ1(1, 1, -1), UV(0.f, 1.f)},   // rgt-btm-front
-		{XYZ1(1, -1, 1), UV(1.f, 0.f)},   // rgt-top-back
-		{XYZ1(1, 1, 1), UV(1.f, 1.f)},    // rgt-btm-back
-		{XYZ1(1, -1, 1), UV(1.f, 0.f)},   // rgt-top-back
-		{XYZ1(1, 1, -1), UV(0.f, 1.f)},   // rgt-btm-front
-		{XYZ1(1, -1, -1), UV(0.f, 0.f)},  // rgt-top-front
-		// back face
 		{XYZ1(-1, 1, 1), UV(1.f, 1.f)},   // lft-btm-back
 		{XYZ1(1, 1, 1), UV(0.f, 1.f)},    // rgt-btm-back
 		{XYZ1(-1, -1, 1), UV(1.f, 0.f)},  // lft-top-back
