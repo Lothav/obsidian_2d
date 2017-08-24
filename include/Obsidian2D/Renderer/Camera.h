@@ -22,7 +22,6 @@ namespace Obsidian2D
 			glm::mat4 _projection;
 			glm::mat4 _view;
 			glm::mat4 _model;
-			glm::mat4 _clip;
 
 			glm::mat4 _mvp; // Model View Projection
 
@@ -34,7 +33,7 @@ namespace Obsidian2D
 
 			void updateMVP()
 			{
-				this->_mvp = /*this->_clip **/ this->_projection * this->_view * this->_model;
+				this->_mvp = this->_projection * this->_view * this->_model;
 			}
 
 		public:

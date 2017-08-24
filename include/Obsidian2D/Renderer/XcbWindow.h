@@ -1,8 +1,6 @@
 #ifndef OBSIDIAN2D_RENDERER_XCBWINDOW_
 #define OBSIDIAN2D_RENDERER_XCBWINDOW_
 
-#define XYZ1(_x_, _y_, _z_) (_x_), (_y_), (_z_), 1.0
-
 #include <cstdlib>
 #include <cstring>
 #include <iostream>
@@ -12,16 +10,6 @@
 #include "Obsidian2D/Renderer/Window.h"
 #include "Obsidian2D/Core/WindowEvent.h"
 #include <unistd.h>
-
-std::vector<Vertex> g_vb_texture_Data =
-{
-		{XYZ1(-1, 1, 1), UV(1.f, 1.f)},   // lft-btm-back
-		{XYZ1(1, 1, 1), UV(0.f, 1.f)},    // rgt-btm-back
-		{XYZ1(-1, -1, 1), UV(1.f, 0.f)},  // lft-top-back
-		{XYZ1(-1, -1, 1), UV(1.f, 0.f)},  // lft-top-back
-		{XYZ1(1, 1, 1), UV(0.f, 1.f)},    // rgt-btm-back
-		{XYZ1(1, -1, 1), UV(0.f, 0.f)},   // rgt-top-back
-};
 
 namespace Obsidian2D
 {
@@ -136,7 +124,7 @@ namespace Obsidian2D
 				this->setConnection();
 				this->createWindow();
 				this->createSurface();
-				this->initGraphicPipeline(depthPresent, g_vb_texture_Data);
+				this->initGraphicPipeline(depthPresent);
 
 				camera_center = this->getCameraDefaultCenter();
 				camera_eye = this->getCameraDefaultEye();

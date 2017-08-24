@@ -22,6 +22,70 @@
 
 #include "Obsidian2D/Util/Loggable.h"
 
+
+#define XYZ1(_x_, _y_, _z_) (_x_), (_y_), (_z_), 1.0
+
+struct Vertex {
+	float position[3];
+	float color[3];
+};
+struct VertexUV {
+	float posX, posY, posZ, posW;  // Position data
+	float u, v;                    // texture u,v
+};
+/*struct Vertex {
+	float posX, posY, posZ, posW;  // Position data
+	float r, g, b, a;              // Color
+};*/
+#define UV(_u_, _v_) (_u_), (_v_)
+
+static const VertexUV vertexData[] =
+		{
+				// left face
+				{XYZ1(-1, -1, -1), UV(1.f, 0.f)},  // lft-top-front
+				{XYZ1(-1, 1, 1), UV(0.f, 1.f)},    // lft-btm-back
+				{XYZ1(-1, -1, 1), UV(0.f, 0.f)},   // lft-top-back
+				{XYZ1(-1, 1, 1), UV(0.f, 1.f)},    // lft-btm-back
+				{XYZ1(-1, -1, -1), UV(1.f, 0.f)},  // lft-top-front
+				{XYZ1(-1, 1, -1), UV(1.f, 1.f)},   // lft-btm-front
+				// front face
+				{XYZ1(-1, -1, -1), UV(0.f, 0.f)},  // lft-top-front
+				{XYZ1(1, -1, -1), UV(1.f, 0.f)},   // rgt-top-front
+				{XYZ1(1, 1, -1), UV(1.f, 1.f)},    // rgt-btm-front
+				{XYZ1(-1, -1, -1), UV(0.f, 0.f)},  // lft-top-front
+				{XYZ1(1, 1, -1), UV(1.f, 1.f)},    // rgt-btm-front
+				{XYZ1(-1, 1, -1), UV(0.f, 1.f)},   // lft-btm-front
+				// top face
+				{XYZ1(-1, -1, -1), UV(0.f, 1.f)},  // lft-top-front
+				{XYZ1(1, -1, 1), UV(1.f, 0.f)},    // rgt-top-back
+				{XYZ1(1, -1, -1), UV(1.f, 1.f)},   // rgt-top-front
+				{XYZ1(-1, -1, -1), UV(0.f, 1.f)},  // lft-top-front
+				{XYZ1(-1, -1, 1), UV(0.f, 0.f)},   // lft-top-back
+				{XYZ1(1, -1, 1), UV(1.f, 0.f)},    // rgt-top-back
+				// bottom face
+				{XYZ1(-1, 1, -1), UV(0.f, 0.f)},  // lft-btm-front
+				{XYZ1(1, 1, 1), UV(1.f, 1.f)},    // rgt-btm-back
+				{XYZ1(-1, 1, 1), UV(0.f, 1.f)},   // lft-btm-back
+				{XYZ1(-1, 1, -1), UV(0.f, 0.f)},  // lft-btm-front
+				{XYZ1(1, 1, -1), UV(1.f, 0.f)},   // rgt-btm-front
+				{XYZ1(1, 1, 1), UV(1.f, 1.f)},    // rgt-btm-back
+				// right face
+				{XYZ1(1, 1, -1), UV(0.f, 1.f)},   // rgt-btm-front
+				{XYZ1(1, -1, 1), UV(1.f, 0.f)},   // rgt-top-back
+				{XYZ1(1, 1, 1), UV(1.f, 1.f)},    // rgt-btm-back
+				{XYZ1(1, -1, 1), UV(1.f, 0.f)},   // rgt-top-back
+				{XYZ1(1, 1, -1), UV(0.f, 1.f)},   // rgt-btm-front
+				{XYZ1(1, -1, -1), UV(0.f, 0.f)},  // rgt-top-front
+				// back face
+				{XYZ1(-1, 1, 1), UV(1.f, 1.f)},   // lft-btm-back
+				{XYZ1(1, 1, 1), UV(0.f, 1.f)},    // rgt-btm-back
+				{XYZ1(-1, -1, 1), UV(1.f, 0.f)},  // lft-top-back
+				{XYZ1(-1, -1, 1), UV(1.f, 0.f)},  // lft-top-back
+				{XYZ1(1, 1, 1), UV(0.f, 1.f)},    // rgt-btm-back
+				{XYZ1(1, -1, 1), UV(0.f, 0.f)},   // rgt-top-back
+		};
+
+
 typedef struct _swap_chain_buffers {
 	VkImage image;
 	VkImageView view;
