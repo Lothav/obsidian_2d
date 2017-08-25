@@ -2,10 +2,11 @@
 #include <cmath>
 
 #include <SFML/Graphics.hpp>
+#include <SFML/System/Clock.hpp>
 
 #include "Player.h"
 #include "SoundManager.h"
-
+#include "Debug.h"
 
 #define MS_PER_UPDATE 16
 
@@ -46,6 +47,7 @@ void run()
 
     SoundManager::playMusic("assets/sounds/bg_01.ogg", true);
 
+    sf::Clock deltaClock;
     while (running)
     {
         unsigned long long current = getCurrentTime();
@@ -56,9 +58,13 @@ void run()
         sf::Event event;
         while (window->pollEvent(event))
         {
+            Debug::processEvent(event);
+
             if (event.type == sf::Event::Closed) {
                 window->close();
                 running = false;
+            } else if (event.type == sf::Event::KeyReleased && event.key.code == sf::Keyboard::F12) {
+                Debug::startStop(*window);
             }
 
             player.input(event);
@@ -73,6 +79,9 @@ void run()
 
             lag -= MS_PER_UPDATE;
         }
+
+        Debug::update(*window, deltaClock.restart());
+        Debug::test();
 
         window->draw(background);
 
@@ -134,6 +143,10 @@ void run()
 
         window->draw(player.getSprite());
 
+        Debug::render(*window);
+
         window->display();
     }
+
+    Debug::shutdown();
 }

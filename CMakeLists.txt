@@ -16,6 +16,14 @@ set(MAIN_FILE game/src/main.cpp)
 
 set(EXECUTABLE_OUTPUT_PATH bin)
 
+find_package(OpenGL REQUIRED)
+
+file(GLOB_RECURSE HEADER_FILES game/extlib/**/*.h)
+file(GLOB_RECURSE SOURCE_FILES game/extlib/**/*.cpp)
+
+include_directories(game/extlib/imgui)
+
 file(COPY game/assets DESTINATION ${EXECUTABLE_OUTPUT_PATH})
 
-add_executable(game ${MAIN_FILE})
+add_executable(game ${HEADER_FILES} ${SOURCE_FILES} ${MAIN_FILE})
+target_link_libraries(game ${OPENGL_LIBRARIES})
