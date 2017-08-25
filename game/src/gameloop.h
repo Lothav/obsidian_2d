@@ -65,8 +65,6 @@ void run()
                 running = false;
             } else if (event.type == sf::Event::KeyReleased && event.key.code == sf::Keyboard::F12) {
                 Debug::startStop(*window);
-            } else if (event.type == sf::Event::KeyReleased && event.key.code == sf::Keyboard::F11) {
-                Debug::test();
             }
 
             player.input(event);
@@ -83,6 +81,7 @@ void run()
         }
 
         Debug::update(*window, deltaClock.restart());
+        Debug::test();
 
         window->draw(background);
 
@@ -145,6 +144,7 @@ void run()
         window->draw(player.getSprite());
 
         Debug::render(*window);
+
         window->display();
     }
 
