@@ -54,6 +54,14 @@ public:
         }
     }
 
+    static void shutdown()
+    {
+        if (initiated)
+        {
+            ImGui::SFML::Shutdown();
+        }
+    }
+
     static void test()
     {
         if (canRun())

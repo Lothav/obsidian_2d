@@ -147,4 +147,6 @@ void run()
         Debug::render(*window);
         window->display();
     }
+
+    Debug::shutdown();
 }
