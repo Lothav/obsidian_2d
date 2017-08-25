@@ -12,18 +12,18 @@ elseif(CMAKE_BUILD_TYPE MATCHES "Release")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fvisibility=hidden -O3")
 endif()
 
-set(MAIN_FILE game/src/main.cpp)
+set(MAIN_FILE src/main.cpp)
 
 set(EXECUTABLE_OUTPUT_PATH bin)
 
 find_package(OpenGL REQUIRED)
 
-file(GLOB_RECURSE HEADER_FILES game/extlib/**/*.h)
-file(GLOB_RECURSE SOURCE_FILES game/extlib/**/*.cpp)
+file(GLOB_RECURSE HEADER_FILES extlib/**/*.h)
+file(GLOB_RECURSE SOURCE_FILES extlib/**/*.cpp)
 
-include_directories(game/extlib/imgui)
+include_directories(extlib/imgui)
 
-file(COPY game/assets DESTINATION ${EXECUTABLE_OUTPUT_PATH})
+file(COPY assets DESTINATION ${EXECUTABLE_OUTPUT_PATH})
 
 add_executable(game ${HEADER_FILES} ${SOURCE_FILES} ${MAIN_FILE})
 target_link_libraries(game ${OPENGL_LIBRARIES})
