@@ -46,7 +46,7 @@ public:
         }
     }
 
-    static void render(sf::RenderWindow& window)
+    static void render(sf::RenderTarget& window)
     {
         if (canRun())
         {
