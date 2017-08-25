@@ -84,6 +84,58 @@ namespace Obsidian2D
 				vkDestroyInstance(instance, NULL);
 			}
 
+            void draw()
+            {
+                VkResult res;
+
+                this->updateCamera(device);
+
+                res = vkAcquireNextImageKHR(device, swap_chain, UINT64_MAX,
+                                            imageAcquiredSemaphore, VK_NULL_HANDLE, &current_buffer);
+                assert(res == VK_SUCCESS);
+
+                VkPipelineStageFlags pipe_stage_flags = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+
+                VkSubmitInfo submit_info;
+                submit_info.pNext                   = NULL;
+                submit_info.sType                   = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+                submit_info.waitSemaphoreCount      = 1;
+                submit_info.pWaitSemaphores         = &imageAcquiredSemaphore;
+                submit_info.pWaitDstStageMask       = &pipe_stage_flags;
+                submit_info.commandBufferCount      = 1;
+                submit_info.pCommandBuffers         = &command_buffer[current_buffer];
+                submit_info.signalSemaphoreCount    = 1;
+                submit_info.pSignalSemaphores       = &renderSemaphore;
+
+                res = vkQueueSubmit(graphics_queue, 1, &submit_info, drawFence[current_buffer]);
+                assert(res == VK_SUCCESS);
+
+                do {
+                    res = vkWaitForFences(device, 1, &drawFence[current_buffer], VK_TRUE, VK_SAMPLE_COUNT_1_BIT);
+                } while (res == VK_TIMEOUT);
+                assert(res == VK_SUCCESS);
+                vkResetFences(device, 1, &drawFence[current_buffer]);
+
+                VkPresentInfoKHR present;
+                present.sType 				= VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
+                present.pNext 				= NULL;
+                present.swapchainCount 		= 1;
+                present.pSwapchains 		= &swap_chain;
+                present.pImageIndices 		= &current_buffer;
+                present.pWaitSemaphores 	= NULL;
+                present.waitSemaphoreCount 	= 0;
+                present.pResults            = NULL;
+
+                if (renderSemaphore != VK_NULL_HANDLE)
+                {
+                    present.pWaitSemaphores = &renderSemaphore;
+                    present.waitSemaphoreCount = 1;
+                }
+
+                res = vkQueuePresentKHR(present_queue, &present);
+                assert(res == VK_SUCCESS);
+            }
+
 		private:
 			VkPhysicalDeviceProperties 				gpu_props;
 			VkSemaphore         					imageAcquiredSemaphore;
@@ -118,12 +170,6 @@ namespace Obsidian2D
 				VkDeviceMemory 						mem;
 				VkDescriptorBufferInfo 				buffer_info;
 			} vertex_buffer;
-
-			struct {
-				VkBuffer 							buf;
-				VkDeviceMemory 						mem;
-				VkDescriptorBufferInfo 				buffer_info;
-			} uniform_data;
 
 			struct {
 				VkFormat 							format = VK_FORMAT_UNDEFINED;
@@ -556,7 +602,6 @@ namespace Obsidian2D
 				res = vkCreateImage(device, &image_info, NULL, &depth.image);
 				assert(res == VK_SUCCESS);
 
-				VkMemoryRequirements mem_reqs;
 				vkGetImageMemoryRequirements(device, depth.image, &mem_reqs);
 
 				mem_alloc.allocationSize = mem_reqs.size;
@@ -619,13 +664,7 @@ namespace Obsidian2D
 				res = vkAllocateMemory(device, &alloc_info, NULL, &(uniform_data.mem));
 				assert(res == VK_SUCCESS);
 
-				res = vkMapMemory(device, uniform_data.mem, 0, mem_reqs.size, 0, (void **)&pData);
-				assert(res == VK_SUCCESS);
-
-				memcpy(pData, &MVP, sizeof(MVP));
-				this->setCameraBufferAddress(pData);
-
-				vkUnmapMemory(device, uniform_data.mem);
+				this->updateCamera(device);
 
 				res = vkBindBufferMemory(device, uniform_data.buf, uniform_data.mem, 0);
 				assert(res == VK_SUCCESS);
@@ -1132,60 +1171,8 @@ namespace Obsidian2D
 					vkCmdEndRenderPass(command_buffer[i]);
 					res = vkEndCommandBuffer(command_buffer[i]);
 					assert(res == VK_SUCCESS);
-					current_buffer = 0;
 
 				}
-			}
-
-			void draw()
-			{
-				VkResult res;
-
-				res = vkAcquireNextImageKHR(device, swap_chain, UINT64_MAX,
-											imageAcquiredSemaphore, VK_NULL_HANDLE, &current_buffer);
-				assert(res == VK_SUCCESS);
-
-				VkPipelineStageFlags pipe_stage_flags = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
-
-				VkSubmitInfo submit_info;
-				submit_info.pNext                   = NULL;
-				submit_info.sType                   = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-				submit_info.waitSemaphoreCount      = 1;
-				submit_info.pWaitSemaphores         = &imageAcquiredSemaphore;
-				submit_info.pWaitDstStageMask       = &pipe_stage_flags;
-				submit_info.commandBufferCount      = 1;
-				submit_info.pCommandBuffers         = &command_buffer[current_buffer];
-				submit_info.signalSemaphoreCount    = 1;
-				submit_info.pSignalSemaphores       = &renderSemaphore;
-
-				res = vkQueueSubmit(graphics_queue, 1, &submit_info, drawFence[current_buffer]);
-				assert(res == VK_SUCCESS);
-
-				do {
-					res = vkWaitForFences(device, 1, &drawFence[current_buffer], VK_TRUE, VK_SAMPLE_COUNT_1_BIT);
-				} while (res == VK_TIMEOUT);
-				assert(res == VK_SUCCESS);
-				vkResetFences(device, 1, &drawFence[current_buffer]);
-
-
-				VkPresentInfoKHR present;
-				present.sType 				= VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
-				present.pNext 				= NULL;
-				present.swapchainCount 		= 1;
-				present.pSwapchains 		= &swap_chain;
-				present.pImageIndices 		= &current_buffer;
-				present.pWaitSemaphores 	= NULL;
-				present.waitSemaphoreCount 	= 0;
-				present.pResults            = NULL;
-
-				if (renderSemaphore != VK_NULL_HANDLE)
-				{
-					present.pWaitSemaphores = &renderSemaphore;
-					present.waitSemaphoreCount = 1;
-				}
-
-				res = vkQueuePresentKHR(present_queue, &present);
-				assert(res == VK_SUCCESS);
 			}
 		};
 	}

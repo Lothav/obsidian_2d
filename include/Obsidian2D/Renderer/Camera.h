@@ -25,8 +25,6 @@ namespace Obsidian2D
 
 			glm::mat4 _mvp; // Model View Projection
 
-			void* _buffer_address 						= nullptr;
-
 			const std::array<int, 3> _default_eye		= {-5, 3, -10};
 			const std::array<int, 3> _default_center	= {0, 0, 0};
 			const std::array<int, 3> _default_up 		= {0, -1, 0};
@@ -37,6 +35,13 @@ namespace Obsidian2D
 			}
 
 		public:
+			VkMemoryRequirements mem_reqs;
+
+			struct {
+				VkBuffer 							buf;
+				VkDeviceMemory 						mem;
+				VkDescriptorBufferInfo 				buffer_info;
+			} uniform_data;
 
 			void initCamera()
 			{
@@ -55,11 +60,6 @@ namespace Obsidian2D
 				this->_model = glm::mat4(1.0f);
 
 				this->updateMVP();
-			}
-
-			void setCameraBufferAddress(void * buffer_address)
-			{
-				this->_buffer_address = buffer_address;
 			}
 
 			void setCameraViewEye(glm::vec3 eye)
@@ -103,10 +103,15 @@ namespace Obsidian2D
 				return _default_up;
 			};
 
-			void updateCamera()
+			void updateCamera(VkDevice device)
 			{
-				assert(this->_buffer_address != nullptr);
-				memcpy(this->_buffer_address, &this->_mvp, sizeof(this->_mvp));
+				VkResult res;
+				void* _buffer_address = nullptr;
+
+				res = vkMapMemory(device, uniform_data.mem, 0, sizeof(this->_mvp), 0, &_buffer_address);
+				assert(res == VK_SUCCESS);
+				memcpy(_buffer_address, &this->_mvp, sizeof(this->_mvp));
+				vkUnmapMemory(device, uniform_data.mem);
 			}
 
 		};

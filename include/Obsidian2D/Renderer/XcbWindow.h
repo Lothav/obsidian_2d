@@ -129,8 +129,6 @@ namespace Obsidian2D
 				camera_center = this->getCameraDefaultCenter();
 				camera_eye = this->getCameraDefaultEye();
 				camera_up = this->getCameraDefaultUp();
-
-				this->draw();
 			}
 
 			::Obsidian2D::Core::WindowEvent poolEvent()
@@ -201,9 +199,6 @@ namespace Obsidian2D
 						this->setCameraViewCenter(glm::vec3(camera_center[0], camera_center[1], camera_center[2]));
 						this->setCameraViewEye(glm::vec3(camera_eye[0], camera_eye[1], camera_eye[2]));
 						this->setCameraViewUp(glm::vec3(camera_up[0], camera_up[1], camera_up[2]));
-						this->updateCamera();
-
-						this->draw();
 
 						return ::Obsidian2D::Core::WindowEvent::ButtonDown;
 					} else if((e->response_type & ~0x80) == XCB_KEY_RELEASE) {

@@ -87,7 +87,7 @@ namespace Obsidian2D
 							app->baseOnInput(e);
 						}
 					}
-
+                    xcbWindow->draw();
 					app->baseOnUpdate();
 				}
 
