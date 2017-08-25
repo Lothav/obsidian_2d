@@ -67,10 +67,6 @@ public:
         if (canRun())
         {
             ImGui::ShowTestWindow();
-
-            ImGui::Begin("Hello, world!");
-            ImGui::Button("Look at this pretty button");
-            ImGui::End();
         }
     }
 
