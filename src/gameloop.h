@@ -21,11 +21,23 @@ void run()
 {
     auto window = new sf::RenderWindow(sf::VideoMode(1280, 720), "Obsidian2D", sf::Style::Default, sf::ContextSettings(24,8,16));
     sf::View view(sf::FloatRect(0, 0, 1280, 720));
-    view.zoom(1.25f);
+    //view.zoom(1.25f);
     window->setView(view);
 
     World protoWorld("assets/maps/0001.csv");
     Player player;
+
+    // // Declare and load a font
+    // sf::Font font;
+    // if(!font.loadFromFile("assets/MavenPro-Regular.ttf")) {
+    //     std::cout << "font failed" << std::endl;
+    // }
+    // // Create a text
+    // sf::Text text("hello", font);
+    // text.setCharacterSize(30);
+    // text.setColor(sf::Color::White);
+    // text.setOutlineColor(sf::Color::Black);
+    // text.setOutlineThickness(3);
 
     unsigned long long previous = getCurrentTime();
     unsigned long long lag = 0;
@@ -79,6 +91,11 @@ void run()
         protoWorld.draw(window);
 
         window->draw(player.getSprite());
+
+        // auto defaultView = window->getDefaultView();
+        // window->setView(defaultView);
+        // window->draw(text);
+        // window->setView(view);
         Debug::render(*window);
 
         window->display();

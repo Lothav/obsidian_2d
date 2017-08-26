@@ -53,7 +53,6 @@ public:
     World(const std::string& mapPath)
     {
         tileTexture.loadFromFile("assets/tiles/prototype/floor_E.png");
-        //tileTexture.generateMipmap();
 
         tileSize.x = 256.f;
         tileSize.y = 149.f;
@@ -65,6 +64,7 @@ public:
 
         tile.setTexture(tileTexture);
         //tile.setScale({0.75f, 0.75f});
+        tileTexture.generateMipmap();
     }
 
     ~World()
@@ -74,8 +74,25 @@ public:
 
     void update(unsigned long long time, vec2f mouse)
     {
-        this->mouseOver.x = (((mouse.x - tileOffset.x - this->mapOffset.x) / (this->tileSize.x/2.f) + (mouse.y - tileOffset.y - this->mapOffset.y) / (this->tileSize.y/2.f)) / 2.f) - 0.5f;
-        this->mouseOver.y = (((mouse.y - tileOffset.y - this->mapOffset.y) / (this->tileSize.y/2.f) - (mouse.x - tileOffset.x - this->mapOffset.x) / (this->tileSize.x/2.f)) / 2.f) + 0.5f;
+        std::cout << mouse.x << ", " << mouse.y << std::endl;
+
+        //this->mouseOver.x = (((mouse.x - this->mapOffset.x) / (this->tileSize.x/2.f) + (mouse.y) / (this->tileSize.y/2.f)) / 2.f);
+        //this->mouseOver.y = (((mouse.y) / (this->tileSize.y/2.f) - (mouse.x - this->mapOffset.x) / (this->tileSize.x/2.f)) / 2.f);
+
+        mouse.x -= this->mapOffset.x;
+        mouse.x -= this->tileSize.x/2.f;
+
+        mouse.x -= this->tileOffset.x;
+
+        mouse.y -= this->mapOffset.y;
+        mouse.y += this->tileSize.y/2.f;
+
+        mouse.y -= this->tileOffset.y;
+
+        this->mouseOver.x = mouse.x / this->tileSize.x + mouse.y / this->tileSize.y;
+        this->mouseOver.y = mouse.y / this->tileSize.y - mouse.x / this->tileSize.x;
+
+        std::cout << this->mouseOver.x << ", " << this->mouseOver.y << std::endl;
 
         this->colorModifier = 1-(static_cast<float>(std::sin(time*0.005)) + 1.f)/8.f;
     }
@@ -99,7 +116,7 @@ public:
             lineCount++;
         }
 
-        this->mapOffset.x = (static_cast<float>(this->map.size()*this->tileSize.x) / 2.f) - (this->tileSize.x/2.f);
+        this->mapOffset.x = (static_cast<float>((this->map.size()-1)*this->tileSize.x) / 2.f) - (this->tileSize.x/2.f);
         this->mapOffset.y = 0;
     }
 
@@ -115,7 +132,7 @@ public:
                     iso.y = (static_cast<float>(line.first) + static_cast<float>(column.first)) * this->tileSize.y/2.f;
                     tile.setPosition(this->mapOffset.x + iso.x, this->mapOffset.y + iso.y);
 
-                    if(std::trunc(this->mouseOver.x) == line.first && std::trunc(this->mouseOver.y) == column.first) {
+                    if(std::floor(this->mouseOver.x) == line.first && std::floor(this->mouseOver.y) == column.first) {
                         tile.setColor(sf::Color::Color(200*(this->colorModifier*0.5f), 200*(this->colorModifier*0.5f), 255*this->colorModifier));
                     } else {
                         tile.setColor(sf::Color::White);
@@ -125,6 +142,7 @@ public:
                 }
             }
         }
+
     }
 };
 
