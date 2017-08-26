@@ -20,8 +20,8 @@ static unsigned long long getCurrentTime()
 void run()
 {
     auto window = new sf::RenderWindow(sf::VideoMode(1280, 720), "Obsidian2D", sf::Style::Default, sf::ContextSettings(24,8,16));
-    sf::View view(sf::FloatRect(0, 0, 1920, 1080));
-    //view.zoom(1.f);
+    sf::View view(sf::FloatRect(0, 0, 1280, 720));
+    view.zoom(1.25f);
     window->setView(view);
 
     World protoWorld("assets/maps/0001.csv");
@@ -58,12 +58,19 @@ void run()
         while (lag >= MS_PER_UPDATE)
         {
             lag -= MS_PER_UPDATE;
+
             player.update(elapsed);
             view.setCenter(player.getPosition().x, player.getPosition().y);
             window->setView(view);
         }
 
+        sf::Vector2f mouseWorldPos = window->mapPixelToCoords(sf::Mouse::getPosition(*window));
 
+        vec2f mouse;
+        mouse.x = mouseWorldPos.x;
+        mouse.y = mouseWorldPos.y;
+
+        protoWorld.update(current, mouse);
         Debug::update(*window, deltaClock.restart());
         Debug::test();
 
