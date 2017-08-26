@@ -6,6 +6,8 @@
 #define OBSIDIAN2D_CORE_WINDOW2_H
 
 #include "Camera.h"
+#include "Memory.h"
+
 #define APP_NAME "Obsidian2D"
 
 namespace Obsidian2D
@@ -606,7 +608,7 @@ namespace Obsidian2D
 
 				mem_alloc.allocationSize = mem_reqs.size;
 				/* Use the memory properties to determine the type of memory required */
-				pass = this->memory_type_from_properties(
+				pass = Memory::memory_type_from_properties(
 						memory_properties,
 						mem_reqs.memoryTypeBits,
 						VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
@@ -653,7 +655,7 @@ namespace Obsidian2D
 				alloc_info.memoryTypeIndex = 0;
 
 				alloc_info.allocationSize = mem_reqs.size;
-				pass = memory_type_from_properties(
+				pass = Memory::memory_type_from_properties(
 						memory_properties,
 						mem_reqs.memoryTypeBits,
 						VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
@@ -842,7 +844,7 @@ namespace Obsidian2D
 				m_alloc_info.pNext 										= NULL;
 				m_alloc_info.memoryTypeIndex 							= 0;
 				m_alloc_info.allocationSize 							= mem_reqs.size;
-				pass = memory_type_from_properties (
+				pass = Memory::memory_type_from_properties(
 						memory_properties,
 						mem_reqs.memoryTypeBits,
 						VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
