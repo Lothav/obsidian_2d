@@ -1,0 +1,57 @@
+{ "height":10,
+ "layers":[
+        {
+         "data":[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+         "height":10,
+         "name":"Tile Layer 1",
+         "opacity":1,
+         "type":"tilelayer",
+         "visible":true,
+         "width":10,
+         "x":0,
+         "y":0
+        }],
+ "nextobjectid":1,
+ "orientation":"isometric",
+ "properties":
+    {
+
+    },
+ "renderorder":"right-down",
+ "tileheight":150,
+ "tilesets":[
+        {
+         "firstgid":1,
+         "margin":0,
+         "name":"a",
+         "properties":
+            {
+
+            },
+         "spacing":0,
+         "tilecount":2,
+         "tileheight":150,
+         "tileproperties":
+            {
+             "0":
+                {
+                 "a":"10"
+                }
+            },
+         "tiles":
+            {
+             "0":
+                {
+                 "image":"Obsidian2D\/assets\/tile.png"
+                },
+             "1":
+                {
+                 "image":"Obsidian2D\/assets\/tile.png"
+                }
+            },
+         "tilewidth":256
+        }],
+ "tilewidth":256,
+ "version":1,
+ "width":10
+}
