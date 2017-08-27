@@ -27,17 +27,17 @@ void run()
     World protoWorld("assets/maps/0001.json");
     Player player;
 
-    // // Declare and load a font
-    // sf::Font font;
-    // if(!font.loadFromFile("assets/MavenPro-Regular.ttf")) {
-    //     std::cout << "font failed" << std::endl;
-    // }
-    // // Create a text
-    // sf::Text text("hello", font);
-    // text.setCharacterSize(30);
-    // text.setColor(sf::Color::White);
-    // text.setOutlineColor(sf::Color::Black);
-    // text.setOutlineThickness(3);
+    // Declare and load a font
+    sf::Font font;
+    if(!font.loadFromFile("assets/fonts/MavenPro-Regular.ttf")) {
+        std::cout << "font failed" << std::endl;
+    }
+    // Create a text
+    sf::Text text("GO RIGHT+DOWN FOR A FEW SECS", font);
+    text.setCharacterSize(30);
+    text.setColor(sf::Color::White);
+    text.setOutlineColor(sf::Color::Black);
+    text.setOutlineThickness(3);
 
     unsigned long long previous = getCurrentTime();
     unsigned long long lag = 0;
@@ -94,7 +94,7 @@ void run()
 
         // auto defaultView = window->getDefaultView();
         // window->setView(defaultView);
-        // window->draw(text);
+         window->draw(text);
         // window->setView(view);
         Debug::render(*window);
 
