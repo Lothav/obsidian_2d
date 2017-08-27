@@ -20,7 +20,7 @@ static unsigned long long getCurrentTime()
 void run()
 {
     auto window = new sf::RenderWindow(sf::VideoMode(1280, 720), "Obsidian2D", sf::Style::Default, sf::ContextSettings(24,8,16));
-    sf::View view(sf::FloatRect(0, 0, 1280, 720));
+    sf::View view(sf::FloatRect(0, 0, 1920, 1080));
     //view.zoom(1.25f);
     window->setView(view);
 
