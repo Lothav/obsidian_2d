@@ -95,8 +95,14 @@ public:
             }
         }
 
+        //Loses first fame of animation
         animation.nextFrame();
         return false;
+    }
+
+    const vec2f& getPosition()
+    {
+        return this->position.getPosition();
     }
 
     const sf::Sprite& getSprite()

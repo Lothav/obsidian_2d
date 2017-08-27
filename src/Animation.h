@@ -43,7 +43,8 @@ public:
             _path.append(std::to_string(i));
             _path.append(".png");
             texture.loadFromFile(_path);
-            texture.setSmooth(1);
+            //texture.setSmooth(1);
+            texture.generateMipmap();
             animation.push_back(texture);
         }
 
