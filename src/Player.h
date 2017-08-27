@@ -95,6 +95,7 @@ public:
             }
         }
 
+        //Loses first fame of animation
         animation.nextFrame();
         return false;
     }

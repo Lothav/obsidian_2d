@@ -6,8 +6,8 @@
 #include <SFML/Window/Event.hpp>
 #include <SFML/System/Time.hpp>
 
-#include "imgui.h"
-#include "imgui-SFML.h"
+#include "imgui/imgui.h"
+#include "imgui/imgui-SFML.h"
 
 class Debug {
 private:

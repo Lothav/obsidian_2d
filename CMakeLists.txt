@@ -21,7 +21,7 @@ find_package(OpenGL REQUIRED)
 file(GLOB_RECURSE HEADER_FILES extlib/**/*.h)
 file(GLOB_RECURSE SOURCE_FILES extlib/**/*.cpp)
 
-include_directories(extlib/imgui)
+include_directories(extlib)
 
 file(COPY assets DESTINATION ${EXECUTABLE_OUTPUT_PATH})
 

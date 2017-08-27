@@ -24,7 +24,7 @@ void run()
     //view.zoom(1.25f);
     window->setView(view);
 
-    World protoWorld("assets/maps/0001.csv");
+    World protoWorld("assets/maps/0001.json");
     Player player;
 
     // // Declare and load a font
