@@ -32,7 +32,11 @@ namespace Obsidian2D
 				vkUnmapMemory(device, device_memory);
 			}
 
-			static bool findMemoryType(VkPhysicalDeviceMemoryProperties memory_properties, uint32_t typeBits, VkFlags requirements_mask, uint32_t *typeIndex)
+			static bool findMemoryType(
+					VkPhysicalDeviceMemoryProperties memory_properties,
+					uint32_t typeBits,
+					VkFlags requirements_mask,
+					uint32_t *typeIndex)
 			{
 				// Search memtypes to find first index with those properties
 				for (uint32_t i = 0; i < memory_properties.memoryTypeCount; i++) {
