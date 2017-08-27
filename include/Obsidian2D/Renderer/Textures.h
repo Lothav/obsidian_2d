@@ -20,11 +20,12 @@ namespace Obsidian2D
 
 		private:
 
-			VkDevice device;
+			VkDevice 				device;
 
-			void createImage(uint32_t width, uint32_t height, VkFormat format, VkImageTiling tiling,
-							 VkImageUsageFlags usage, VkPhysicalDeviceMemoryProperties properties, VkImage& image,
-							 VkDeviceMemory& imageMemory)
+			static void createImage(VkDevice device, uint32_t width, uint32_t height, VkFormat format,
+								  	VkImageTiling tiling, VkImageUsageFlags usage,
+									VkMemoryPropertyFlags properties, VkImage& image,
+									VkDeviceMemory& imageMemory)
 			{
 				VkResult res;
 
@@ -53,13 +54,7 @@ namespace Obsidian2D
 				allocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
 				allocInfo.allocationSize = memRequirements.size;
 
-				bool pass = Memory::memory_type_from_properties(
-						properties,
-						memRequirements.memoryTypeBits,
-						VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
-						&allocInfo.memoryTypeIndex);
-
-				assert(pass);
+				allocInfo.memoryTypeIndex = Memory::findMemoryType(memRequirements.memoryTypeBits, properties);
 
 				res = vkAllocateMemory(device, &allocInfo, nullptr, &imageMemory);
 				assert(res == VK_SUCCESS);
@@ -67,19 +62,38 @@ namespace Obsidian2D
 				vkBindImageMemory(device, image, imageMemory, 0);
 			}
 
-		public:
+			static void createBuffer(VkDevice device, VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory) {
+				VkBufferCreateInfo bufferInfo = {};
+				bufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
+				bufferInfo.size = size;
+				bufferInfo.usage = usage;
+				bufferInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 
-			Textures(VkDevice device)
-			{
-				this->device = device;
+				assert(vkCreateBuffer(device, &bufferInfo, nullptr, &buffer) != VK_SUCCESS);
+
+				VkMemoryRequirements memRequirements;
+				vkGetBufferMemoryRequirements(device, buffer, &memRequirements);
+
+				VkMemoryAllocateInfo allocInfo = {};
+				allocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
+				allocInfo.allocationSize = memRequirements.size;
+				allocInfo.memoryTypeIndex = Memory::findMemoryType(memRequirements.memoryTypeBits, properties);
+
+				assert(vkAllocateMemory(device, &allocInfo, nullptr, &bufferMemory) != VK_SUCCESS);
+
+				vkBindBufferMemory(device, buffer, bufferMemory, 0);
 			}
 
-			void createTextureImage()
+		public:
+
+			static void createTextureImage(VkDevice device, const char* path)
 			{
-				VkResult res;
+				VkResult 				res;
+				VkImage 				textureImage;
+				VkDeviceMemory 			textureImageMemory;
 
 				int texWidth, texHeight, texChannels;
-				stbi_uc* pixels = stbi_load("textures/texture.jpg", &texWidth, &texHeight, &texChannels, STBI_rgb_alpha);
+				stbi_uc* pixels = stbi_load(path, &texWidth, &texHeight, &texChannels, STBI_rgb_alpha);
 				VkDeviceSize imageSize = static_cast<VkDeviceSize>(texWidth * texHeight * 4);
 
 				assert(pixels);
@@ -88,8 +102,7 @@ namespace Obsidian2D
 				VkDeviceMemory stagingBufferMemory;
 
 				createBuffer(
-						imageSize,
-						VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
+						device, imageSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
 						VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
 						stagingBuffer,
 						stagingBufferMemory);
@@ -101,7 +114,10 @@ namespace Obsidian2D
 
 				stbi_image_free(pixels);
 
-				createImage(texWidth, texHeight, VK_FORMAT_R8G8B8A8_UNORM, VK_IMAGE_TILING_OPTIMAL, VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, textureImage, textureImageMemory);
+				createImage(device, static_cast<uint32_t>(texWidth), static_cast<uint32_t>(texHeight),
+							VK_FORMAT_R8G8B8A8_UNORM, VK_IMAGE_TILING_OPTIMAL,
+							VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT,
+							VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, textureImage, textureImageMemory);
 			}
 
 		};
