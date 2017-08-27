@@ -7,7 +7,7 @@
 #include <cstring>
 #include "./stb/stb_image.h"
 #include "Memory.h"
-#include "Buffers.h"
+#include "Buffer.h"
 
 #ifndef OBSIDIAN2D_TEXTURES_H
 #define OBSIDIAN2D_TEXTURES_H
@@ -80,11 +80,12 @@ namespace Obsidian2D
 				VkBuffer stagingBuffer;
 				VkDeviceMemory stagingBufferMemory;
 
-				Buffers::createBuffer (
+				Buffer * staging_buffer = new Buffer();
+
+				staging_buffer->createBuffer (
 						physicalDevice, device, imageSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
-						VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-						&stagingBuffer,
-						&stagingBufferMemory);
+						VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT
+				);
 
 				void* data;
 				vkMapMemory(device, stagingBufferMemory, 0, imageSize, 0, &data);

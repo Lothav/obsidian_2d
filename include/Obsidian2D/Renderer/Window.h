@@ -44,8 +44,8 @@ namespace Obsidian2D
 				vkDestroyDescriptorPool(device, desc_pool, NULL);
 
 				// Destroy vertex buffer
-				vkDestroyBuffer(device, vertex_buffer.buf, NULL);
-				vkFreeMemory(device, vertex_buffer.mem, NULL);
+				vkDestroyBuffer(device, vertex_buffer->buf, NULL);
+				vkFreeMemory(device, vertex_buffer->mem, NULL);
 
 				// Destroy frame buffer
 				for (i = 0; i < swapchainImageCount; i++) {
@@ -65,8 +65,8 @@ namespace Obsidian2D
 				vkDestroyPipelineLayout(device, pipeline_layout, NULL);
 
 				// Destroy uniform buffer
-				vkDestroyBuffer(device, uniform_data.buf, NULL);
-				vkFreeMemory(device, uniform_data.mem, NULL);
+				vkDestroyBuffer(device, uniform_data->buf, NULL);
+				vkFreeMemory(device, uniform_data->mem, NULL);
 
 				// Destroy depth buffer
 				vkDestroyImageView(device, depth.view, NULL);
@@ -168,11 +168,7 @@ namespace Obsidian2D
 			uint32_t 								graphics_queue_family_index = UINT32_MAX;
 			uint32_t 								present_queue_family_index = UINT32_MAX;
 
-			struct {
-				VkBuffer 							buf;
-				VkDeviceMemory 						mem;
-				VkDescriptorBufferInfo 				buffer_info;
-			} vertex_buffer;
+			Buffer * vertex_buffer;
 
 			struct {
 				VkFormat 							format = VK_FORMAT_UNDEFINED;
@@ -617,16 +613,14 @@ namespace Obsidian2D
 				uint8_t *pData;
 
 				/*  create Uniform Buffer  */
-				Buffers::createBuffer (
+
+				uniform_data = new Buffer();
+
+				uniform_data->createBuffer (
 						gpu_vector[0], device, sizeof(MVP),
 						VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
-						VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-						&uniform_data.buf, &uniform_data.mem
+						VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT
 				);
-
-				uniform_data.buffer_info.buffer 						= uniform_data.buf;
-				uniform_data.buffer_info.offset 						= 0;
-				uniform_data.buffer_info.range 							= sizeof(MVP);
 
 				bool use_texture = false;
 				VkDescriptorSetLayoutBinding layout_bindings[2];
@@ -775,18 +769,16 @@ namespace Obsidian2D
 				}
 
 
-				Buffers::createBuffer (
+				vertex_buffer = new Buffer();
+
+				vertex_buffer->createBuffer (
 						gpu_vector[0], device, dataSize,
 						VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
-						VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-						&vertex_buffer.buf, &vertex_buffer.mem
+						VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT
 				);
-				vertex_buffer.buffer_info.range 						= dataSize;
-				vertex_buffer.buffer_info.offset 						= 0;
-				vertex_buffer.buffer_info.buffer 						= vertex_buffer.buf;
 
-				Memory::copyMemory(device, vertex_buffer.mem, vertexData, dataSize);
-				res = vkMapMemory(device, vertex_buffer.mem, 0, dataSize, 0, (void **)&pData);
+				Memory::copyMemory(device, vertex_buffer->mem, vertexData, dataSize);
+				res = vkMapMemory(device, vertex_buffer->mem, 0, dataSize, 0, (void **)&pData);
 				assert(res == VK_SUCCESS);
 
 				VkVertexInputBindingDescription vi_binding;
@@ -849,7 +841,7 @@ namespace Obsidian2D
 				writes[0].dstSet 												= desc_set[0];
 				writes[0].descriptorCount 										= 1;
 				writes[0].descriptorType 										= VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-				writes[0].pBufferInfo 											= &uniform_data.buffer_info;
+				writes[0].pBufferInfo 											= &uniform_data->buffer_info;
 				writes[0].dstArrayElement 										= 0;
 				writes[0].dstBinding 											= 0;
 
@@ -1087,7 +1079,7 @@ namespace Obsidian2D
 											desc_set.data(), 0, NULL);
 
 					const VkDeviceSize offsets[1] = {0};
-					vkCmdBindVertexBuffers(command_buffer[i], 0, 1, &vertex_buffer.buf, offsets);
+					vkCmdBindVertexBuffers(command_buffer[i], 0, 1, &vertex_buffer->buf, offsets);
 
 					this->init_viewports(command_buffer[i]);
 					this->init_scissors(command_buffer[i]);

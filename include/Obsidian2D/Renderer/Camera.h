@@ -3,6 +3,7 @@
 
 #include "Layers.h"
 #include "Memory.h"
+#include "Buffer.h"
 
 typedef struct _view_camera {
 	glm::vec3 eye;
@@ -38,11 +39,7 @@ namespace Obsidian2D
 		public:
 			VkMemoryRequirements mem_reqs;
 
-			struct {
-				VkBuffer 							buf;
-				VkDeviceMemory 						mem;
-				VkDescriptorBufferInfo 				buffer_info;
-			} uniform_data;
+			Buffer* uniform_data;
 
 			void initCamera()
 			{
@@ -107,7 +104,7 @@ namespace Obsidian2D
 			void updateCamera(VkDevice device)
 			{
 				VkResult res;
-				Memory::copyMemory(device, uniform_data.mem, &this->_mvp, sizeof(this->_mvp));
+				Memory::copyMemory(device, uniform_data->mem, &this->_mvp, sizeof(this->_mvp));
 			}
 
 		};
