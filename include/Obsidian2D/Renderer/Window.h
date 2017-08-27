@@ -7,6 +7,7 @@
 
 #include "Camera.h"
 #include "Memory.h"
+#include "Textures.h"
 
 #define APP_NAME "Obsidian2D"
 
@@ -500,27 +501,8 @@ namespace Obsidian2D
 
 				for (uint32_t i = 0; i < swapchainImageCount; i++) {
 					swap_chain_buffer sc_buffer;
-
-					VkImageViewCreateInfo color_image_view = {};
-					color_image_view.sType 								= VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
-					color_image_view.pNext 								= NULL;
-					color_image_view.format								= format;
-					color_image_view.components.r 						= VK_COMPONENT_SWIZZLE_R;
-					color_image_view.components.g 						= VK_COMPONENT_SWIZZLE_G;
-					color_image_view.components.b 						= VK_COMPONENT_SWIZZLE_B;
-					color_image_view.components.a 						= VK_COMPONENT_SWIZZLE_A;
-					color_image_view.subresourceRange.aspectMask 		= VK_IMAGE_ASPECT_COLOR_BIT;
-					color_image_view.subresourceRange.baseMipLevel		= 0;
-					color_image_view.subresourceRange.levelCount 		= 1;
-					color_image_view.subresourceRange.baseArrayLayer 	= 0;
-					color_image_view.subresourceRange.layerCount 		= 1;
-					color_image_view.viewType 							= VK_IMAGE_VIEW_TYPE_2D;
-					color_image_view.flags 								= 0;
-
+					sc_buffer.view = Textures::createImageView(device, swapchainImages[i], format);
 					sc_buffer.image = swapchainImages[i];
-					color_image_view.image = sc_buffer.image;
-
-					res = vkCreateImageView(device, &color_image_view, NULL, &sc_buffer.view);
 					buffers.push_back(sc_buffer);
 					assert(res == VK_SUCCESS);
 				}

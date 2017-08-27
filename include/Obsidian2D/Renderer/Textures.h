@@ -54,7 +54,7 @@ namespace Obsidian2D
 				allocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
 				allocInfo.allocationSize = memRequirements.size;
 
-				allocInfo.memoryTypeIndex = Memory::findMemoryType(memRequirements.memoryTypeBits, properties);
+				//allocInfo.memoryTypeIndex = Memory::findMemoryType(memRequirements.memoryTypeBits, properties);
 
 				res = vkAllocateMemory(device, &allocInfo, nullptr, &imageMemory);
 				assert(res == VK_SUCCESS);
@@ -77,7 +77,7 @@ namespace Obsidian2D
 				VkMemoryAllocateInfo allocInfo = {};
 				allocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
 				allocInfo.allocationSize = memRequirements.size;
-				allocInfo.memoryTypeIndex = Memory::findMemoryType(memRequirements.memoryTypeBits, properties);
+				//allocInfo.memoryTypeIndex = Memory::findMemoryType(memRequirements.memoryTypeBits, properties);
 
 				assert(vkAllocateMemory(device, &allocInfo, nullptr, &bufferMemory) != VK_SUCCESS);
 
@@ -118,6 +118,30 @@ namespace Obsidian2D
 							VK_FORMAT_R8G8B8A8_UNORM, VK_IMAGE_TILING_OPTIMAL,
 							VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT,
 							VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, textureImage, textureImageMemory);
+			}
+
+			static VkImageView createImageView(VkDevice device, VkImage image, VkFormat format) {
+
+				VkResult res;
+
+				VkImageViewCreateInfo viewInfo = {};
+				viewInfo.sType 								= VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
+				viewInfo.image 								= image;
+				viewInfo.viewType 							= VK_IMAGE_VIEW_TYPE_2D;
+				viewInfo.format 							= format;
+				viewInfo.subresourceRange.aspectMask 		= VK_IMAGE_ASPECT_COLOR_BIT;
+				viewInfo.subresourceRange.baseMipLevel 		= 0;
+				viewInfo.subresourceRange.levelCount 		= 1;
+				viewInfo.subresourceRange.baseArrayLayer 	= 0;
+				viewInfo.subresourceRange.layerCount 		= 1;
+
+				VkImageView imageView;
+
+				res = vkCreateImageView(device, &viewInfo, nullptr, &imageView);
+
+				assert(res == VK_SUCCESS);
+
+				return imageView;
 			}
 
 		};
