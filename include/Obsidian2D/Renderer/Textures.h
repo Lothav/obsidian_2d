@@ -6,9 +6,11 @@
 #include <assert.h>
 #include <cstring>
 #include <stdexcept>
-#include "./stb/stb_image.h"
 #include "Memory.h"
 #include "Buffer.h"
+
+#define STB_IMAGE_IMPLEMENTATION
+#include "./stb/stb_image.h"
 
 #ifndef OBSIDIAN2D_TEXTURES_H
 #define OBSIDIAN2D_TEXTURES_H
