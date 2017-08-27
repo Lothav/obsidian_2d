@@ -7,6 +7,7 @@
 #include <cstring>
 #include "./stb/stb_image.h"
 #include "Memory.h"
+#include "Buffers.h"
 
 #ifndef OBSIDIAN2D_TEXTURES_H
 #define OBSIDIAN2D_TEXTURES_H
@@ -62,31 +63,9 @@ namespace Obsidian2D
 				vkBindImageMemory(device, image, imageMemory, 0);
 			}
 
-			static void createBuffer(VkDevice device, VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory) {
-				VkBufferCreateInfo bufferInfo = {};
-				bufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
-				bufferInfo.size = size;
-				bufferInfo.usage = usage;
-				bufferInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
-
-				assert(vkCreateBuffer(device, &bufferInfo, nullptr, &buffer) != VK_SUCCESS);
-
-				VkMemoryRequirements memRequirements;
-				vkGetBufferMemoryRequirements(device, buffer, &memRequirements);
-
-				VkMemoryAllocateInfo allocInfo = {};
-				allocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
-				allocInfo.allocationSize = memRequirements.size;
-				//allocInfo.memoryTypeIndex = Memory::findMemoryType(memRequirements.memoryTypeBits, properties);
-
-				assert(vkAllocateMemory(device, &allocInfo, nullptr, &bufferMemory) != VK_SUCCESS);
-
-				vkBindBufferMemory(device, buffer, bufferMemory, 0);
-			}
-
 		public:
 
-			static void createTextureImage(VkDevice device, const char* path)
+			static void createTextureImage(VkPhysicalDevice physicalDevice, VkDevice device, const char* path)
 			{
 				VkResult 				res;
 				VkImage 				textureImage;
@@ -101,11 +80,11 @@ namespace Obsidian2D
 				VkBuffer stagingBuffer;
 				VkDeviceMemory stagingBufferMemory;
 
-				createBuffer(
-						device, imageSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
+				Buffers::createBuffer (
+						physicalDevice, device, imageSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
 						VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-						stagingBuffer,
-						stagingBufferMemory);
+						&stagingBuffer,
+						&stagingBufferMemory);
 
 				void* data;
 				vkMapMemory(device, stagingBufferMemory, 0, imageSize, 0, &data);

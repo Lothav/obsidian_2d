@@ -2,6 +2,7 @@
 #define OBSIDIAN2D_CORE_CAMERA_H
 
 #include "Layers.h"
+#include "Memory.h"
 
 typedef struct _view_camera {
 	glm::vec3 eye;
@@ -106,12 +107,7 @@ namespace Obsidian2D
 			void updateCamera(VkDevice device)
 			{
 				VkResult res;
-				void* _buffer_address = nullptr;
-
-				res = vkMapMemory(device, uniform_data.mem, 0, sizeof(this->_mvp), 0, &_buffer_address);
-				assert(res == VK_SUCCESS);
-				memcpy(_buffer_address, &this->_mvp, sizeof(this->_mvp));
-				vkUnmapMemory(device, uniform_data.mem);
+				Memory::copyMemory(device, uniform_data.mem, &this->_mvp, sizeof(this->_mvp));
 			}
 
 		};

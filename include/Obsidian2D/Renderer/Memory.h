@@ -6,6 +6,8 @@
 #define OBSIDIAN2D_MEMORY_H
 
 #include <vulkan/vulkan.h>
+#include <assert.h>
+#include <cstring>
 
 namespace Obsidian2D
 {
@@ -14,7 +16,23 @@ namespace Obsidian2D
 		class Memory
 		{
 		public:
-			static bool memory_type_from_properties(VkPhysicalDeviceMemoryProperties memory_properties, uint32_t typeBits, VkFlags requirements_mask, uint32_t *typeIndex)
+
+			static void copyMemory (
+					VkDevice device,
+					VkDeviceMemory device_memory,
+					const void * object,
+					size_t object_size)
+			{
+				VkResult res;
+				void* _buffer_address = nullptr;
+
+				res = vkMapMemory(device, device_memory, 0, object_size, 0, &_buffer_address);
+				assert(res == VK_SUCCESS);
+				memcpy(_buffer_address, object, object_size);
+				vkUnmapMemory(device, device_memory);
+			}
+
+			static bool findMemoryType(VkPhysicalDeviceMemoryProperties memory_properties, uint32_t typeBits, VkFlags requirements_mask, uint32_t *typeIndex)
 			{
 				// Search memtypes to find first index with those properties
 				for (uint32_t i = 0; i < memory_properties.memoryTypeCount; i++) {
@@ -36,7 +54,8 @@ namespace Obsidian2D
 				vkGetPhysicalDeviceMemoryProperties(device, &memProperties);
 
 				for (uint32_t i = 0; i < memProperties.memoryTypeCount; i++) {
-					if ((typeFilter & (1 << i)) && (memProperties.memoryTypes[i].propertyFlags & properties) == properties) {
+					if ((typeFilter & (1 << i)) &&
+							(memProperties.memoryTypes[i].propertyFlags & properties) == properties) {
 						return i;
 					}
 				}

@@ -590,7 +590,7 @@ namespace Obsidian2D
 
 				mem_alloc.allocationSize = mem_reqs.size;
 				/* Use the memory properties to determine the type of memory required */
-				pass = Memory::memory_type_from_properties(
+				pass = Memory::findMemoryType(
 						memory_properties,
 						mem_reqs.memoryTypeBits,
 						VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
@@ -615,48 +615,18 @@ namespace Obsidian2D
 
 				glm::mat4 MVP = this->getMVP();
 				uint8_t *pData;
-				VkBufferCreateInfo buf_info = {};
 
-				buf_info.sType							= VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
-				buf_info.pNext							= NULL;
-				buf_info.usage							= VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT;
-				buf_info.size 							= sizeof(MVP);
-				buf_info.queueFamilyIndexCount			= 0;
-				buf_info.pQueueFamilyIndices 			= NULL;
-				buf_info.sharingMode 					= VK_SHARING_MODE_EXCLUSIVE;
-				buf_info.flags 							= 0;
-
-				res = vkCreateBuffer(device, &buf_info, NULL, &uniform_data.buf);
-				assert(res == VK_SUCCESS);
-
-				vkGetBufferMemoryRequirements(device, uniform_data.buf, &mem_reqs);
-
-				VkMemoryAllocateInfo alloc_info = {};
-				alloc_info.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
-				alloc_info.pNext = NULL;
-				alloc_info.memoryTypeIndex = 0;
-
-				alloc_info.allocationSize = mem_reqs.size;
-				pass = Memory::memory_type_from_properties(
-						memory_properties,
-						mem_reqs.memoryTypeBits,
+				/*  create Uniform Buffer  */
+				Buffers::createBuffer (
+						gpu_vector[0], device, sizeof(MVP),
+						VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
 						VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-						&alloc_info.memoryTypeIndex
+						&uniform_data.buf, &uniform_data.mem
 				);
-				assert(pass && "No mappable, coherent memory");
 
-				res = vkAllocateMemory(device, &alloc_info, NULL, &(uniform_data.mem));
-				assert(res == VK_SUCCESS);
-
-				this->updateCamera(device);
-
-				res = vkBindBufferMemory(device, uniform_data.buf, uniform_data.mem, 0);
-				assert(res == VK_SUCCESS);
-
-				uniform_data.buffer_info.buffer = uniform_data.buf;
-				uniform_data.buffer_info.offset = 0;
-				uniform_data.buffer_info.range = sizeof(MVP);
-
+				uniform_data.buffer_info.buffer 						= uniform_data.buf;
+				uniform_data.buffer_info.offset 						= 0;
+				uniform_data.buffer_info.range 							= sizeof(MVP);
 
 				bool use_texture = false;
 				VkDescriptorSetLayoutBinding layout_bindings[2];
@@ -804,48 +774,19 @@ namespace Obsidian2D
 					assert(res == VK_SUCCESS);
 				}
 
-				VkBufferCreateInfo vertex_buf_info = {};
-				vertex_buf_info.sType 									= VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
-				vertex_buf_info.pNext 									= NULL;
-				vertex_buf_info.usage 									= VK_BUFFER_USAGE_VERTEX_BUFFER_BIT;
-				vertex_buf_info.size 									= dataSize;
-				vertex_buf_info.queueFamilyIndexCount 					= 0;
-				vertex_buf_info.pQueueFamilyIndices 					= NULL;
-				vertex_buf_info.sharingMode 							= VK_SHARING_MODE_EXCLUSIVE;
-				vertex_buf_info.flags 									= 0;
 
-
-
-				res = vkCreateBuffer(device, &vertex_buf_info, NULL, &vertex_buffer.buf);
-				assert(res == VK_SUCCESS);
-
-				vkGetBufferMemoryRequirements(device, vertex_buffer.buf, &mem_reqs);
-
-				VkMemoryAllocateInfo m_alloc_info = {};
-				m_alloc_info.sType 										= VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
-				m_alloc_info.pNext 										= NULL;
-				m_alloc_info.memoryTypeIndex 							= 0;
-				m_alloc_info.allocationSize 							= mem_reqs.size;
-				pass = Memory::memory_type_from_properties(
-						memory_properties,
-						mem_reqs.memoryTypeBits,
+				Buffers::createBuffer (
+						gpu_vector[0], device, dataSize,
+						VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
 						VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-						&m_alloc_info.memoryTypeIndex
+						&vertex_buffer.buf, &vertex_buffer.mem
 				);
-				assert(pass && "No mappable, coherent memory");
-
-				res = vkAllocateMemory(device, &m_alloc_info, NULL, &(vertex_buffer.mem));
-				assert(res == VK_SUCCESS);
-				vertex_buffer.buffer_info.range 						= mem_reqs.size;
+				vertex_buffer.buffer_info.range 						= dataSize;
 				vertex_buffer.buffer_info.offset 						= 0;
+				vertex_buffer.buffer_info.buffer 						= vertex_buffer.buf;
 
-				res = vkMapMemory(device, vertex_buffer.mem, 0, mem_reqs.size, 0, (void **)&pData);
-				assert(res == VK_SUCCESS);
-				memcpy(pData, vertexData, dataSize);
-
-				vkUnmapMemory(device, vertex_buffer.mem);
-
-				res = vkBindBufferMemory(device, vertex_buffer.buf, vertex_buffer.mem, 0);
+				Memory::copyMemory(device, vertex_buffer.mem, vertexData, dataSize);
+				res = vkMapMemory(device, vertex_buffer.mem, 0, dataSize, 0, (void **)&pData);
 				assert(res == VK_SUCCESS);
 
 				VkVertexInputBindingDescription vi_binding;
