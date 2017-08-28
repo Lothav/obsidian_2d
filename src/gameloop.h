@@ -26,18 +26,18 @@ void run()
 
     World protoWorld("assets/maps/0001.json");
     Player player;
-
+    player.position.setPosition(protoWorld.getFirstTilePosition());
     // Declare and load a font
     sf::Font font;
     if(!font.loadFromFile("assets/fonts/MavenPro-Regular.ttf")) {
         std::cout << "font failed" << std::endl;
     }
     // Create a text
-    sf::Text text("GO RIGHT+DOWN FOR A FEW SECS", font);
-    text.setCharacterSize(30);
-    text.setColor(sf::Color::White);
+    sf::Text text("Little Bobby Tables", font);
+    text.setCharacterSize(20);
+    text.setFillColor(sf::Color::White);
     text.setOutlineColor(sf::Color::Black);
-    text.setOutlineThickness(3);
+    text.setOutlineThickness(2);
 
     unsigned long long previous = getCurrentTime();
     unsigned long long lag = 0;
@@ -72,7 +72,8 @@ void run()
             lag -= MS_PER_UPDATE;
 
             player.update(elapsed);
-            view.setCenter(player.getPosition().x, player.getPosition().y);
+            view.setCenter(player.position.getPosition().x, player.position.getPosition().y);
+            text.setPosition(player.position.getPosition().x+10, player.position.getPosition().y);
             window->setView(view);
         }
 

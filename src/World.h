@@ -76,6 +76,14 @@ public:
 
     }
 
+    vec2f getFirstTilePosition()
+    {
+        vec2f iso;
+        iso.x = this->mapOffset.x + this->tileOffset.x + this->tileSize.x/2.f;
+        iso.y = this->mapOffset.y + this->tileOffset.y + this->tileSize.y/2.f;
+        return iso;
+    }
+
     void update(unsigned long long time, vec2f mouse)
     {
         mouse.x -= this->mapOffset.x;

@@ -100,11 +100,6 @@ public:
         return false;
     }
 
-    const vec2f& getPosition()
-    {
-        return this->position.getPosition();
-    }
-
     const sf::Sprite& getSprite()
     {
         this->sprite.setTexture(this->animation.getCurrentFrame());
