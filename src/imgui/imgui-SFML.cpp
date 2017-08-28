@@ -30,7 +30,7 @@ namespace
 
     void RenderDrawLists(ImDrawData* draw_data); // rendering callback function prototype
 
-// Implementation of ImageButton overload
+    // Implementation of ImageButton overload
     bool imageButtonImpl(const sf::Texture& texture, const sf::FloatRect& textureRect, const sf::Vector2f& size, const int framePadding,
                          const sf::Color& bgColor, const sf::Color& tintColor);
 
@@ -205,7 +205,7 @@ namespace ImGui
     } // end of namespace SFML
 
 
-/////////////// Image Overloads
+    /////////////// Image Overloads
 
     void Image(const sf::Texture& texture,
                const sf::Color& tintColor, const sf::Color& borderColor)
@@ -252,7 +252,7 @@ namespace ImGui
         Image(*texturePtr, size, tintColor, borderColor);
     }
 
-/////////////// Image Button Overloads
+    /////////////// Image Button Overloads
 
     bool ImageButton(const sf::Texture& texture,
                      const int framePadding, const sf::Color& bgColor, const sf::Color& tintColor)
@@ -282,7 +282,7 @@ namespace ImGui
         return ::imageButtonImpl(*texturePtr, static_cast<sf::FloatRect>(sprite.getTextureRect()), size, framePadding, bgColor, tintColor);
     }
 
-/////////////// Draw_list Overloads
+    /////////////// Draw_list Overloads
 
     void DrawLine(const sf::Vector2f& a, const sf::Vector2f& b, const sf::Color& color,
                   float thickness)
@@ -328,7 +328,7 @@ namespace
         return ImVec2(rect.left + rect.width + pos.x, rect.top + rect.height + pos.y);
     }
 
-// Rendering callback
+    // Rendering callback
     void RenderDrawLists(ImDrawData* draw_data)
     {
         if (draw_data->CmdListsCount == 0) {
