@@ -304,8 +304,6 @@ namespace Obsidian2D
 				uint32_t dataSize = sizeof(vertexData);
 				VkImageUsageFlags usageFlags = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT;
 
-				Textures::createTextureImage(gpu_vector[0], device, "../img_fjords.jpg", _command_pool, graphics_queue, memory_properties);
-
 				VkBool32 *pSupportsPresent = (VkBool32 *)malloc(queue_family_count * sizeof(VkBool32));
 				for (uint32_t i = 0; i < queue_family_count; i++) {
 					vkGetPhysicalDeviceSurfaceSupportKHR(gpu_vector[0], i, surface, &pSupportsPresent[i]);
@@ -1065,6 +1063,7 @@ namespace Obsidian2D
 				fenceInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
 				fenceInfo.pNext = NULL;
 				fenceInfo.flags = 0;
+				Textures::createTextureImage(gpu_vector[0], device, "../img_fjords.jpg", _command_pool, graphics_queue, memory_properties);
 
 				drawFence.resize(command_buffer.size());
 				for (i = 0; i < command_buffer.size(); i++){
