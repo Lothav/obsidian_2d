@@ -44,7 +44,6 @@ void run()
 
     bool running = true;
 
-    sf::Clock deltaClock;
     while (running)
     {
         unsigned long long current = getCurrentTime();
@@ -84,7 +83,7 @@ void run()
         mouse.y = mouseWorldPos.y;
 
         protoWorld.update(current, mouse);
-        Debug::update(*window, deltaClock.restart());
+        Debug::update(*window, elapsed);
         Debug::test();
 
         window->clear(sf::Color::Color(44,62,80));

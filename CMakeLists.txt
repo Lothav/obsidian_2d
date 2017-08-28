@@ -18,8 +18,8 @@ set(EXECUTABLE_OUTPUT_PATH bin)
 
 find_package(OpenGL REQUIRED)
 
-file(GLOB_RECURSE HEADER_FILES extlib/**/*.h)
-file(GLOB_RECURSE SOURCE_FILES extlib/**/*.cpp)
+file(GLOB_RECURSE HEADER_FILES extlib/**/*.h src/imgui/*.h)
+file(GLOB_RECURSE SOURCE_FILES extlib/**/*.cpp src/imgui/*.cpp)
 
 include_directories(extlib)
 

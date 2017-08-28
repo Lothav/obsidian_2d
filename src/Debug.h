@@ -38,7 +38,7 @@ public:
         }
     }
 
-    static void update(sf::RenderWindow& window, sf::Time dt)
+    static void update(sf::RenderWindow& window, long dt)
     {
         if (canRun())
         {
