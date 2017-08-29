@@ -131,18 +131,18 @@ namespace ImGui
             }
         }
 
-        void Update(sf::RenderWindow& window, long dt)
+        void Update(sf::RenderWindow& window, float dt)
         {
             Update(window, window, dt);
         }
 
-        void Update(sf::Window& window, sf::RenderTarget& target, long dt)
+        void Update(sf::Window& window, sf::RenderTarget& target, float dt)
         {
             Update(sf::Mouse::getPosition(window), static_cast<sf::Vector2f>(target.getSize()), dt);
             window.setMouseCursorVisible(!ImGui::GetIO().MouseDrawCursor); // don't draw mouse cursor if ImGui draws it
         }
 
-        void Update(const sf::Vector2i& mousePos, const sf::Vector2f& displaySize, long dt)
+        void Update(const sf::Vector2i& mousePos, const sf::Vector2f& displaySize, float dt)
         {
             ImGuiIO& io = ImGui::GetIO();
             io.DisplaySize = displaySize;

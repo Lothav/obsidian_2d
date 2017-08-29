@@ -24,9 +24,9 @@ namespace ImGui
 
         void ProcessEvent(const sf::Event& event);
 
-        void Update(sf::RenderWindow& window, long dt);
-        void Update(sf::Window& window, sf::RenderTarget& target, long dt);
-        void Update(const sf::Vector2i& mousePos, const sf::Vector2f& displaySize, long dt);
+        void Update(sf::RenderWindow& window, float dt);
+        void Update(sf::Window& window, sf::RenderTarget& target, float dt);
+        void Update(const sf::Vector2i& mousePos, const sf::Vector2f& displaySize, float dt);
 
         void Render(sf::RenderTarget& target);
 

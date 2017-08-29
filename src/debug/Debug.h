@@ -38,11 +38,11 @@ public:
         }
     }
 
-    static void update(sf::RenderWindow& window, long dt)
+    static void update(sf::RenderWindow& window, float dt)
     {
         if (canRun())
         {
-            ImGui::SFML::Update(window, dt);
+            ImGui::SFML::Update(window, dt / 1000.0);
         }
     }
 
