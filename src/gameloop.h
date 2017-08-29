@@ -6,9 +6,8 @@
 
 #include "Player.h"
 #include "SoundManager.h"
-#include "Debug.h"
+#include "debug/Debug.h"
 #include "World.h"
-
 
 #define MS_PER_UPDATE 16
 
@@ -94,7 +93,7 @@ void run()
 
         // auto defaultView = window->getDefaultView();
         // window->setView(defaultView);
-         window->draw(text);
+        window->draw(text);
         // window->setView(view);
         Debug::render(*window);
 
