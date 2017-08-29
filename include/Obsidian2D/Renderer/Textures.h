@@ -24,8 +24,6 @@ namespace Obsidian2D
 
 		private:
 
-			VkDevice 				device;
-
 			static void createImage(VkDevice device, uint32_t width, uint32_t height, VkFormat format,
 								  	VkImageTiling tiling, VkImageUsageFlags usage,
 									VkMemoryPropertyFlags properties, VkImage& image,
@@ -192,7 +190,7 @@ namespace Obsidian2D
 
 		public:
 
-			static void createTextureImage(
+			static VkImage createTextureImage(
 					VkPhysicalDevice physicalDevice,
 					VkDevice device,
 					const char* path,
@@ -235,6 +233,8 @@ namespace Obsidian2D
 
 				vkDestroyBuffer(device, staging_buffer->buf, nullptr);
 				vkFreeMemory(device, staging_buffer->mem, nullptr);
+
+				return textureImage;
 			}
 
 			static VkImageView createImageView(VkDevice device, VkImage image, VkFormat format) {

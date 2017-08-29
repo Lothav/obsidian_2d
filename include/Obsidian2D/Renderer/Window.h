@@ -622,7 +622,7 @@ namespace Obsidian2D
 						VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT
 				);
 
-				bool use_texture = false;
+				bool use_texture = true;
 				VkDescriptorSetLayoutBinding layout_bindings[2];
 				layout_bindings[0].binding 								= 0;
 				layout_bindings[0].descriptorType 						= VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
@@ -831,9 +831,33 @@ namespace Obsidian2D
 
 				VkWriteDescriptorSet writes[2];
 
-				struct {
-					VkDescriptorImageInfo image_info;
-				} texture_data;
+
+				VkImage texture_image = Textures::createTextureImage(gpu_vector[0], device, "../../include/Obsidian2D/Renderer/shaders/baleog.jpg", _command_pool, graphics_queue, memory_properties);
+				VkImageView texture_image_view = Textures::createImageView(device, texture_image, VK_FORMAT_R8G8B8A8_UNORM);
+				VkSampler texture_sampler = nullptr;
+				VkSamplerCreateInfo sampler = {};
+				sampler.sType 											= VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
+				sampler.maxAnisotropy 									= 1.0f;
+				sampler.magFilter 										= VK_FILTER_LINEAR;
+				sampler.minFilter 										= VK_FILTER_LINEAR;
+				sampler.mipmapMode 										= VK_SAMPLER_MIPMAP_MODE_LINEAR;
+				sampler.addressModeU 									= VK_SAMPLER_ADDRESS_MODE_REPEAT;
+				sampler.addressModeV 									= VK_SAMPLER_ADDRESS_MODE_REPEAT;
+				sampler.addressModeW 									= VK_SAMPLER_ADDRESS_MODE_REPEAT;
+				sampler.mipLodBias 										= 0.0f;
+				sampler.compareOp 										= VK_COMPARE_OP_NEVER;
+				sampler.minLod 											= 0.0f;
+				sampler.maxLod 											= 0.0f;
+				sampler.maxAnisotropy 									= 1.0;
+				sampler.anisotropyEnable 								= VK_FALSE;
+				sampler.borderColor 									= VK_BORDER_COLOR_FLOAT_OPAQUE_WHITE;
+				assert(vkCreateSampler(device, &sampler, nullptr, &texture_sampler) == VK_SUCCESS);
+
+
+				VkDescriptorImageInfo texture_info;
+				texture_info.imageLayout 										= VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+				texture_info.imageView 											= texture_image_view;
+				texture_info.sampler 											= texture_sampler;
 
 				writes[0] = {};
 				writes[0].sType 												= VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
@@ -845,21 +869,16 @@ namespace Obsidian2D
 				writes[0].dstArrayElement 										= 0;
 				writes[0].dstBinding 											= 0;
 
-				if (use_texture) {
-					writes[1] = {};
-					writes[1].sType 											= VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-					writes[1].dstSet 											= desc_set[0];
-					writes[1].dstBinding 										= 1;
-					writes[1].descriptorCount 									= 1;
-					writes[1].descriptorType 									= VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-					writes[1].pImageInfo 										= &texture_data.image_info;
-					writes[1].dstArrayElement 									= 0;
-				}
+				writes[1] = {};
+				writes[1].sType 											= VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+				writes[1].dstSet 											= desc_set[0];
+				writes[1].dstBinding 										= 1;
+				writes[1].descriptorCount 									= 1;
+				writes[1].descriptorType 									= VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+				writes[1].pImageInfo 										= &texture_info;
+				writes[1].dstArrayElement 									= 0;
 
 				vkUpdateDescriptorSets(device, use_texture ? 2 : 1, writes, 0, NULL);
-
-
-
 
 				VkPipelineCacheCreateInfo pipelineCache;
 				pipelineCache.sType 											= VK_STRUCTURE_TYPE_PIPELINE_CACHE_CREATE_INFO;
@@ -1063,7 +1082,6 @@ namespace Obsidian2D
 				fenceInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
 				fenceInfo.pNext = NULL;
 				fenceInfo.flags = 0;
-				Textures::createTextureImage(gpu_vector[0], device, "../img_fjords.jpg", _command_pool, graphics_queue, memory_properties);
 
 				drawFence.resize(command_buffer.size());
 				for (i = 0; i < command_buffer.size(); i++){
@@ -1085,7 +1103,7 @@ namespace Obsidian2D
 					this->init_viewports(command_buffer[i]);
 					this->init_scissors(command_buffer[i]);
 
-					vkCmdDraw(command_buffer[i], 3, 1, 0, 0);
+					vkCmdDraw(command_buffer[i], 36, 1, 0, 0);
 					vkCmdEndRenderPass(command_buffer[i]);
 					res = vkEndCommandBuffer(command_buffer[i]);
 					assert(res == VK_SUCCESS);
