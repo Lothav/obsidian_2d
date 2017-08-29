@@ -8,11 +8,13 @@
 
 #include "imgui/imgui.h"
 #include "../imgui/imgui-SFML.h"
+#include "Log.h"
 
 class Debug {
 private:
     static bool initiated;
     static bool running;
+    static bool open;
 
 protected:
     Debug() {}
@@ -66,7 +68,35 @@ public:
     {
         if (canRun())
         {
-            ImGui::ShowTestWindow();
+            static bool show_app_log = false;
+
+            if (show_app_log)
+            {
+                Log::ShowLog(&show_app_log);
+            }
+
+            ImGuiWindowFlags window_flags = 0;
+            window_flags |= ImGuiWindowFlags_MenuBar;
+            ImGui::SetNextWindowSize(ImVec2(550,680), ImGuiCond_FirstUseEver);
+            if (!ImGui::Begin("Obsidian2D", &Debug::open, window_flags))
+            {
+                // Early out if the window is collapsed, as an optimization.
+                ImGui::End();
+                return;
+            }
+
+            if (ImGui::BeginMenuBar())
+            {
+                if (ImGui::BeginMenu("Menu"))
+                {
+                    ImGui::MenuItem("Log", NULL, &show_app_log);
+                    ImGui::EndMenu();
+                }
+
+                ImGui::EndMenuBar();
+            }
+
+            ImGui::End();
         }
     }
 
@@ -78,4 +108,5 @@ public:
 
 bool Debug::initiated = false;
 bool Debug::running = false;
+bool Debug::open = false;
 #endif //_DebugClass_
