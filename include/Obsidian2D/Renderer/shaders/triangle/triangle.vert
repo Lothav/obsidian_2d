@@ -6,11 +6,13 @@ layout (std140, binding = 0) uniform bufferVals {
     mat4 mvp;
 } myBufferVals;
 
-layout (location = 0) in vec4 pos;
-layout (location = 1) in vec4 inColor;
-layout (location = 0) out vec4 outColor;
+layout (location = 0) in vec3 inPos;
+layout (location = 1) in vec2 inUV;
+layout (location = 2) in vec3 inNormal;
+
+layout (location = 0) out vec2 outUV;
 
 void main() {
-   outColor = inColor;
-   gl_Position = myBufferVals.mvp * pos;
+   outUV = inUV;
+   gl_Position = myBufferVals.mvp * vec4(inPos.xyz, 1.0);
 }

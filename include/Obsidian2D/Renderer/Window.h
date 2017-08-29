@@ -301,7 +301,7 @@ namespace Obsidian2D
 				res = vkCreateWin32SurfaceKHR(inst, &createInfo, NULL, &surface);*/
 #endif  // __ANDROID__  && _WIN32
 
-				uint32_t dataSize = sizeof(vertexData);
+                unsigned long dataSize = vertexData.size() * sizeof(vertexData);
 				VkImageUsageFlags usageFlags = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT;
 
 				VkBool32 *pSupportsPresent = (VkBool32 *)malloc(queue_family_count * sizeof(VkBool32));
@@ -623,7 +623,8 @@ namespace Obsidian2D
 				);
 
 				bool use_texture = true;
-				VkDescriptorSetLayoutBinding layout_bindings[2];
+				std::vector<VkDescriptorSetLayoutBinding>layout_bindings = {};
+                layout_bindings.resize(2);
 				layout_bindings[0].binding 								= 0;
 				layout_bindings[0].descriptorType 						= VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
 				layout_bindings[0].descriptorCount 						= 1;
@@ -644,8 +645,7 @@ namespace Obsidian2D
 				descriptor_layout.sType 								= VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
 				descriptor_layout.pNext 								= NULL;
 				descriptor_layout.bindingCount 							= use_texture ? 2 : 1;
-				descriptor_layout.pBindings 							= layout_bindings;
-
+				descriptor_layout.pBindings 							= layout_bindings.data();
 
 				desc_layout.resize(1);
 				res = vkCreateDescriptorSetLayout(device, &descriptor_layout, NULL, desc_layout.data());
@@ -653,12 +653,12 @@ namespace Obsidian2D
 
 				/* Now use the descriptor layout to create a pipeline layout */
 				VkPipelineLayoutCreateInfo pPipelineLayoutCreateInfo = {};
-				pPipelineLayoutCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-				pPipelineLayoutCreateInfo.pNext = NULL;
-				pPipelineLayoutCreateInfo.pushConstantRangeCount = 0;
-				pPipelineLayoutCreateInfo.pPushConstantRanges = NULL;
-				pPipelineLayoutCreateInfo.setLayoutCount = 1;
-				pPipelineLayoutCreateInfo.pSetLayouts = desc_layout.data();
+				pPipelineLayoutCreateInfo.sType                         = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
+				pPipelineLayoutCreateInfo.pNext                         = NULL;
+				pPipelineLayoutCreateInfo.pushConstantRangeCount        = 0;
+				pPipelineLayoutCreateInfo.pPushConstantRanges           = NULL;
+				pPipelineLayoutCreateInfo.setLayoutCount                = 1;
+				pPipelineLayoutCreateInfo.pSetLayouts                   = desc_layout.data();
 
 				res = vkCreatePipelineLayout(device, &pPipelineLayoutCreateInfo, NULL, &pipeline_layout);
 				assert(res == VK_SUCCESS);
@@ -777,25 +777,30 @@ namespace Obsidian2D
 						VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT
 				);
 
-				Memory::copyMemory(device, vertex_buffer->mem, vertexData, dataSize);
+				Memory::copyMemory(device, vertex_buffer->mem, vertexData.data(), dataSize);
 				res = vkMapMemory(device, vertex_buffer->mem, 0, dataSize, 0, (void **)&pData);
 				assert(res == VK_SUCCESS);
 
 				VkVertexInputBindingDescription vi_binding;
 				vi_binding.binding 										= 0;
 				vi_binding.inputRate 									= VK_VERTEX_INPUT_RATE_VERTEX;
-				vi_binding.stride 										= sizeof(vertexData[0]);
+				vi_binding.stride 										= sizeof(Vertex);
 
-				VkVertexInputAttributeDescription vi_attribs[2];
+				VkVertexInputAttributeDescription vi_attribs[3];
 				vi_attribs[0].binding 									= 0;
 				vi_attribs[0].location 									= 0;
-				vi_attribs[0].format 									= VK_FORMAT_R32G32B32A32_SFLOAT;
-				vi_attribs[0].offset 									= 0;
-				vi_attribs[1].binding 									= 0;
-				vi_attribs[1].location 									= 1;
-				vi_attribs[1].format 									= use_texture ? VK_FORMAT_R32G32_SFLOAT : VK_FORMAT_R32G32B32A32_SFLOAT;
-				vi_attribs[1].offset 									= 16;
+				vi_attribs[0].format 									= VK_FORMAT_R32G32B32_SFLOAT;
+				vi_attribs[0].offset 									= offsetof(Vertex, pos);
 
+                vi_attribs[1].binding 									= 0;
+				vi_attribs[1].location 									= 1;
+				vi_attribs[1].format 									= VK_FORMAT_R32G32_SFLOAT;
+				vi_attribs[1].offset 									= offsetof(Vertex, uv);
+
+                vi_attribs[2].binding 									= 0;
+                vi_attribs[2].location 									= 2;
+                vi_attribs[2].format 									= VK_FORMAT_R32G32B32_SFLOAT;
+                vi_attribs[2].offset 									= offsetof(Vertex, normal);
 
 				VkDescriptorPoolSize type_count[2];
 				type_count[0].type 												= VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
@@ -813,7 +818,6 @@ namespace Obsidian2D
 				descriptor_pool.pPoolSizes 										= type_count;
 
 
-				std::vector<VkDescriptorSet> desc_set;
 
 				res = vkCreateDescriptorPool(device, &descriptor_pool, NULL, &desc_pool);
 				assert(res == VK_SUCCESS);
@@ -825,6 +829,7 @@ namespace Obsidian2D
 				_alloc_info[0].descriptorSetCount 								= 1;
 				_alloc_info[0].pSetLayouts 										= desc_layout.data();
 
+                std::vector<VkDescriptorSet> desc_set;
 				desc_set.resize(1);
 				res = vkAllocateDescriptorSets(device, _alloc_info, desc_set.data());
 				assert(res == VK_SUCCESS);
@@ -832,7 +837,7 @@ namespace Obsidian2D
 				VkWriteDescriptorSet writes[2];
 
 
-				VkImage texture_image = Textures::createTextureImage(gpu_vector[0], device, "../../include/Obsidian2D/Renderer/shaders/baleog.jpg", _command_pool, graphics_queue, memory_properties);
+				VkImage texture_image = Textures::createTextureImage(gpu_vector[0], device, "../../include/Obsidian2D/Renderer/shaders/medivh.jpg", _command_pool, graphics_queue, memory_properties);
 				VkImageView texture_image_view = Textures::createImageView(device, texture_image, VK_FORMAT_R8G8B8A8_UNORM);
 				VkSampler texture_sampler = nullptr;
 				VkSamplerCreateInfo sampler = {};
@@ -909,7 +914,7 @@ namespace Obsidian2D
 					vi.flags 													= 0;
 					vi.vertexBindingDescriptionCount 							= 1;
 					vi.pVertexBindingDescriptions 								= &vi_binding;
-					vi.vertexAttributeDescriptionCount 							= 2;
+					vi.vertexAttributeDescriptionCount 							= 3;
 					vi.pVertexAttributeDescriptions 							= vi_attribs;
 				}
 				VkPipelineInputAssemblyStateCreateInfo ia;
@@ -1103,7 +1108,7 @@ namespace Obsidian2D
 					this->init_viewports(command_buffer[i]);
 					this->init_scissors(command_buffer[i]);
 
-					vkCmdDraw(command_buffer[i], 36, 1, 0, 0);
+					vkCmdDraw(command_buffer[i], 4, 1, 0, 0);
 					vkCmdEndRenderPass(command_buffer[i]);
 					res = vkEndCommandBuffer(command_buffer[i]);
 					assert(res == VK_SUCCESS);
