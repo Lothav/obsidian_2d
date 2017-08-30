@@ -27,9 +27,9 @@ namespace Obsidian2D
 
 			glm::mat4 _mvp; // Model View Projection
 
-			const std::array<int, 3> _default_eye		= {0, 0, 1};
-			const std::array<int, 3> _default_center	= {0, 0, 0};
-			const std::array<int, 3> _default_up 		= {0, 1, 0};
+			const std::array<float, 3> _default_eye		= {0, 0, 1};
+			const std::array<float, 3> _default_center	= {0, 0, 0};
+			const std::array<float, 3> _default_up 		= {0, 1, 0};
 
 			void updateMVP()
 			{
@@ -86,17 +86,17 @@ namespace Obsidian2D
 				return this->_mvp;
 			}
 
-			std::array<int, 3> getCameraDefaultEye()
+			std::array<float, 3> getCameraDefaultEye()
 			{
 				return _default_eye;
 			};
 
-			std::array<int, 3> getCameraDefaultCenter()
+			std::array<float, 3> getCameraDefaultCenter()
 			{
 				return _default_center;
 			};
 
-			std::array<int, 3> getCameraDefaultUp()
+			std::array<float, 3> getCameraDefaultUp()
 			{
 				return _default_up;
 			};

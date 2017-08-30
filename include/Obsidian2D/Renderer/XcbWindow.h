@@ -29,9 +29,9 @@ namespace Obsidian2D
 			xcb_window_t 							window;
 			xcb_connection_t*						connection;
 
-			std::array<int, 3>						camera_eye;
-			std::array<int, 3>						camera_center;
-			std::array<int, 3>						camera_up;
+			std::array<float, 3>						camera_eye;
+			std::array<float, 3>						camera_center;
+			std::array<float, 3>						camera_up;
 
 			void setConnection()
 			{
@@ -154,45 +154,45 @@ namespace Obsidian2D
 						xcb_key_press_event_t * kp = (xcb_key_press_event_t *)e;
 
 						if( kp->detail == 'O'){
-							camera_center[0]--;
+							camera_center[0]-= 0.1f;
 						}else if(kp->detail == 'P'){
-							camera_center[1]++;
+							camera_center[1] += 0.1f;
 						}else if(kp->detail == 'Q'){
-							camera_center[0]++;
+							camera_center[0] += 0.1f;
 						}else if(kp->detail == 'j'){
-							camera_center[1]--;
+							camera_center[1]-= 0.1f;
 						}else if(kp->detail == 'Z'){
-							camera_center[2]--;
+							camera_center[2]-= 0.1f;
 						}else if(kp->detail == '['){
-							camera_center[2]++;
+							camera_center[2] += 0.1f;
 						}
 
 						if( kp->detail == 'W'){
-							camera_center[0]--;
+							camera_center[0]-= 0.1f;
 						}else if(kp->detail == 'X'){
-							camera_center[1]--;
+							camera_center[1]-= 0.1f;
 						}else if(kp->detail == 'Y'){
-							camera_center[0]++;
+							camera_center[0] += 0.1f;
 						}else if(kp->detail == 'T'){
-							camera_center[1]++;
+							camera_center[1] += 0.1f;
 						}else if(kp->detail == 'S'){
-							camera_center[2]--;
+							camera_center[2]-= 0.1f;
 						}else if(kp->detail == 'U'){
-							camera_center[2]++;
+							camera_center[2] += 0.1f;
 						}
 
 						if( kp->detail == 'r'){
-							camera_up[0]++;
+							camera_up[0] += 0.1f;
 						}else if(kp->detail == 'q'){
-							camera_up[0]--;
+							camera_up[0]-= 0.1f;
 						}else if(kp->detail == 'o'){
-							camera_up[1]++;
+							camera_up[1] += 0.1f;
 						}else if(kp->detail == 't'){
-							camera_up[1]--;
+							camera_up[1]-= 0.1f;
 						}else if(kp->detail == 'u'){
-							camera_up[2]--;
+							camera_up[2]-= 0.1f;
 						}else if(kp->detail == 'p'){
-							camera_up[2]++;
+							camera_up[2] += 0.1f;
 						}
 
 						std::cout << kp->detail << std::endl;
