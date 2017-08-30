@@ -240,8 +240,12 @@ namespace Obsidian2D
 				return textureImage;
 			}
 
-			static VkImageView createImageView(VkDevice device, VkImage image, VkFormat format) {
-
+			static VkImageView createImageView(
+					VkDevice device,
+					VkImage image,
+					VkFormat format,
+					VkImageAspectFlags aspectMask = VK_IMAGE_ASPECT_COLOR_BIT)
+			{
 				VkResult res;
 
 				VkImageViewCreateInfo viewInfo = {};
@@ -249,7 +253,7 @@ namespace Obsidian2D
 				viewInfo.image 								= image;
 				viewInfo.viewType 							= VK_IMAGE_VIEW_TYPE_2D;
 				viewInfo.format 							= format;
-				viewInfo.subresourceRange.aspectMask 		= VK_IMAGE_ASPECT_COLOR_BIT;
+				viewInfo.subresourceRange.aspectMask 		= aspectMask;
 				viewInfo.subresourceRange.baseMipLevel 		= 0;
 				viewInfo.subresourceRange.levelCount 		= 1;
 				viewInfo.subresourceRange.baseArrayLayer 	= 0;

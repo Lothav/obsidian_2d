@@ -614,9 +614,7 @@ namespace Obsidian2D
 				assert(res == VK_SUCCESS);
 
 				/* Create image view */
-				view_info.image = depth.image;
-				res = vkCreateImageView(device, &view_info, NULL, &depth.view);
-				assert(res == VK_SUCCESS);
+				depth.view = Textures::createImageView(device, depth.image, depth_format, view_info.subresourceRange.aspectMask);
 
 				this->initCamera();
 
