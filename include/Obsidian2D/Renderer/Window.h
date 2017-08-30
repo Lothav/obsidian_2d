@@ -301,7 +301,7 @@ namespace Obsidian2D
 				res = vkCreateWin32SurfaceKHR(inst, &createInfo, NULL, &surface);*/
 #endif  // __ANDROID__  && _WIN32
 
-                unsigned long dataSize = vertexData.size() * sizeof(vertexData);
+                unsigned long dataSize = vertexData.size() * sizeof(Vertex);
 				VkImageUsageFlags usageFlags = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT;
 
 				VkBool32 *pSupportsPresent = (VkBool32 *)malloc(queue_family_count * sizeof(VkBool32));
@@ -770,7 +770,6 @@ namespace Obsidian2D
 
 
 				vertex_buffer = new Buffer();
-
 				vertex_buffer->createBuffer (
 						gpu_vector[0], device, dataSize,
 						VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
@@ -786,7 +785,9 @@ namespace Obsidian2D
 				vi_binding.inputRate 									= VK_VERTEX_INPUT_RATE_VERTEX;
 				vi_binding.stride 										= sizeof(Vertex);
 
-				VkVertexInputAttributeDescription vi_attribs[3];
+				std::vector<VkVertexInputAttributeDescription> vi_attribs;
+                vi_attribs.resize(3);
+
 				vi_attribs[0].binding 									= 0;
 				vi_attribs[0].location 									= 0;
 				vi_attribs[0].format 									= VK_FORMAT_R32G32B32_SFLOAT;
@@ -803,19 +804,19 @@ namespace Obsidian2D
                 vi_attribs[2].offset 									= offsetof(Vertex, normal);
 
 				VkDescriptorPoolSize type_count[2];
-				type_count[0].type 												= VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-				type_count[0].descriptorCount 									= 1;
+				type_count[0].type 										= VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+				type_count[0].descriptorCount 							= 1;
 				if (use_texture) {
-					type_count[1].type 											= VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-					type_count[1].descriptorCount 								= 1;
+					type_count[1].type 									= VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+					type_count[1].descriptorCount 						= 1;
 				}
 
 				VkDescriptorPoolCreateInfo descriptor_pool = {};
-				descriptor_pool.sType 											= VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
-				descriptor_pool.pNext 											= NULL;
-				descriptor_pool.maxSets 										= 1;
-				descriptor_pool.poolSizeCount 									= use_texture ? 2 : 1;
-				descriptor_pool.pPoolSizes 										= type_count;
+				descriptor_pool.sType 									= VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
+				descriptor_pool.pNext 									= NULL;
+				descriptor_pool.maxSets 								= 1;
+				descriptor_pool.poolSizeCount 							= use_texture ? 2 : 1;
+				descriptor_pool.pPoolSizes 								= type_count;
 
 
 
@@ -823,21 +824,17 @@ namespace Obsidian2D
 				assert(res == VK_SUCCESS);
 
 				VkDescriptorSetAllocateInfo _alloc_info[1];
-				_alloc_info[0].sType 											= VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
-				_alloc_info[0].pNext 											= NULL;
-				_alloc_info[0].descriptorPool 									= desc_pool;
-				_alloc_info[0].descriptorSetCount 								= 1;
-				_alloc_info[0].pSetLayouts 										= desc_layout.data();
+				_alloc_info[0].sType 									= VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
+				_alloc_info[0].pNext 									= NULL;
+				_alloc_info[0].descriptorPool 							= desc_pool;
+				_alloc_info[0].descriptorSetCount 						= 1;
+				_alloc_info[0].pSetLayouts 								= desc_layout.data();
 
-                std::vector<VkDescriptorSet> desc_set;
-				desc_set.resize(1);
-				res = vkAllocateDescriptorSets(device, _alloc_info, desc_set.data());
+                VkDescriptorSet desc_set;
+				res = vkAllocateDescriptorSets(device, _alloc_info, &desc_set);
 				assert(res == VK_SUCCESS);
 
-				VkWriteDescriptorSet writes[2];
-
-
-				VkImage texture_image = Textures::createTextureImage(gpu_vector[0], device, "../../include/Obsidian2D/Renderer/shaders/medivh.jpg", _command_pool, graphics_queue, memory_properties);
+				VkImage texture_image = Textures::createTextureImage(gpu_vector[0], device, "../../include/Obsidian2D/Renderer/shaders/baleog.jpg", _command_pool, graphics_queue, memory_properties);
 				VkImageView texture_image_view = Textures::createImageView(device, texture_image, VK_FORMAT_R8G8B8A8_UNORM);
 				VkSampler texture_sampler = nullptr;
 				VkSamplerCreateInfo sampler = {};
@@ -860,37 +857,38 @@ namespace Obsidian2D
 
 
 				VkDescriptorImageInfo texture_info;
-				texture_info.imageLayout 										= VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-				texture_info.imageView 											= texture_image_view;
-				texture_info.sampler 											= texture_sampler;
+				texture_info.imageLayout 								= VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+				texture_info.imageView 									= texture_image_view;
+				texture_info.sampler 									= texture_sampler;
 
-				writes[0] = {};
-				writes[0].sType 												= VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-				writes[0].pNext 												= NULL;
-				writes[0].dstSet 												= desc_set[0];
-				writes[0].descriptorCount 										= 1;
-				writes[0].descriptorType 										= VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-				writes[0].pBufferInfo 											= &uniform_data->buffer_info;
-				writes[0].dstArrayElement 										= 0;
-				writes[0].dstBinding 											= 0;
+                VkWriteDescriptorSet writes[2];
+                writes[0] = {};
+				writes[0].sType 										= VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+				writes[0].pNext 										= NULL;
+				writes[0].dstSet 										= desc_set;
+				writes[0].descriptorCount 								= 1;
+				writes[0].descriptorType 								= VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+				writes[0].pBufferInfo 									= &uniform_data->buffer_info;
+				writes[0].dstArrayElement 								= 0;
+				writes[0].dstBinding 									= 0;
 
 				writes[1] = {};
-				writes[1].sType 											= VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-				writes[1].dstSet 											= desc_set[0];
-				writes[1].dstBinding 										= 1;
-				writes[1].descriptorCount 									= 1;
-				writes[1].descriptorType 									= VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-				writes[1].pImageInfo 										= &texture_info;
-				writes[1].dstArrayElement 									= 0;
+				writes[1].sType 										= VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+				writes[1].dstSet 										= desc_set;
+				writes[1].dstBinding 									= 1;
+				writes[1].descriptorCount 								= 1;
+				writes[1].descriptorType 								= VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+				writes[1].pImageInfo 									= &texture_info;
+				writes[1].dstArrayElement 								= 0;
 
 				vkUpdateDescriptorSets(device, use_texture ? 2 : 1, writes, 0, NULL);
 
 				VkPipelineCacheCreateInfo pipelineCache;
-				pipelineCache.sType 											= VK_STRUCTURE_TYPE_PIPELINE_CACHE_CREATE_INFO;
-				pipelineCache.pNext 											= NULL;
-				pipelineCache.initialDataSize 									= 0;
-				pipelineCache.pInitialData 										= NULL;
-				pipelineCache.flags 											= 0;
+				pipelineCache.sType 									= VK_STRUCTURE_TYPE_PIPELINE_CACHE_CREATE_INFO;
+				pipelineCache.pNext 									= NULL;
+				pipelineCache.initialDataSize 							= 0;
+				pipelineCache.pInitialData 								= NULL;
+				pipelineCache.flags 									= 0;
 				res = vkCreatePipelineCache(device, &pipelineCache, NULL, &pPipelineCache);
 				assert(res == VK_SUCCESS);
 
@@ -899,23 +897,23 @@ namespace Obsidian2D
 				VkPipelineDynamicStateCreateInfo dynamicState = {};
 				memset(dynamicStateEnables, 0, sizeof dynamicStateEnables);
 
-				dynamicState.sType 												= VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO;
-				dynamicState.pNext 												= NULL;
-				dynamicState.pDynamicStates 									= dynamicStateEnables;
-				dynamicState.dynamicStateCount 									= 0;
+				dynamicState.sType 										= VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO;
+				dynamicState.pNext 										= NULL;
+				dynamicState.pDynamicStates 							= dynamicStateEnables;
+				dynamicState.dynamicStateCount 							= 0;
 
 				bool include_vi = true;
 
 				VkPipelineVertexInputStateCreateInfo vi;
 				memset(&vi, 0, sizeof(vi));
-				vi.sType 														= VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
+				vi.sType 												= VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
 				if (include_vi) {
-					vi.pNext 													= NULL;
-					vi.flags 													= 0;
-					vi.vertexBindingDescriptionCount 							= 1;
-					vi.pVertexBindingDescriptions 								= &vi_binding;
-					vi.vertexAttributeDescriptionCount 							= 3;
-					vi.pVertexAttributeDescriptions 							= vi_attribs;
+					vi.pNext 											= NULL;
+					vi.flags 											= 0;
+					vi.vertexBindingDescriptionCount 					= 1;
+					vi.pVertexBindingDescriptions 						= &vi_binding;
+					vi.vertexAttributeDescriptionCount 					= 3;
+					vi.pVertexAttributeDescriptions 					= vi_attribs.data();
 				}
 				VkPipelineInputAssemblyStateCreateInfo ia;
 				ia.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
@@ -925,54 +923,54 @@ namespace Obsidian2D
 				ia.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
 
 				VkPipelineRasterizationStateCreateInfo rs;
-				rs.sType 														= VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
-				rs.pNext 														= NULL;
-				rs.flags 														= 0;
-				rs.polygonMode 													= VK_POLYGON_MODE_FILL;
-				rs.cullMode 													= VK_CULL_MODE_BACK_BIT;
-				rs.frontFace 													= VK_FRONT_FACE_CLOCKWISE;
-				rs.depthClampEnable 											= VK_FALSE;
-				rs.rasterizerDiscardEnable 										= VK_FALSE;
-				rs.depthBiasEnable 												= VK_FALSE;
-				rs.depthBiasConstantFactor 										= 0;
-				rs.depthBiasClamp 												= 0;
-				rs.depthBiasSlopeFactor 										= 0;
-				rs.lineWidth 													= 1.0f;
+				rs.sType 												= VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
+				rs.pNext 												= NULL;
+				rs.flags 												= 0;
+				rs.polygonMode 											= VK_POLYGON_MODE_FILL;
+				rs.cullMode 											= VK_CULL_MODE_BACK_BIT;
+				rs.frontFace 											= VK_FRONT_FACE_CLOCKWISE;
+				rs.depthClampEnable 									= VK_FALSE;
+				rs.rasterizerDiscardEnable 								= VK_FALSE;
+				rs.depthBiasEnable 										= VK_FALSE;
+				rs.depthBiasConstantFactor 								= 0;
+				rs.depthBiasClamp 										= 0;
+				rs.depthBiasSlopeFactor 								= 0;
+				rs.lineWidth 											= 1.0f;
 
 				VkPipelineColorBlendStateCreateInfo cb;
-				cb.sType 														= VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;
-				cb.flags 														= 0;
-				cb.pNext 														= NULL;
+				cb.sType 												= VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;
+				cb.flags 												= 0;
+				cb.pNext 												= NULL;
 
 				VkPipelineColorBlendAttachmentState att_state[1];
-				att_state[0].colorWriteMask 									= 0xf;
-				att_state[0].blendEnable 										= VK_FALSE;
-				att_state[0].alphaBlendOp 										= VK_BLEND_OP_ADD;
-				att_state[0].colorBlendOp 										= VK_BLEND_OP_ADD;
-				att_state[0].srcColorBlendFactor 								= VK_BLEND_FACTOR_ZERO;
-				att_state[0].dstColorBlendFactor 								= VK_BLEND_FACTOR_ZERO;
-				att_state[0].srcAlphaBlendFactor 								= VK_BLEND_FACTOR_ZERO;
-				att_state[0].dstAlphaBlendFactor 								= VK_BLEND_FACTOR_ZERO;
-				cb.attachmentCount 												= 1;
-				cb.pAttachments 												= att_state;
-				cb.logicOpEnable 												= VK_FALSE;
-				cb.logicOp 														= VK_LOGIC_OP_NO_OP;
-				cb.blendConstants[0] 											= 1.0f;
-				cb.blendConstants[1] 											= 1.0f;
-				cb.blendConstants[2] 											= 1.0f;
-				cb.blendConstants[3] 											= 1.0f;
+				att_state[0].colorWriteMask 							= 0xf;
+				att_state[0].blendEnable 								= VK_FALSE;
+				att_state[0].alphaBlendOp 								= VK_BLEND_OP_ADD;
+				att_state[0].colorBlendOp 								= VK_BLEND_OP_ADD;
+				att_state[0].srcColorBlendFactor 						= VK_BLEND_FACTOR_ZERO;
+				att_state[0].dstColorBlendFactor 						= VK_BLEND_FACTOR_ZERO;
+				att_state[0].srcAlphaBlendFactor 						= VK_BLEND_FACTOR_ZERO;
+				att_state[0].dstAlphaBlendFactor 						= VK_BLEND_FACTOR_ZERO;
+				cb.attachmentCount 										= 1;
+				cb.pAttachments 										= att_state;
+				cb.logicOpEnable 										= VK_FALSE;
+				cb.logicOp 												= VK_LOGIC_OP_NO_OP;
+				cb.blendConstants[0] 									= 1.0f;
+				cb.blendConstants[1] 									= 1.0f;
+				cb.blendConstants[2] 									= 1.0f;
+				cb.blendConstants[3] 									= 1.0f;
 
 				VkPipelineViewportStateCreateInfo vp = {};
 				vp.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
 				vp.pNext = NULL;
 				vp.flags = 0;
 #ifndef __ANDROID__
-				vp.viewportCount 												= 1;
-				dynamicStateEnables[dynamicState.dynamicStateCount++] 			= VK_DYNAMIC_STATE_VIEWPORT;
-				vp.scissorCount 												= 1;
-				dynamicStateEnables[dynamicState.dynamicStateCount++] 			= VK_DYNAMIC_STATE_SCISSOR;
-				vp.pScissors 													= NULL;
-				vp.pViewports 													= NULL;
+				vp.viewportCount 										= 1;
+				dynamicStateEnables[dynamicState.dynamicStateCount++] 	= VK_DYNAMIC_STATE_VIEWPORT;
+				vp.scissorCount 										= 1;
+				dynamicStateEnables[dynamicState.dynamicStateCount++] 	= VK_DYNAMIC_STATE_SCISSOR;
+				vp.pScissors 											= NULL;
+				vp.pViewports 											= NULL;
 #else
 				// Temporary disabling dynamic viewport on Android because some of drivers doesn't
     // support the feature.
@@ -994,25 +992,25 @@ namespace Obsidian2D
     vp.pViewports = &viewports;
 #endif
 				VkPipelineDepthStencilStateCreateInfo ds;
-				ds.sType 														= VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO;
-				ds.pNext 														= NULL;
-				ds.flags 														= 0;
-				ds.depthTestEnable 												= (VkBool32) depthPresent;
-				ds.depthWriteEnable 											= (VkBool32) depthPresent;
-				ds.depthCompareOp 												= VK_COMPARE_OP_LESS_OR_EQUAL;
-				ds.depthBoundsTestEnable 										= VK_FALSE;
-				ds.stencilTestEnable 											= VK_FALSE;
-				ds.back.failOp 													= VK_STENCIL_OP_KEEP;
-				ds.back.passOp 													= VK_STENCIL_OP_KEEP;
-				ds.back.compareOp 												= VK_COMPARE_OP_ALWAYS;
-				ds.back.compareMask 											= 0;
-				ds.back.reference 												= 0;
-				ds.back.depthFailOp 											= VK_STENCIL_OP_KEEP;
-				ds.back.writeMask 												= 0;
-				ds.minDepthBounds 												= 0;
-				ds.maxDepthBounds 												= 0;
-				ds.stencilTestEnable 											= VK_FALSE;
-				ds.front 														= ds.back;
+				ds.sType 												= VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO;
+				ds.pNext 												= NULL;
+				ds.flags 												= 0;
+				ds.depthTestEnable 										= (VkBool32) depthPresent;
+				ds.depthWriteEnable 									= (VkBool32) depthPresent;
+				ds.depthCompareOp 										= VK_COMPARE_OP_LESS_OR_EQUAL;
+				ds.depthBoundsTestEnable 								= VK_FALSE;
+				ds.stencilTestEnable 									= VK_FALSE;
+				ds.back.failOp 											= VK_STENCIL_OP_KEEP;
+				ds.back.passOp 											= VK_STENCIL_OP_KEEP;
+				ds.back.compareOp 										= VK_COMPARE_OP_ALWAYS;
+				ds.back.compareMask 									= 0;
+				ds.back.reference 										= 0;
+				ds.back.depthFailOp 									= VK_STENCIL_OP_KEEP;
+				ds.back.writeMask 										= 0;
+				ds.minDepthBounds 										= 0;
+				ds.maxDepthBounds 										= 0;
+				ds.stencilTestEnable 									= VK_FALSE;
+				ds.front 												= ds.back;
 
 				VkPipelineMultisampleStateCreateInfo ms;
 				ms.sType 														= VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO;
@@ -1099,8 +1097,8 @@ namespace Obsidian2D
 
 					vkCmdBeginRenderPass(command_buffer[i], &rp_begin, VK_SUBPASS_CONTENTS_INLINE);
 					vkCmdBindPipeline(command_buffer[i], VK_PIPELINE_BIND_POINT_GRAPHICS, vkPipeline);
-					vkCmdBindDescriptorSets(command_buffer[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline_layout, 0, 1,
-											desc_set.data(), 0, NULL);
+					vkCmdBindDescriptorSets(command_buffer[i], VK_PIPELINE_BIND_POINT_GRAPHICS,
+                                            pipeline_layout, 0, 1, &desc_set, 0, NULL);
 
 					const VkDeviceSize offsets[1] = {0};
 					vkCmdBindVertexBuffers(command_buffer[i], 0, 1, &vertex_buffer->buf, offsets);
@@ -1108,7 +1106,7 @@ namespace Obsidian2D
 					this->init_viewports(command_buffer[i]);
 					this->init_scissors(command_buffer[i]);
 
-					vkCmdDraw(command_buffer[i], 4, 1, 0, 0);
+					vkCmdDraw(command_buffer[i], vertexData.size(), 1, 0, 0);
 					vkCmdEndRenderPass(command_buffer[i]);
 					res = vkEndCommandBuffer(command_buffer[i]);
 					assert(res == VK_SUCCESS);
