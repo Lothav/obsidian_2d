@@ -33,6 +33,11 @@ namespace Obsidian2D
                         vkDestroyImageView(device, buffers[i].view, nullptr);
                     }
                 }
+
+                vkDestroyImage(device, texture_image, nullptr);
+                vkDestroyImageView(device,texture_image_view, nullptr);
+                vkDestroySampler(device, texture_sampler, nullptr);
+
                 if (surface != VK_NULL_HANDLE)
                 {
                     vkDestroySwapchainKHR(device, swap_chain, nullptr);
@@ -82,6 +87,8 @@ namespace Obsidian2D
 					vkDestroyFence(device, drawFence[i], nullptr);
 				}
 
+                vkFreeMemory(device, Textures::textureImageMemory, nullptr);
+
                 vkDestroyCommandPool(device, _command_pool, NULL);
                 vkDestroyDevice(this->device, NULL);
 				vkDestroyInstance(instance, NULL);
@@ -100,15 +107,15 @@ namespace Obsidian2D
                 VkPipelineStageFlags pipe_stage_flags = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
 
                 VkSubmitInfo submit_info;
-                submit_info.pNext                   = NULL;
-                submit_info.sType                   = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-                submit_info.waitSemaphoreCount      = 1;
-                submit_info.pWaitSemaphores         = &imageAcquiredSemaphore;
-                submit_info.pWaitDstStageMask       = &pipe_stage_flags;
-                submit_info.commandBufferCount      = 1;
-                submit_info.pCommandBuffers         = &command_buffer[current_buffer];
-                submit_info.signalSemaphoreCount    = 1;
-                submit_info.pSignalSemaphores       = &renderSemaphore;
+                submit_info.pNext                     = NULL;
+                submit_info.sType                     = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+                submit_info.waitSemaphoreCount        = 1;
+                submit_info.pWaitSemaphores           = &imageAcquiredSemaphore;
+                submit_info.pWaitDstStageMask         = &pipe_stage_flags;
+                submit_info.commandBufferCount        = 1;
+                submit_info.pCommandBuffers           = &command_buffer[current_buffer];
+                submit_info.signalSemaphoreCount      = 1;
+                submit_info.pSignalSemaphores         = &renderSemaphore;
 
                 res = vkQueueSubmit(graphics_queue, 1, &submit_info, drawFence[current_buffer]);
                 assert(res == VK_SUCCESS);
@@ -120,14 +127,14 @@ namespace Obsidian2D
                 vkResetFences(device, 1, &drawFence[current_buffer]);
 
                 VkPresentInfoKHR present;
-                present.sType 				= VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
-                present.pNext 				= NULL;
-                present.swapchainCount 		= 1;
-                present.pSwapchains 		= &swap_chain;
-                present.pImageIndices 		= &current_buffer;
-                present.pWaitSemaphores 	= NULL;
-                present.waitSemaphoreCount 	= 0;
-                present.pResults            = NULL;
+                present.sType 				           = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
+                present.pNext 				           = NULL;
+                present.swapchainCount 		           = 1;
+                present.pSwapchains 		           = &swap_chain;
+                present.pImageIndices 		           = &current_buffer;
+                present.pWaitSemaphores 	           = NULL;
+                present.waitSemaphoreCount 	           = 0;
+                present.pResults                       = NULL;
 
                 if (renderSemaphore != VK_NULL_HANDLE)
                 {
@@ -137,6 +144,8 @@ namespace Obsidian2D
 
                 res = vkQueuePresentKHR(present_queue, &present);
                 assert(res == VK_SUCCESS);
+
+                vkDeviceWaitIdle(device);
             }
 
 		private:
@@ -167,7 +176,9 @@ namespace Obsidian2D
 			VkDescriptorPool 						desc_pool;
 			uint32_t 								graphics_queue_family_index = UINT32_MAX;
 			uint32_t 								present_queue_family_index = UINT32_MAX;
-
+            VkSampler                               texture_sampler = nullptr;
+            VkImage                                 texture_image = nullptr;
+            VkImageView                             texture_image_view = nullptr;
 			Buffer * vertex_buffer;
 
 			struct {
@@ -834,10 +845,10 @@ namespace Obsidian2D
 				res = vkAllocateDescriptorSets(device, _alloc_info, &desc_set);
 				assert(res == VK_SUCCESS);
 
-				VkImage texture_image = Textures::createTextureImage(gpu_vector[0], device, "../../include/Obsidian2D/Renderer/shaders/baleog.jpg", _command_pool, graphics_queue, memory_properties);
-				VkImageView texture_image_view = Textures::createImageView(device, texture_image, VK_FORMAT_R8G8B8A8_UNORM);
-				VkSampler texture_sampler = nullptr;
-				VkSamplerCreateInfo sampler = {};
+				texture_image = Textures::createTextureImage(gpu_vector[0], device, "../../include/Obsidian2D/Renderer/shaders/baleog.jpg", _command_pool, graphics_queue, memory_properties);
+				texture_image_view = Textures::createImageView(device, texture_image, VK_FORMAT_R8G8B8A8_UNORM);
+
+                VkSamplerCreateInfo sampler = {};
 				sampler.sType 											= VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
 				sampler.maxAnisotropy 									= 1.0f;
 				sampler.magFilter 										= VK_FILTER_LINEAR;
@@ -853,8 +864,8 @@ namespace Obsidian2D
 				sampler.maxAnisotropy 									= 1.0;
 				sampler.anisotropyEnable 								= VK_FALSE;
 				sampler.borderColor 									= VK_BORDER_COLOR_FLOAT_OPAQUE_WHITE;
-				assert(vkCreateSampler(device, &sampler, nullptr, &texture_sampler) == VK_SUCCESS);
 
+                assert(vkCreateSampler(device, &sampler, nullptr, &texture_sampler) == VK_SUCCESS);
 
 				VkDescriptorImageInfo texture_info;
 				texture_info.imageLayout 								= VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
@@ -1106,7 +1117,7 @@ namespace Obsidian2D
 					this->init_viewports(command_buffer[i]);
 					this->init_scissors(command_buffer[i]);
 
-					vkCmdDraw(command_buffer[i], vertexData.size(), 1, 0, 0);
+					vkCmdDraw(command_buffer[i], static_cast<uint32_t>(vertexData.size()), 1, 0, 0);
 					vkCmdEndRenderPass(command_buffer[i]);
 					res = vkEndCommandBuffer(command_buffer[i]);
 					assert(res == VK_SUCCESS);

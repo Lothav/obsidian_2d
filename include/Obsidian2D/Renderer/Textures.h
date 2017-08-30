@@ -190,6 +190,8 @@ namespace Obsidian2D
 
 		public:
 
+			static VkDeviceMemory textureImageMemory;
+
 			static VkImage createTextureImage(
 					VkPhysicalDevice physicalDevice,
 					VkDevice device,
@@ -200,7 +202,6 @@ namespace Obsidian2D
 			{
 				VkResult 				res;
 				VkImage 				textureImage;
-				VkDeviceMemory 			textureImageMemory;
 
 				int texWidth, texHeight, texChannels;
 				stbi_uc* pixels = stbi_load(path, &texWidth, &texHeight, &texChannels, STBI_rgb_alpha);
@@ -234,6 +235,8 @@ namespace Obsidian2D
 				vkDestroyBuffer(device, staging_buffer->buf, nullptr);
 				vkFreeMemory(device, staging_buffer->mem, nullptr);
 
+				free(staging_buffer);
+
 				return textureImage;
 			}
 
@@ -262,6 +265,8 @@ namespace Obsidian2D
 			}
 
 		};
+
+		VkDeviceMemory Textures::textureImageMemory;
 	}
 }
 
