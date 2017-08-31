@@ -8,6 +8,7 @@
 #include "Camera.h"
 #include "Memory.h"
 #include "Textures.h"
+#include "BufferImage.h"
 
 #define APP_NAME "Obsidian2D"
 
@@ -70,9 +71,7 @@ namespace Obsidian2D
 				vkDestroyPipelineLayout(device, pipeline_layout, NULL);
 
 				// Destroy depth buffer
-				vkDestroyImageView(device, depth.view, NULL);
-				vkDestroyImage(device, depth.image, NULL);
-				vkFreeMemory(device, depth.mem, NULL);
+				delete depth_buffer;
 
 				vkFreeCommandBuffers(device, _command_pool, (u_int32_t)command_buffer.size(), command_buffer.data());
 
@@ -176,13 +175,7 @@ namespace Obsidian2D
             VkImage                                 texture_image = nullptr;
             VkImageView                             texture_image_view = nullptr;
 			Buffer * vertex_buffer;
-
-			struct {
-				VkFormat 							format = VK_FORMAT_UNDEFINED;
-				VkImage 							image;
-				VkDeviceMemory 						mem;
-				VkImageView 						view;
-			} depth;
+			BufferImage* depth_buffer;
 
 		protected:
 
@@ -516,101 +509,43 @@ namespace Obsidian2D
 					free(presentModes);
 				}
 
-				bool U_ASSERT_ONLY pass;
-				VkImageCreateInfo image_info = {};
 
-				/* allow custom depth formats */
-				if (depth.format == VK_FORMAT_UNDEFINED) depth.format = VK_FORMAT_D16_UNORM;
+				/* Depth Buffer */
 
-#ifdef __ANDROID__
-				// Depth format needs to be VK_FORMAT_D24_UNORM_S8_UINT on Android.
-    const VkFormat depth_format = VK_FORMAT_D24_UNORM_S8_UINT;
-#else
-				const VkFormat depth_format = depth.format;
-#endif
+				const VkFormat depth_format = VK_FORMAT_D16_UNORM;
+				const VkImageAspectFlags depthAspectMask = VK_IMAGE_ASPECT_DEPTH_BIT;
+
 				VkFormatProperties props;
+				VkImageTiling depth_tiling;
+
 				vkGetPhysicalDeviceFormatProperties(gpu_vector[0], depth_format, &props);
+
 				if (props.linearTilingFeatures & VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT) {
-					image_info.tiling = VK_IMAGE_TILING_LINEAR;
+					depth_tiling = VK_IMAGE_TILING_LINEAR;
 				} else if (props.optimalTilingFeatures & VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT) {
-					image_info.tiling = VK_IMAGE_TILING_OPTIMAL;
+					depth_tiling = VK_IMAGE_TILING_OPTIMAL;
 				} else {
 					/* Try other depth formats? */
 					std::cout << "depth_format " << depth_format << " Unsupported.\n";
 					exit(-1);
 				}
 
-				image_info.sType 								= VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
-				image_info.pNext 								= NULL;
-				image_info.imageType 							= VK_IMAGE_TYPE_2D;
-				image_info.format 								= depth_format;
-				image_info.extent.width 						= (uint32_t)width;
-				image_info.extent.height 						= (uint32_t)height;
-				image_info.extent.depth 						= 1;
-				image_info.mipLevels 							= 1;
-				image_info.arrayLayers 							= 1;
-				image_info.samples 								= VK_SAMPLE_COUNT_1_BIT;
-				image_info.initialLayout 						= VK_IMAGE_LAYOUT_UNDEFINED;
-				image_info.queueFamilyIndexCount 				= 0;
-				image_info.pQueueFamilyIndices 					= NULL;
-				image_info.sharingMode 							= VK_SHARING_MODE_EXCLUSIVE;
-				image_info.usage 								= VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT;
-				image_info.flags 								= 0;
+				struct ImageProps img_props = {};
+				img_props.format 			= depth_format;
+				img_props.tiling 			= depth_tiling;
+				img_props.aspectMask 		= depthAspectMask;
+				img_props.usage 			= VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT;
+				img_props.height 			= static_cast<uint32_t>(height);
+				img_props.width 			= static_cast<uint32_t>(width);
 
-				VkMemoryAllocateInfo mem_alloc = {};
-				mem_alloc.sType									= VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
-				mem_alloc.pNext									= NULL;
-				mem_alloc.allocationSize 						= 0;
-				mem_alloc.memoryTypeIndex 						= 0;
+				struct MemoryProps mem_props = {};
+				mem_props.memory_props 		= memory_properties;
+				mem_props.device 			= device;
 
-				VkImageViewCreateInfo view_info = {};
-				view_info.sType 								= VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
-				view_info.pNext 								= NULL;
-				view_info.image 								= VK_NULL_HANDLE;
-				view_info.format 								= depth_format;
-				view_info.components.r 							= VK_COMPONENT_SWIZZLE_R;
-				view_info.components.g 							= VK_COMPONENT_SWIZZLE_G;
-				view_info.components.b 							= VK_COMPONENT_SWIZZLE_B;
-				view_info.components.a 							= VK_COMPONENT_SWIZZLE_A;
-				view_info.subresourceRange.aspectMask 			= VK_IMAGE_ASPECT_DEPTH_BIT;
-				view_info.subresourceRange.baseMipLevel 		= 0;
-				view_info.subresourceRange.levelCount 			= 1;
-				view_info.subresourceRange.baseArrayLayer 		= 0;
-				view_info.subresourceRange.layerCount 			= 1;
-				view_info.viewType 								= VK_IMAGE_VIEW_TYPE_2D;
-				view_info.flags 								= 0;
+				depth_buffer = new BufferImage(mem_props, img_props);
 
-				if (depth_format == VK_FORMAT_D16_UNORM_S8_UINT || depth_format == VK_FORMAT_D24_UNORM_S8_UINT ||
-					depth_format == VK_FORMAT_D32_SFLOAT_S8_UINT) {
-					view_info.subresourceRange.aspectMask |= VK_IMAGE_ASPECT_STENCIL_BIT;
-				}
 
-				/* Create image */
-				res = vkCreateImage(device, &image_info, NULL, &depth.image);
-				assert(res == VK_SUCCESS);
 
-				vkGetImageMemoryRequirements(device, depth.image, &mem_reqs);
-
-				mem_alloc.allocationSize = mem_reqs.size;
-				/* Use the memory properties to determine the type of memory required */
-				pass = Memory::findMemoryType(
-						memory_properties,
-						mem_reqs.memoryTypeBits,
-						VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
-						&mem_alloc.memoryTypeIndex
-				);
-				assert(pass);
-
-				/* Allocate memory */
-				res = vkAllocateMemory(device, &mem_alloc, NULL, &depth.mem);
-				assert(res == VK_SUCCESS);
-
-				/* Bind memory */
-				res = vkBindImageMemory(device, depth.image, depth.mem, 0);
-				assert(res == VK_SUCCESS);
-
-				/* Create image view */
-				depth.view = Textures::createImageView(device, depth.image, depth_format, view_info.subresourceRange.aspectMask);
 
 				this->initCamera();
 
@@ -679,7 +614,7 @@ namespace Obsidian2D
 				attachments[0].flags 						= 0;
 
 				if (depthPresent) {
-					attachments[1].format 					= depth.format;
+					attachments[1].format 					= depth_buffer->format;
 					attachments[1].samples 					= VK_SAMPLE_COUNT_1_BIT;
 					attachments[1].loadOp 					= clear ? VK_ATTACHMENT_LOAD_OP_CLEAR : VK_ATTACHMENT_LOAD_OP_DONT_CARE;
 					attachments[1].storeOp 					= VK_ATTACHMENT_STORE_OP_STORE;
@@ -744,7 +679,7 @@ namespace Obsidian2D
 				assert(shaderStages[1].module != VK_NULL_HANDLE);
 
 				VkImageView img_attachments[2];
-				img_attachments[1] = depth.view;
+				img_attachments[1] = depth_buffer->view;
 
 				VkFramebufferCreateInfo fb_info = {};
 				fb_info.sType 											= VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
