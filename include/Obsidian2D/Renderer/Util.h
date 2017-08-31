@@ -22,22 +22,6 @@
 
 #include "Obsidian2D/Util/Loggable.h"
 
-struct Vertex {
-	float pos[3];
-	float uv[2];
-	float normal[3];
-};
-std::vector<Vertex> vertexData =
-{
-		{ { -1.0f,  1.0f, 0.0f }, { 0.0f, 1.0f },{ 0.0f, 0.0f, 1.0f } },
-		{ { -1.0f, -1.0f, 0.0f }, { 0.0f, 0.0f },{ 0.0f, 0.0f, 1.0f } },
-        { { 1.0f,  1.0f, 0.0f }, { 1.0f, 1.0f },{ 0.0f, 0.0f, 1.0f } },
-
-        { { 1.0f, 1.0f, 0.0f }, { 1.0f, 1.0f },{ 0.0f, 0.0f, 1.0f } },
-        { { -1.0f, -1.0f, 0.0f }, { 0.0f, 0.0f },{ 0.0f, 0.0f, 1.0f } },
-        { { 1.0f,  -1.0f, 0.0f }, { 1.0f, 0.0f },{ 0.0f, 0.0f, 1.0f } },
-};
-
 typedef struct _swap_chain_buffers {
 	VkImage image;
 	VkImageView view;

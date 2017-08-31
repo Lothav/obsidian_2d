@@ -9,6 +9,14 @@
 #include <assert.h>
 #include "Memory.h"
 
+struct BufferData {
+    VkPhysicalDevice    physicalDevice;
+    VkDevice            device;
+    VkDeviceSize        size;
+    VkBufferUsageFlags  usage;
+    VkFlags             properties;
+};
+
 namespace Obsidian2D
 {
 	namespace Renderer
@@ -16,7 +24,7 @@ namespace Obsidian2D
 		class Buffer
 		{
 
-		private:
+        protected:
 			VkDevice _instance_device;
 
 		public:
@@ -31,9 +39,9 @@ namespace Obsidian2D
 				vkFreeMemory(_instance_device, mem, nullptr);
 			}
 
-			Buffer(VkPhysicalDevice physicalDevice, VkDevice device, VkDeviceSize size, VkBufferUsageFlags usage, VkFlags properties)
+			Buffer(struct BufferData buffer_data)
 			{
-				this->_instance_device = device;
+				this->_instance_device = buffer_data.device;
 
 				VkResult res;
 				bool pass;
@@ -41,22 +49,22 @@ namespace Obsidian2D
 				VkBufferCreateInfo bufferInfo = {};
 
 				bufferInfo.sType 						= VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
-				bufferInfo.size 						= size;
-				bufferInfo.usage 						= usage;
+				bufferInfo.size 						= buffer_data.size;
+				bufferInfo.usage 						= buffer_data.usage;
 				bufferInfo.queueFamilyIndexCount		= 0;
 				bufferInfo.pQueueFamilyIndices 			= nullptr;
 				bufferInfo.sharingMode 					= VK_SHARING_MODE_EXCLUSIVE;
 				bufferInfo.flags 						= 0;
 				bufferInfo.pNext 						= nullptr;
 
-				res = vkCreateBuffer(device, &bufferInfo, nullptr, &this->buf);
+				res = vkCreateBuffer(buffer_data.device, &bufferInfo, nullptr, &this->buf);
 				assert(res == VK_SUCCESS);
 
 				VkMemoryRequirements memRequirements;
-				vkGetBufferMemoryRequirements(device, this->buf, &memRequirements);
+				vkGetBufferMemoryRequirements(buffer_data.device, this->buf, &memRequirements);
 
 				VkPhysicalDeviceMemoryProperties memProperties;
-				vkGetPhysicalDeviceMemoryProperties(physicalDevice, &memProperties);
+				vkGetPhysicalDeviceMemoryProperties(buffer_data.physicalDevice, &memProperties);
 
 				VkMemoryAllocateInfo allocInfo = {};
 				allocInfo.sType 						= VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
@@ -66,21 +74,21 @@ namespace Obsidian2D
 				pass = Memory::findMemoryType (
 						memProperties,
 						memRequirements.memoryTypeBits,
-						properties,
+                        buffer_data.properties,
 						&allocInfo.memoryTypeIndex);
 
 				assert(pass);
 
-				res = vkAllocateMemory(device, &allocInfo, nullptr, &this->mem);
+				res = vkAllocateMemory(buffer_data.device, &allocInfo, nullptr, &this->mem);
 				assert(res == VK_SUCCESS);
 
-				vkBindBufferMemory(device, this->buf, this->mem, 0);
+				vkBindBufferMemory(buffer_data.device, this->buf, this->mem, 0);
 
-				this->buffer_info.range 				= size;
+				this->buffer_info.range 				= buffer_data.size;
 				this->buffer_info.offset 				= 0;
 				this->buffer_info.buffer 				= this->buf;
 			}
-		};
+        };
 	}
 }
 #endif //OBSIDIAN2D_BUFFER_H

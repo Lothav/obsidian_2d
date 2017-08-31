@@ -9,6 +9,7 @@
 #include "Memory.h"
 #include "Textures.h"
 #include "BufferImage.h"
+#include "VertexBuffer.h"
 
 #define APP_NAME "Obsidian2D"
 
@@ -174,10 +175,10 @@ namespace Obsidian2D
             VkSampler                               texture_sampler = nullptr;
             VkImage                                 texture_image = nullptr;
             VkImageView                             texture_image_view = nullptr;
-			Buffer * vertex_buffer;
 			BufferImage* depth_buffer;
 
 		protected:
+            VertexBuffer * vertex_buffer;
 
 			void createInstance()
 			{
@@ -301,7 +302,6 @@ namespace Obsidian2D
 				res = vkCreateWin32SurfaceKHR(inst, &createInfo, NULL, &surface);*/
 #endif  // __ANDROID__  && _WIN32
 
-                unsigned long dataSize = vertexData.size() * sizeof(Vertex);
 				VkImageUsageFlags usageFlags = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT;
 
 				VkBool32 *pSupportsPresent = (VkBool32 *)malloc(queue_family_count * sizeof(VkBool32));
@@ -554,9 +554,15 @@ namespace Obsidian2D
 
 				/*  create Uniform Buffer  */
 
-				uniform_data = new Buffer(gpu_vector[0], device, sizeof(MVP),
-										  VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
-										  VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
+                struct BufferData uniformBufferData = {};
+
+                uniformBufferData.device            = device;
+                uniformBufferData.usage             = VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT;
+                uniformBufferData.physicalDevice    = gpu_vector[0];
+                uniformBufferData.properties        = VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT;
+                uniformBufferData.size              = sizeof(MVP);
+
+                uniform_data = new Buffer(uniformBufferData);
 
 				bool use_texture = true;
 				std::vector<VkDescriptorSetLayoutBinding>layout_bindings = {};
@@ -701,13 +707,15 @@ namespace Obsidian2D
 					assert(res == VK_SUCCESS);
 				}
 
-				vertex_buffer = new Buffer(gpu_vector[0], device, dataSize,
-										   VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
-										   VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
+                struct BufferData vertexBufferData = {};
 
-				Memory::copyMemory(device, vertex_buffer->mem, vertexData.data(), dataSize);
-				res = vkMapMemory(device, vertex_buffer->mem, 0, dataSize, 0, (void **)&pData);
-				assert(res == VK_SUCCESS);
+                vertexBufferData.device            = device;
+                vertexBufferData.usage             = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT;
+                vertexBufferData.physicalDevice    = gpu_vector[0];
+                vertexBufferData.properties        = VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT;
+                vertexBufferData.size              = vertexData.size() * sizeof(Vertex);
+
+                vertex_buffer = new VertexBuffer(vertexBufferData);
 
 				VkVertexInputBindingDescription vi_binding;
 				vi_binding.binding 										= 0;

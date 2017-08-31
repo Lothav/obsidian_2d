@@ -201,8 +201,15 @@ namespace Obsidian2D
 
 				assert(pixels);
 
-				Buffer * staging_buffer = new Buffer(physicalDevice, device, imageSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
-													VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
+				struct BufferData stagingBufferData = {};
+
+				stagingBufferData.device            = device;
+				stagingBufferData.usage             = VK_BUFFER_USAGE_TRANSFER_SRC_BIT;
+				stagingBufferData.physicalDevice    = physicalDevice;
+				stagingBufferData.properties        = VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT;
+				stagingBufferData.size              = imageSize;
+
+				Buffer * staging_buffer = new Buffer(stagingBufferData);
 
 				void* data = nullptr;
 				vkMapMemory(device, staging_buffer->mem, 0, imageSize, 0, &data);
