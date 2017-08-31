@@ -48,9 +48,9 @@ namespace Obsidian2D
 				vkDestroyPipelineCache(device, pPipelineCache, NULL);
 				vkDestroyDescriptorPool(device, desc_pool, NULL);
 
-				// Destroy vertex buffer
-				vkDestroyBuffer(device, vertex_buffer->buf, NULL);
-				vkFreeMemory(device, vertex_buffer->mem, NULL);
+				// Destroy buffers
+				delete vertex_buffer;
+				delete uniform_data;
 
 				// Destroy frame buffer
 				for (i = 0; i < swapchainImageCount; i++) {
@@ -68,10 +68,6 @@ namespace Obsidian2D
 				// Destroy descriptor and pipeline layouts
 				for (i = 0; i < 1; i++) vkDestroyDescriptorSetLayout(device, desc_layout[i], NULL);
 				vkDestroyPipelineLayout(device, pipeline_layout, NULL);
-
-				// Destroy uniform buffer
-				vkDestroyBuffer(device, uniform_data->buf, NULL);
-				vkFreeMemory(device, uniform_data->mem, NULL);
 
 				// Destroy depth buffer
 				vkDestroyImageView(device, depth.view, NULL);
@@ -623,13 +619,9 @@ namespace Obsidian2D
 
 				/*  create Uniform Buffer  */
 
-				uniform_data = new Buffer();
-
-				uniform_data->createBuffer (
-						gpu_vector[0], device, sizeof(MVP),
-						VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
-						VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT
-				);
+				uniform_data = new Buffer(gpu_vector[0], device, sizeof(MVP),
+										  VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
+										  VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
 
 				bool use_texture = true;
 				std::vector<VkDescriptorSetLayoutBinding>layout_bindings = {};
@@ -777,13 +769,9 @@ namespace Obsidian2D
 					assert(res == VK_SUCCESS);
 				}
 
-
-				vertex_buffer = new Buffer();
-				vertex_buffer->createBuffer (
-						gpu_vector[0], device, dataSize,
-						VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
-						VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT
-				);
+				vertex_buffer = new Buffer(gpu_vector[0], device, dataSize,
+										   VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
+										   VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
 
 				Memory::copyMemory(device, vertex_buffer->mem, vertexData.data(), dataSize);
 				res = vkMapMemory(device, vertex_buffer->mem, 0, dataSize, 0, (void **)&pData);
@@ -1057,16 +1045,6 @@ namespace Obsidian2D
 				assert(res == VK_SUCCESS);
 
 
-
-
-				VkClearValue clear_values[2];
-				clear_values[0].color.float32[0] = 0.2f;
-				clear_values[0].color.float32[1] = 0.2f;
-				clear_values[0].color.float32[2] = 0.2f;
-				clear_values[0].color.float32[3] = 0.2f;
-				clear_values[1].depthStencil.depth = 1.0f;
-				clear_values[1].depthStencil.stencil = 0;
-
 				VkSemaphoreCreateInfo imageAcquiredSemaphoreCreateInfo;
 				imageAcquiredSemaphoreCreateInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
 				imageAcquiredSemaphoreCreateInfo.pNext = NULL;
@@ -1078,6 +1056,14 @@ namespace Obsidian2D
 				res = vkCreateSemaphore(device, &imageAcquiredSemaphoreCreateInfo, NULL, &renderSemaphore);
 				assert(res == VK_SUCCESS);
 
+
+				VkClearValue clear_values[2];
+				clear_values[0].color.float32[0] = 0.2f;
+				clear_values[0].color.float32[1] = 0.2f;
+				clear_values[0].color.float32[2] = 0.2f;
+				clear_values[0].color.float32[3] = 0.2f;
+				clear_values[1].depthStencil.depth = 1.0f;
+				clear_values[1].depthStencil.stencil = 0;
 
 				VkRenderPassBeginInfo rp_begin;
 				rp_begin.sType 											= VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;

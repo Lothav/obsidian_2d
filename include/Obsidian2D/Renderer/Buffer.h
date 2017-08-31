@@ -15,19 +15,25 @@ namespace Obsidian2D
 	{
 		class Buffer
 		{
+
+		private:
+			VkDevice _instance_device;
+
 		public:
 
-			VkBuffer 							buf;
-			VkDeviceMemory 						mem;
-			VkDescriptorBufferInfo 				buffer_info;
+			VkBuffer 									buf;
+			VkDeviceMemory 								mem;
+			VkDescriptorBufferInfo 						buffer_info;
 
-			void createBuffer (
-					VkPhysicalDevice physicalDevice,
-					VkDevice device,
-					VkDeviceSize size,
-					VkBufferUsageFlags usage,
-					VkFlags properties)
+			~Buffer()
 			{
+				vkDestroyBuffer(_instance_device, buf, nullptr);
+				vkFreeMemory(_instance_device, mem, nullptr);
+			}
+
+			Buffer(VkPhysicalDevice physicalDevice, VkDevice device, VkDeviceSize size, VkBufferUsageFlags usage, VkFlags properties)
+			{
+				this->_instance_device = device;
 
 				VkResult res;
 				bool pass;
@@ -57,7 +63,7 @@ namespace Obsidian2D
 				allocInfo.allocationSize 				= memRequirements.size;
 				allocInfo.pNext 						= nullptr;
 
-				pass = Memory::findMemoryType(
+				pass = Memory::findMemoryType (
 						memProperties,
 						memRequirements.memoryTypeBits,
 						properties,
@@ -66,13 +72,13 @@ namespace Obsidian2D
 				assert(pass);
 
 				res = vkAllocateMemory(device, &allocInfo, nullptr, &this->mem);
-				assert( res == VK_SUCCESS );
+				assert(res == VK_SUCCESS);
 
 				vkBindBufferMemory(device, this->buf, this->mem, 0);
 
-				this->buffer_info.range 					= size;
-				this->buffer_info.offset 					= 0;
-				this->buffer_info.buffer 					= this->buf;
+				this->buffer_info.range 				= size;
+				this->buffer_info.offset 				= 0;
+				this->buffer_info.buffer 				= this->buf;
 			}
 		};
 	}

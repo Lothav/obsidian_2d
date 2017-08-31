@@ -150,15 +150,7 @@ namespace Obsidian2D
 					throw std::invalid_argument("unsupported layout transition!");
 				}
 
-				vkCmdPipelineBarrier (
-						commandBuffer,
-						sourceStage, destinationStage,
-						0,
-						0, nullptr,
-						0, nullptr,
-						1, &barrier
-				);
-
+				vkCmdPipelineBarrier ( commandBuffer, sourceStage, destinationStage, 0, 0, nullptr, 0, nullptr, 1, &barrier);
 				endSingleTimeCommands(commandBuffer, commandPool, graphicsQueue, device);
 			}
 
@@ -209,12 +201,8 @@ namespace Obsidian2D
 
 				assert(pixels);
 
-				Buffer * staging_buffer = new Buffer();
-
-				staging_buffer->createBuffer (
-						physicalDevice, device, imageSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
-						VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT
-				);
+				Buffer * staging_buffer = new Buffer(physicalDevice, device, imageSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
+													VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
 
 				void* data = nullptr;
 				vkMapMemory(device, staging_buffer->mem, 0, imageSize, 0, &data);
@@ -232,10 +220,7 @@ namespace Obsidian2D
 				copyBufferToImage(staging_buffer->buf, textureImage, static_cast<uint32_t>(texWidth), static_cast<uint32_t>(texHeight), commandPool, graphicQueue, device);
 				transitionImageLayout(textureImage, VK_FORMAT_R8G8B8A8_UNORM, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, commandPool, graphicQueue, device);
 
-				vkDestroyBuffer(device, staging_buffer->buf, nullptr);
-				vkFreeMemory(device, staging_buffer->mem, nullptr);
-
-				free(staging_buffer);
+				delete staging_buffer;
 
 				return textureImage;
 			}
