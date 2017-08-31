@@ -664,11 +664,8 @@ namespace Obsidian2D
 				res = vkCreatePipelineLayout(device, &pPipelineLayoutCreateInfo, NULL, &pipeline_layout);
 				assert(res == VK_SUCCESS);
 
-
-
 				/* DEPENDS on init_swap_chain() and init_depth_buffer() */
 				bool clear = true;
-				VkImageLayout finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
 				/* Need attachments for render target and depth buffer */
 				VkAttachmentDescription attachments[2];
 				attachments[0].format 						= format;
@@ -678,7 +675,7 @@ namespace Obsidian2D
 				attachments[0].stencilLoadOp 				= VK_ATTACHMENT_LOAD_OP_DONT_CARE;
 				attachments[0].stencilStoreOp 				= VK_ATTACHMENT_STORE_OP_DONT_CARE;
 				attachments[0].initialLayout 				= VK_IMAGE_LAYOUT_UNDEFINED;
-				attachments[0].finalLayout 					= finalLayout;
+				attachments[0].finalLayout 					= VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
 				attachments[0].flags 						= 0;
 
 				if (depthPresent) {
