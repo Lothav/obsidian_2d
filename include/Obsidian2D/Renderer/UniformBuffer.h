@@ -1,5 +1,5 @@
-#ifndef OBSIDIAN2D_CORE_CAMERA_H
-#define OBSIDIAN2D_CORE_CAMERA_H
+#ifndef OBSIDIAN2D_CORE_UNIFORM_BUFFER_H
+#define OBSIDIAN2D_CORE_UNIFORM_BUFFER_H
 
 #include "Layers.h"
 #include "Memory.h"
@@ -15,8 +15,16 @@ namespace Obsidian2D
 {
 	namespace Renderer
 	{
-		class Camera : public Layers
+		class UniformBuffer : public Buffer
 		{
+		public:
+
+			UniformBuffer(struct BufferData uniformBufferData) : Buffer(uniformBufferData)
+			{}
+
+			~UniformBuffer()
+			{}
+
 		private:
 
 			ViewCamera _view_camera;
@@ -39,9 +47,7 @@ namespace Obsidian2D
 		public:
 			VkMemoryRequirements mem_reqs;
 
-			Buffer* uniform_data;
-
-			void initCamera()
+			void initModelView(u_int32_t width, u_int32_t height)
 			{
 				float fov = glm::radians(45.0f);
 				if (width > height) {
@@ -104,7 +110,7 @@ namespace Obsidian2D
 			void updateCamera(VkDevice device)
 			{
 				VkResult res;
-				Memory::copyMemory(device, uniform_data->mem, &this->_mvp, sizeof(this->_mvp));
+				Memory::copyMemory(device, this->mem, &this->_mvp, sizeof(this->_mvp));
 			}
 
 		};
@@ -112,4 +118,4 @@ namespace Obsidian2D
 }
 
 
-#endif //OBSIDIAN2D_CORE_CAMERA_H
+#endif //OBSIDIAN2D_CORE_UNIFORM_BUFFER_H

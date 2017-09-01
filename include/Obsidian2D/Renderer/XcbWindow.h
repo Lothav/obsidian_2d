@@ -126,9 +126,9 @@ namespace Obsidian2D
 				this->createSurface();
 				this->initGraphicPipeline(depthPresent);
 
-				camera_center = this->getCameraDefaultCenter();
-				camera_eye = this->getCameraDefaultEye();
-				camera_up = this->getCameraDefaultUp();
+				camera_center   = uniform_buffer->getCameraDefaultCenter();
+				camera_eye      = uniform_buffer->getCameraDefaultEye();
+				camera_up       = uniform_buffer->getCameraDefaultUp();
 			}
 
 			::Obsidian2D::Core::WindowEvent poolEvent()
@@ -197,9 +197,9 @@ namespace Obsidian2D
 						}
 
 						std::cout << kp->detail << std::endl;
-						this->setCameraViewCenter(glm::vec3(camera_center[0], camera_center[1], camera_center[2]));
-						this->setCameraViewEye(glm::vec3(camera_eye[0], camera_eye[1], camera_eye[2]));
-						this->setCameraViewUp(glm::vec3(camera_up[0], camera_up[1], camera_up[2]));
+						uniform_buffer->setCameraViewCenter(glm::vec3(camera_center[0], camera_center[1], camera_center[2]));
+						uniform_buffer->setCameraViewEye(glm::vec3(camera_eye[0], camera_eye[1], camera_eye[2]));
+						uniform_buffer->setCameraViewUp(glm::vec3(camera_up[0], camera_up[1], camera_up[2]));
 
 						return ::Obsidian2D::Core::WindowEvent::ButtonDown;
 					} else if((e->response_type & ~0x80) == XCB_KEY_RELEASE) {

@@ -5,7 +5,7 @@
 #ifndef OBSIDIAN2D_CORE_WINDOW2_H
 #define OBSIDIAN2D_CORE_WINDOW2_H
 
-#include "Camera.h"
+#include "UniformBuffer.h"
 #include "Memory.h"
 #include "Textures.h"
 #include "BufferImage.h"
@@ -17,7 +17,7 @@ namespace Obsidian2D
 {
 	namespace Renderer
 	{
-		class Window : public Camera {
+		class Window : public Layers {
 
 		public:
 
@@ -56,7 +56,7 @@ namespace Obsidian2D
 				{
 					delete v_buff;
 				}
-				delete uniform_data;
+				delete uniform_buffer;
 
 				// Destroy frame buffer
 				for (i = 0; i < swapchainImageCount; i++) {
@@ -98,7 +98,7 @@ namespace Obsidian2D
             {
                 VkResult res;
 
-                this->updateCamera(device);
+                uniform_buffer->updateCamera(device);
 
                 res = vkAcquireNextImageKHR(device, swap_chain, UINT64_MAX,
                                             imageAcquiredSemaphore, VK_NULL_HANDLE, &current_buffer);
@@ -182,7 +182,8 @@ namespace Obsidian2D
 			BufferImage* depth_buffer;
 
 		protected:
-            std::vector<VertexBuffer *> vertex_buffer;
+            std::vector<VertexBuffer *>             vertex_buffer;
+            UniformBuffer*                          uniform_buffer;
 
 			void createInstance()
 			{
@@ -553,13 +554,6 @@ namespace Obsidian2D
 				depth_buffer = new BufferImage(mem_props, img_props);
 
 
-
-
-				this->initCamera();
-
-				glm::mat4 MVP = this->getMVP();
-				uint8_t *pData;
-
 				/*  create Uniform Buffer  */
 
                 struct BufferData uniformBufferData = {};
@@ -568,9 +562,13 @@ namespace Obsidian2D
                 uniformBufferData.usage             = VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT;
                 uniformBufferData.physicalDevice    = gpu_vector[0];
                 uniformBufferData.properties        = VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT;
-                uniformBufferData.size              = sizeof(MVP);
+                uniformBufferData.size              = sizeof(glm::mat4);
 
-                uniform_data = new Buffer(uniformBufferData);
+                uniform_buffer = new UniformBuffer(uniformBufferData);
+                uniform_buffer->initModelView(static_cast<uint32_t>(width), static_cast<uint32_t>(height));
+                glm::mat4 MVP = uniform_buffer->getMVP();
+
+
 
 				bool use_texture = true;
 				std::vector<VkDescriptorSetLayoutBinding>layout_bindings = {};
@@ -805,7 +803,7 @@ namespace Obsidian2D
 				writes[0].dstSet 										= desc_set;
 				writes[0].descriptorCount 								= 1;
 				writes[0].descriptorType 								= VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-				writes[0].pBufferInfo 									= &uniform_data->buffer_info;
+				writes[0].pBufferInfo 									= &uniform_buffer->buffer_info;
 				writes[0].dstArrayElement 								= 0;
 				writes[0].dstBinding 									= 0;
 
