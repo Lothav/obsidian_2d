@@ -155,10 +155,6 @@ namespace Obsidian2D
 
 						if( kp->detail == 'O'){
 
-                            Vertex _vertexData = { {static_cast<float>(camera_center[1]),  static_cast<float>(camera_center[0]), 0.0f }, { 0.0f, 1.0f },{ 0.0f, 0.0f, 1.0f } }
-                                    ;
-                            vertex_buffer->push(_vertexData);
-
 							camera_center[0]-= 0.1f;
 						}else if(kp->detail == 'P'){
 							camera_center[1] += 0.1f;

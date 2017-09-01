@@ -51,7 +51,11 @@ namespace Obsidian2D
 				vkDestroyDescriptorPool(device, desc_pool, NULL);
 
 				// Destroy buffers
-				delete vertex_buffer;
+
+				for(auto v_buff : vertex_buffer)
+				{
+					delete v_buff;
+				}
 				delete uniform_data;
 
 				// Destroy frame buffer
@@ -178,7 +182,7 @@ namespace Obsidian2D
 			BufferImage* depth_buffer;
 
 		protected:
-            VertexBuffer * vertex_buffer;
+            std::vector<VertexBuffer *> vertex_buffer;
 
 			void createInstance()
 			{
@@ -210,6 +214,19 @@ namespace Obsidian2D
 
 				VkResult res = vkCreateInstance(&_inst_info, NULL, &instance);
 				assert(res == VK_SUCCESS);
+			}
+
+			void createVertexBuffer(std::vector<Vertex> _vertexData)
+			{
+				struct BufferData vertexBufferData = {};
+
+				vertexBufferData.device            = device;
+				vertexBufferData.usage             = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT;
+				vertexBufferData.physicalDevice    = gpu_vector[0];
+				vertexBufferData.properties        = VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT;
+				vertexBufferData.size              = _vertexData.size() * sizeof(Vertex);
+
+				vertex_buffer.push_back(new VertexBuffer(vertexBufferData));
 			}
 
 			void createLogicalDeviceAndCommandBuffer()
@@ -292,15 +309,6 @@ namespace Obsidian2D
 			void initGraphicPipeline (const bool depthPresent)
 			{
 				VkResult U_ASSERT_ONLY 	res;
-
-#ifdef _WIN32
-		/*		VkWin32SurfaceCreateInfoKHR createInfo = {};
-				createInfo.sType = VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR;
-				createInfo.pNext = NULL;
-				createInfo.hinstance = connection;
-				createInfo.hwnd = window;
-				res = vkCreateWin32SurfaceKHR(inst, &createInfo, NULL, &surface);*/
-#endif  // __ANDROID__  && _WIN32
 
 				VkImageUsageFlags usageFlags = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT;
 
@@ -707,15 +715,7 @@ namespace Obsidian2D
 					assert(res == VK_SUCCESS);
 				}
 
-                struct BufferData vertexBufferData = {};
-
-                vertexBufferData.device            = device;
-                vertexBufferData.usage             = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT;
-                vertexBufferData.physicalDevice    = gpu_vector[0];
-                vertexBufferData.properties        = VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT;
-                vertexBufferData.size              = vertexData.size() * sizeof(Vertex);
-
-                vertex_buffer = new VertexBuffer(vertexBufferData);
+                this->createVertexBuffer(vertexData);
 
 				VkVertexInputBindingDescription vi_binding;
 				vi_binding.binding 										= 0;
@@ -1036,7 +1036,9 @@ namespace Obsidian2D
                                             pipeline_layout, 0, 1, &desc_set, 0, NULL);
 
 					const VkDeviceSize offsets[1] = {0};
-					vkCmdBindVertexBuffers(command_buffer[i], 0, 1, &vertex_buffer->buf, offsets);
+
+					std::vector<VkBuffer> buffers = VertexBuffer::getBuffersFromVector(vertex_buffer);
+					vkCmdBindVertexBuffers(command_buffer[i], 0, static_cast<uint32_t >(buffers.size()), buffers.data(), offsets);
 
 					this->init_viewports(command_buffer[i]);
 					this->init_scissors(command_buffer[i]);

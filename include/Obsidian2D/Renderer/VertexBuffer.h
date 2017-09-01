@@ -66,6 +66,17 @@ namespace Obsidian2D
                 this->updateMemoryWithData();
             }
 
+            static std::vector<VkBuffer> getBuffersFromVector(std::vector<VertexBuffer *> vector)
+            {
+                std::vector<VkBuffer> buffers = {};
+
+                for(auto vertex : vector){
+                    buffers.push_back(vertex->buf);
+                }
+
+                return buffers;
+            }
+
         };
     }
 }
