@@ -10,6 +10,7 @@
 #include "Textures.h"
 #include "BufferImage.h"
 #include "VertexBuffer.h"
+#include "RenderPass.h"
 
 #define APP_NAME "Obsidian2D"
 
@@ -28,13 +29,13 @@ namespace Obsidian2D
 			{
 				uint32_t i;
 
-                if (swap_chain != VK_NULL_HANDLE)
+               /* if (swap_chain != VK_NULL_HANDLE)
                 {
                     for (i = 0; i < swapchainImageCount; i++)
                     {
                         vkDestroyImageView(device, buffers[i].view, nullptr);
                     }
-                }
+                }*/
 
                 vkDestroyImage(device, texture_image, nullptr);
                 vkDestroyImageView(device,texture_image_view, nullptr);
@@ -42,7 +43,7 @@ namespace Obsidian2D
 
                 if (surface != VK_NULL_HANDLE)
                 {
-                    vkDestroySwapchainKHR(device, swap_chain, nullptr);
+                  //  vkDestroySwapchainKHR(device, swap_chain, nullptr);
                     vkDestroySurfaceKHR(instance, surface, nullptr);
                 }
 
@@ -59,17 +60,17 @@ namespace Obsidian2D
 				delete uniform_buffer;
 
 				// Destroy frame buffer
-				for (i = 0; i < swapchainImageCount; i++) {
+				/*for (i = 0; i < swapchainImageCount; i++) {
 					vkDestroyFramebuffer(device, framebuffers[i], NULL);
 				}
-				free(framebuffers);
+				free(framebuffers);*/
 
 				// Destroy shaders
 				vkDestroyShaderModule(device, shaderStages[0].module, NULL);
 				vkDestroyShaderModule(device, shaderStages[1].module, NULL);
 
 				// Destroy render pass
-				vkDestroyRenderPass(device, render_pass, NULL);
+				//vkDestroyRenderPass(device, render_pass, NULL);
 
 				// Destroy descriptor and pipeline layouts
 				for (i = 0; i < 1; i++) vkDestroyDescriptorSetLayout(device, desc_layout[i], NULL);
@@ -97,11 +98,11 @@ namespace Obsidian2D
             void draw()
             {
                 VkResult res;
+				VkSwapchainKHR swap_c = render_pass->getSwapChain()->getSwapChainKHR();
 
                 uniform_buffer->updateCamera(device);
 
-                res = vkAcquireNextImageKHR(device, swap_chain, UINT64_MAX,
-                                            imageAcquiredSemaphore, VK_NULL_HANDLE, &current_buffer);
+                res = vkAcquireNextImageKHR(device, swap_c, UINT64_MAX, imageAcquiredSemaphore, VK_NULL_HANDLE, &current_buffer);
                 assert(res == VK_SUCCESS);
 
                 VkPipelineStageFlags pipe_stage_flags = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
@@ -117,7 +118,7 @@ namespace Obsidian2D
                 submit_info.signalSemaphoreCount      = 1;
                 submit_info.pSignalSemaphores         = &renderSemaphore;
 
-                res = vkQueueSubmit(graphics_queue, 1, &submit_info, drawFence[current_buffer]);
+                res = vkQueueSubmit(render_pass->getSwapChain()->getGraphicQueue(), 1, &submit_info, drawFence[current_buffer]);
                 assert(res == VK_SUCCESS);
 
                 do {
@@ -127,10 +128,11 @@ namespace Obsidian2D
                 vkResetFences(device, 1, &drawFence[current_buffer]);
 
                 VkPresentInfoKHR present;
+
                 present.sType 				           = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
                 present.pNext 				           = NULL;
                 present.swapchainCount 		           = 1;
-                present.pSwapchains 		           = &swap_chain;
+                present.pSwapchains 		           = &swap_c;
                 present.pImageIndices 		           = &current_buffer;
                 present.pWaitSemaphores 	           = NULL;
                 present.waitSemaphoreCount 	           = 0;
@@ -142,7 +144,7 @@ namespace Obsidian2D
                     present.waitSemaphoreCount = 1;
                 }
 
-                res = vkQueuePresentKHR(present_queue, &present);
+                res = vkQueuePresentKHR(render_pass->getSwapChain()->getPresentQueue(), &present);
                 assert(res == VK_SUCCESS);
 
                 vkDeviceWaitIdle(device);
@@ -153,20 +155,13 @@ namespace Obsidian2D
 			VkSemaphore         					imageAcquiredSemaphore;
 			VkSemaphore         					renderSemaphore;
 			std::vector<VkFence>					drawFence;
-			VkSwapchainKHR 							swap_chain;
-			uint32_t 								swapchainImageCount;
-			VkFramebuffer *							framebuffers;
 			VkPipelineShaderStageCreateInfo 		shaderStages[2];
-			VkRenderPass 							render_pass;
 			std::vector<VkDescriptorSetLayout> 		desc_layout;
 			VkPipelineLayout 						pipeline_layout;
 			VkCommandPool							_command_pool;
 			VkDevice 								device;
 			std::vector<VkCommandBuffer>			command_buffer;
-			VkFormat 								format;
-			VkQueue 								graphics_queue, present_queue;
 			VkPhysicalDeviceMemoryProperties 		memory_properties;
-			std::vector<swap_chain_buffer> 			buffers;
 			uint32_t 								current_buffer = 0;
 			std::vector<VkPhysicalDevice> 			gpu_vector;
 			u_int32_t							 	queue_family_count;
@@ -174,13 +169,11 @@ namespace Obsidian2D
 			VkPipeline 								vkPipeline;
 			VkPipelineCache 						pPipelineCache;
 			VkDescriptorPool 						desc_pool;
-			uint32_t 								graphics_queue_family_index = UINT32_MAX;
-			uint32_t 								present_queue_family_index = UINT32_MAX;
             VkSampler                               texture_sampler = nullptr;
             VkImage                                 texture_image = nullptr;
             VkImageView                             texture_image_view = nullptr;
 			BufferImage* depth_buffer;
-
+			RenderPass* render_pass;
 		protected:
             std::vector<VertexBuffer *>             vertex_buffer;
             UniformBuffer*                          uniform_buffer;
@@ -311,247 +304,31 @@ namespace Obsidian2D
 			{
 				VkResult U_ASSERT_ONLY 	res;
 
-				VkImageUsageFlags usageFlags = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT;
+				/* Render Pass */
 
-				VkBool32 *pSupportsPresent = (VkBool32 *)malloc(queue_family_count * sizeof(VkBool32));
-				for (uint32_t i = 0; i < queue_family_count; i++) {
-					vkGetPhysicalDeviceSurfaceSupportKHR(gpu_vector[0], i, surface, &pSupportsPresent[i]);
-				}
+				struct SwapChainParams sc_params = {};
+				sc_params.gpu 					= gpu_vector[0];
+				sc_params.width 				= static_cast<u_int32_t >(width);
+				sc_params.height 				= static_cast<u_int32_t >(height);
+				sc_params.device 				= device;
+				sc_params.queue_family_count 	= queue_family_count;
+				sc_params.queue_family_props 	= queue_family_props;
+				sc_params.surface 				= surface;
+				sc_params.memory_props 			= memory_properties;
+				render_pass = new RenderPass(device, sc_params);
 
-				// Search for a graphics and a present queue in the array of queue
-				// families, try to find one that supports both
+				std::vector< struct rpAttachments > rp_attachments = {};
+				struct rpAttachments attch = {};
+				/* Color Attach */
+				attch.format = render_pass->getSwapChain()->getSwapChainFormat();
+				attch.clear  = true;
+				rp_attachments.push_back(attch);
+				/* Depth Attach */
+				attch.format = render_pass->getDepthBufferFormat();
+				attch.clear  = true;
+				rp_attachments.push_back(attch);
 
-				for (uint32_t i = 0; i < queue_family_count; ++i) {
-					if ((queue_family_props[i].queueFlags & VK_QUEUE_GRAPHICS_BIT) != 0) {
-						if (graphics_queue_family_index == UINT32_MAX) graphics_queue_family_index = i;
-
-						if (pSupportsPresent[i] == VK_TRUE) {
-							graphics_queue_family_index = i;
-							present_queue_family_index = i;
-							break;
-						}
-					}
-				}
-
-				if (present_queue_family_index == UINT32_MAX) {
-					// If didn't find a queue that supports both graphics and present, then
-					// find a separate present queue.
-					for (size_t i = 0; i < queue_family_count; ++i)
-						if (pSupportsPresent[i] == VK_TRUE) {
-							present_queue_family_index = (u_int32_t)i;
-							break;
-						}
-				}
-				free(pSupportsPresent);
-
-				// Generate error if could not find queues that support graphics
-				// and present
-				if (graphics_queue_family_index == UINT32_MAX || present_queue_family_index == UINT32_MAX) {
-					std::cout << "Could not find a queues for both graphics and present";
-					exit(-1);
-				}
-
-				// Get the list of VkFormats that are supported:
-				uint32_t formatCount;
-				res = vkGetPhysicalDeviceSurfaceFormatsKHR(gpu_vector[0], surface, &formatCount, NULL);
-				assert(res == VK_SUCCESS);
-				VkSurfaceFormatKHR *surfFormats = (VkSurfaceFormatKHR *)malloc(formatCount * sizeof(VkSurfaceFormatKHR));
-				res = vkGetPhysicalDeviceSurfaceFormatsKHR(gpu_vector[0], surface, &formatCount, surfFormats);
-				assert(res == VK_SUCCESS);
-				// If the format list includes just one entry of VK_FORMAT_UNDEFINED,
-				// the surface has no preferred format.  Otherwise, at least one
-				// supported format will be returned.
-				if (formatCount == 1 && surfFormats[0].format == VK_FORMAT_UNDEFINED) {
-					format = VK_FORMAT_B8G8R8A8_UNORM;
-				} else {
-					assert(formatCount >= 1);
-					format = surfFormats[0].format;
-				}
-				free(surfFormats);
-
-
-				VkCommandBufferBeginInfo cmd_buf_info = {};
-				cmd_buf_info.sType 							= VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-				cmd_buf_info.pNext 							= NULL;
-				cmd_buf_info.flags 							= 0;
-				cmd_buf_info.pInheritanceInfo 				= NULL;
-
-
-				vkGetDeviceQueue(device, graphics_queue_family_index, 0, &graphics_queue);
-				if (graphics_queue_family_index == present_queue_family_index) {
-					present_queue = graphics_queue;
-				} else {
-					vkGetDeviceQueue(device, present_queue_family_index, 0, &present_queue);
-				}
-
-				VkSurfaceCapabilitiesKHR surfCapabilities;
-
-				res = vkGetPhysicalDeviceSurfaceCapabilitiesKHR(gpu_vector[0], surface, &surfCapabilities);
-				assert(res == VK_SUCCESS);
-
-				res = vkGetPhysicalDeviceSurfacePresentModesKHR(gpu_vector[0], surface, &queue_family_count, NULL);
-				assert(res == VK_SUCCESS);
-				VkPresentModeKHR *presentModes = (VkPresentModeKHR *)malloc(queue_family_count * sizeof(VkPresentModeKHR));
-				assert(presentModes);
-				res = vkGetPhysicalDeviceSurfacePresentModesKHR(gpu_vector[0], surface, &queue_family_count, presentModes);
-				assert(res == VK_SUCCESS);
-
-				VkExtent2D swapchainExtent;
-				// width and height are either both 0xFFFFFFFF, or both not 0xFFFFFFFF.
-				if (surfCapabilities.currentExtent.width == 0xFFFFFFFF) {
-					// If the surface size is undefined, the size is set to
-					// the size of the images requested.
-					swapchainExtent.width =  (uint32_t)width;
-					swapchainExtent.height = (uint32_t)height;
-					if (swapchainExtent.width < surfCapabilities.minImageExtent.width) {
-						swapchainExtent.width = surfCapabilities.minImageExtent.width;
-					} else if (swapchainExtent.width > surfCapabilities.maxImageExtent.width) {
-						swapchainExtent.width = surfCapabilities.maxImageExtent.width;
-					}
-
-					if (swapchainExtent.height < surfCapabilities.minImageExtent.height) {
-						swapchainExtent.height = surfCapabilities.minImageExtent.height;
-					} else if (swapchainExtent.height > surfCapabilities.maxImageExtent.height) {
-						swapchainExtent.height = surfCapabilities.maxImageExtent.height;
-					}
-				} else {
-					// If the surface size is defined, the swap chain size must match
-					swapchainExtent = surfCapabilities.currentExtent;
-				}
-
-				// The FIFO present mode is guaranteed by the spec to be supported
-				// Also note that current Android driver only supports FIFO
-				VkPresentModeKHR swapchainPresentMode = VK_PRESENT_MODE_FIFO_KHR;
-
-				// Determine the number of VkImage's to use in the swap chain.
-				// We need to acquire only 1 presentable image at at time.
-				// Asking for minImageCount images ensures that we can acquire
-				// 1 presentable image as long as we present it before attempting
-				// to acquire another.
-				uint32_t desiredNumberOfSwapChainImages = surfCapabilities.minImageCount + 1;
-				if ((surfCapabilities.maxImageCount > 0) && (desiredNumberOfSwapChainImages > surfCapabilities.maxImageCount))
-				{
-					desiredNumberOfSwapChainImages = surfCapabilities.maxImageCount;
-				}
-
-				VkSurfaceTransformFlagBitsKHR preTransform;
-				if (surfCapabilities.supportedTransforms & VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR) {
-					preTransform = VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR;
-				} else {
-					preTransform = surfCapabilities.currentTransform;
-				}
-
-				// Find a supported composite alpha mode - one of these is guaranteed to be set
-				VkCompositeAlphaFlagBitsKHR compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
-				VkCompositeAlphaFlagBitsKHR compositeAlphaFlags[4] = {
-						VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR,
-						VK_COMPOSITE_ALPHA_PRE_MULTIPLIED_BIT_KHR,
-						VK_COMPOSITE_ALPHA_POST_MULTIPLIED_BIT_KHR,
-						VK_COMPOSITE_ALPHA_INHERIT_BIT_KHR,
-				};
-				for (uint32_t i = 0; i < sizeof(compositeAlphaFlags); i++) {
-					if (surfCapabilities.supportedCompositeAlpha & compositeAlphaFlags[i]) {
-						compositeAlpha = compositeAlphaFlags[i];
-						break;
-					}
-				}
-
-				VkSwapchainCreateInfoKHR swapchain_ci = {};
-				swapchain_ci.sType 					= VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
-				swapchain_ci.pNext 					= NULL;
-				swapchain_ci.surface 				= surface;
-				swapchain_ci.minImageCount 			= desiredNumberOfSwapChainImages;
-				swapchain_ci.imageFormat 			= format;
-				swapchain_ci.imageExtent.width 		= swapchainExtent.width;
-				swapchain_ci.imageExtent.height 	= swapchainExtent.height;
-				swapchain_ci.preTransform 			= preTransform;
-				swapchain_ci.compositeAlpha 		= compositeAlpha;
-				swapchain_ci.imageArrayLayers 		= 1;
-				swapchain_ci.presentMode 			= swapchainPresentMode;
-				swapchain_ci.oldSwapchain 			= VK_NULL_HANDLE;
-#ifndef __ANDROID__
-				swapchain_ci.clipped 				= (VkBool32)true;
-#else
-				swapchain_ci.clipped 				= false;
-#endif
-				swapchain_ci.imageColorSpace 		= VK_COLORSPACE_SRGB_NONLINEAR_KHR;
-				swapchain_ci.imageUsage 			= usageFlags;
-				swapchain_ci.imageSharingMode 		= VK_SHARING_MODE_EXCLUSIVE;
-				swapchain_ci.queueFamilyIndexCount  = 0;
-				swapchain_ci.pQueueFamilyIndices 	= NULL;
-
-				uint32_t queueFamilyIndices[2] = {(uint32_t)graphics_queue_family_index, (uint32_t)present_queue_family_index};
-				if (graphics_queue_family_index != present_queue_family_index) {
-					// If the graphics and present queues are from different queue families,
-					// we either have to explicitly transfer ownership of images between the
-					// queues, or we have to create the swapchain with imageSharingMode
-					// as VK_SHARING_MODE_CONCURRENT
-					swapchain_ci.imageSharingMode = VK_SHARING_MODE_CONCURRENT;
-					swapchain_ci.queueFamilyIndexCount = 2;
-					swapchain_ci.pQueueFamilyIndices = queueFamilyIndices;
-				}
-
-
-				res = vkCreateSwapchainKHR(device, &swapchain_ci, NULL, &swap_chain);
-				assert(res == VK_SUCCESS);
-
-				res = vkGetSwapchainImagesKHR(device, swap_chain, &swapchainImageCount, NULL);
-				assert(res == VK_SUCCESS);
-
-				VkImage *swapchainImages = (VkImage *)malloc(swapchainImageCount * sizeof(VkImage));
-				assert(swapchainImages);
-				res = vkGetSwapchainImagesKHR(device, swap_chain,
-											  &swapchainImageCount, swapchainImages);
-				assert(res == VK_SUCCESS);
-
-				for (uint32_t i = 0; i < swapchainImageCount; i++) {
-					swap_chain_buffer sc_buffer;
-					sc_buffer.view = Textures::createImageView(device, swapchainImages[i], format);
-					sc_buffer.image = swapchainImages[i];
-					buffers.push_back(sc_buffer);
-					assert(res == VK_SUCCESS);
-				}
-
-				free(swapchainImages);
-
-				if (NULL != presentModes) {
-					free(presentModes);
-				}
-
-
-				/* Depth Buffer */
-
-				const VkFormat depth_format = VK_FORMAT_D16_UNORM;
-				const VkImageAspectFlags depthAspectMask = VK_IMAGE_ASPECT_DEPTH_BIT;
-
-				VkFormatProperties props;
-				VkImageTiling depth_tiling;
-
-				vkGetPhysicalDeviceFormatProperties(gpu_vector[0], depth_format, &props);
-
-				if (props.linearTilingFeatures & VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT) {
-					depth_tiling = VK_IMAGE_TILING_LINEAR;
-				} else if (props.optimalTilingFeatures & VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT) {
-					depth_tiling = VK_IMAGE_TILING_OPTIMAL;
-				} else {
-					/* Try other depth formats? */
-					std::cout << "depth_format " << depth_format << " Unsupported.\n";
-					exit(-1);
-				}
-
-				struct ImageProps img_props = {};
-				img_props.format 			= depth_format;
-				img_props.tiling 			= depth_tiling;
-				img_props.aspectMask 		= depthAspectMask;
-				img_props.usage 			= VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT;
-				img_props.height 			= static_cast<uint32_t>(height);
-				img_props.width 			= static_cast<uint32_t>(width);
-
-				struct MemoryProps mem_props = {};
-				mem_props.memory_props 		= memory_properties;
-				mem_props.device 			= device;
-
-				depth_buffer = new BufferImage(mem_props, img_props);
+				render_pass->create(rp_attachments);
 
 
 				/*  create Uniform Buffer  */
@@ -611,64 +388,8 @@ namespace Obsidian2D
 				res = vkCreatePipelineLayout(device, &pPipelineLayoutCreateInfo, NULL, &pipeline_layout);
 				assert(res == VK_SUCCESS);
 
-				/* DEPENDS on init_swap_chain() and init_depth_buffer() */
-				bool clear = true;
-				/* Need attachments for render target and depth buffer */
-				VkAttachmentDescription attachments[2];
-				attachments[0].format 						= format;
-				attachments[0].samples						= VK_SAMPLE_COUNT_1_BIT;
-				attachments[0].loadOp 						= clear ? VK_ATTACHMENT_LOAD_OP_CLEAR : VK_ATTACHMENT_LOAD_OP_DONT_CARE;
-				attachments[0].storeOp						= VK_ATTACHMENT_STORE_OP_STORE;
-				attachments[0].stencilLoadOp 				= VK_ATTACHMENT_LOAD_OP_DONT_CARE;
-				attachments[0].stencilStoreOp 				= VK_ATTACHMENT_STORE_OP_DONT_CARE;
-				attachments[0].initialLayout 				= VK_IMAGE_LAYOUT_UNDEFINED;
-				attachments[0].finalLayout 					= VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
-				attachments[0].flags 						= 0;
 
-				if (depthPresent) {
-					attachments[1].format 					= depth_buffer->format;
-					attachments[1].samples 					= VK_SAMPLE_COUNT_1_BIT;
-					attachments[1].loadOp 					= clear ? VK_ATTACHMENT_LOAD_OP_CLEAR : VK_ATTACHMENT_LOAD_OP_DONT_CARE;
-					attachments[1].storeOp 					= VK_ATTACHMENT_STORE_OP_STORE;
-					attachments[1].stencilLoadOp 			= VK_ATTACHMENT_LOAD_OP_LOAD;
-					attachments[1].stencilStoreOp 			= VK_ATTACHMENT_STORE_OP_STORE;
-					attachments[1].initialLayout 			= VK_IMAGE_LAYOUT_UNDEFINED;
-					attachments[1].finalLayout 				= VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
-					attachments[1].flags 					= 0;
-				}
 
-				VkAttachmentReference color_reference = {};
-				color_reference.attachment 					= 0;
-				color_reference.layout 						= VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
-
-				VkAttachmentReference depth_reference = {};
-				depth_reference.attachment 					= 1;
-				depth_reference.layout 						= VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
-
-				VkSubpassDescription subpass = {};
-				subpass.pipelineBindPoint 					= VK_PIPELINE_BIND_POINT_GRAPHICS;
-				subpass.flags 								= 0;
-				subpass.inputAttachmentCount 				= 0;
-				subpass.pInputAttachments 					= NULL;
-				subpass.colorAttachmentCount 				= 1;
-				subpass.pColorAttachments 					= &color_reference;
-				subpass.pResolveAttachments 				= NULL;
-				subpass.pDepthStencilAttachment 			= depthPresent ? &depth_reference : NULL;
-				subpass.preserveAttachmentCount 			= 0;
-				subpass.pPreserveAttachments 				= NULL;
-
-				VkRenderPassCreateInfo rp_info = {};
-				rp_info.sType 								= VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
-				rp_info.pNext 								= NULL;
-				rp_info.attachmentCount 					= depthPresent ? 2 : 1;
-				rp_info.pAttachments 						= attachments;
-				rp_info.subpassCount 						= 1;
-				rp_info.pSubpasses 							= &subpass;
-				rp_info.dependencyCount 					= 0;
-				rp_info.pDependencies 						= NULL;
-
-				res = vkCreateRenderPass(device, &rp_info, NULL, &render_pass);
-				assert(res == VK_SUCCESS);
 
 				// Vertex shader
 				shaderStages[0].sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
@@ -689,29 +410,6 @@ namespace Obsidian2D
 				// Main entry point for the shader
 				shaderStages[1].pName = "main";
 				assert(shaderStages[1].module != VK_NULL_HANDLE);
-
-				VkImageView img_attachments[2];
-				img_attachments[1] = depth_buffer->view;
-
-				VkFramebufferCreateInfo fb_info = {};
-				fb_info.sType 											= VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
-				fb_info.pNext 											= NULL;
-				fb_info.renderPass 										= render_pass;
-				fb_info.attachmentCount 								= depthPresent ? 2 : 1;
-				fb_info.pAttachments 									= img_attachments;
-				fb_info.width 											= (uint32_t)width;
-				fb_info.height 											= (uint32_t)height;
-				fb_info.layers 											= 1;
-
-				uint32_t i;
-
-				framebuffers = (VkFramebuffer *)malloc(swapchainImageCount * sizeof(VkFramebuffer));
-
-				for (i = 0; i < swapchainImageCount; i++) {
-					img_attachments[0] = buffers[i].view;
-					res = vkCreateFramebuffer(device, &fb_info, NULL, &framebuffers[i]);
-					assert(res == VK_SUCCESS);
-				}
 
                 this->createVertexBuffer(vertexData);
 
@@ -769,7 +467,8 @@ namespace Obsidian2D
 				res = vkAllocateDescriptorSets(device, _alloc_info, &desc_set);
 				assert(res == VK_SUCCESS);
 
-				texture_image = Textures::createTextureImage(gpu_vector[0], device, "../../include/Obsidian2D/Renderer/shaders/baleog.jpg", _command_pool, graphics_queue, memory_properties);
+				texture_image = Textures::createTextureImage(gpu_vector[0], device, "../../include/Obsidian2D/Renderer/shaders/baleog.jpg",
+															 _command_pool, render_pass->getSwapChain()->getGraphicQueue(), memory_properties);
 				texture_image_view = Textures::createImageView(device, texture_image, VK_FORMAT_R8G8B8A8_UNORM);
 
                 VkSamplerCreateInfo sampler = {};
@@ -816,7 +515,7 @@ namespace Obsidian2D
 				writes[1].pImageInfo 									= &texture_info;
 				writes[1].dstArrayElement 								= 0;
 
-				vkUpdateDescriptorSets(device, use_texture ? 2 : 1, writes, 0, NULL);
+				vkUpdateDescriptorSets(device, 2, writes, 0, NULL);
 
 				VkPipelineCacheCreateInfo pipelineCache;
 				pipelineCache.sType 									= VK_STRUCTURE_TYPE_PIPELINE_CACHE_CREATE_INFO;
@@ -976,7 +675,7 @@ namespace Obsidian2D
 				pipeline.pDepthStencilState 									= &ds;
 				pipeline.pStages 												= shaderStages;
 				pipeline.stageCount 											= 2;
-				pipeline.renderPass 											= render_pass;
+				pipeline.renderPass 											= render_pass->getRenderPass();
 				pipeline.subpass 												= 0;
 
 				res = vkCreateGraphicsPipelines(device, pPipelineCache, 1, &pipeline, NULL, &vkPipeline);
@@ -1006,7 +705,7 @@ namespace Obsidian2D
 				VkRenderPassBeginInfo rp_begin;
 				rp_begin.sType 											= VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
 				rp_begin.pNext 											= NULL;
-				rp_begin.renderPass 									= render_pass;
+				rp_begin.renderPass 									= render_pass->getRenderPass();
 				rp_begin.renderArea.offset.x 							= 0;
 				rp_begin.renderArea.offset.y 							= 0;
 				rp_begin.renderArea.extent.width 						= (uint32_t)width;
@@ -1019,9 +718,15 @@ namespace Obsidian2D
 				fenceInfo.pNext = NULL;
 				fenceInfo.flags = 0;
 
+				VkCommandBufferBeginInfo cmd_buf_info = {};
+				cmd_buf_info.sType 							= VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+				cmd_buf_info.pNext 							= NULL;
+				cmd_buf_info.flags 							= 0;
+				cmd_buf_info.pInheritanceInfo 				= NULL;
+
 				drawFence.resize(command_buffer.size());
-				for (i = 0; i < command_buffer.size(); i++){
-					rp_begin.framebuffer = framebuffers[i];
+				for (u_int32_t i = 0; i < command_buffer.size(); i++){
+					rp_begin.framebuffer = render_pass->getFrameBuffer()[i];
 
 					res = vkBeginCommandBuffer(command_buffer[i], &cmd_buf_info);
 					assert(res == VK_SUCCESS);

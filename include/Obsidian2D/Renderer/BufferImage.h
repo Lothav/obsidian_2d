@@ -37,9 +37,9 @@ namespace Obsidian2D
 
         public:
 
-            VkImage 		image;
-            VkDeviceMemory 	mem;
-            VkImageView 	view;
+            VkImage 		image   = nullptr;
+            VkDeviceMemory 	mem     = nullptr;
+            VkImageView 	view    = nullptr;
             VkFormat        format;
 
             ~BufferImage()
@@ -49,14 +49,18 @@ namespace Obsidian2D
                 vkFreeMemory(_mem_props.device, mem, nullptr);
             }
 
-            BufferImage (struct MemoryProps memory_pro, struct ImageProps img_props)
+            BufferImage (struct MemoryProps memory_pro, struct ImageProps img_props, VkImage* images = nullptr)
             {
-                this->_mem_props = memory_pro;
-                this->_img_pros = img_props;
-                this->format = img_props.format;
+                this->_img_pros     = img_props;
+                this->_mem_props    = memory_pro;
+                this->format        = img_props.format;
 
-                createImage();
-                allocateMemory();
+                if(images == nullptr) {
+                    createImage();
+                    allocateMemory();
+                } else {
+                    image = *images;
+                }
                 createImageView();
             }
 
