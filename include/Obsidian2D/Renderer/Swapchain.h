@@ -116,7 +116,7 @@ namespace Obsidian2D
 					MemoryProps mem_props = {};
 					mem_props.device = _swap_chain_params.device;
 
-					BufferImage* sc_buffer = new BufferImage(mem_props, img_props, _swap_chain_images);
+					BufferImage* sc_buffer = new BufferImage(mem_props, img_props, &_swap_chain_images[i]);
 
 					_swap_chain_buffer.push_back(sc_buffer);
 				}
