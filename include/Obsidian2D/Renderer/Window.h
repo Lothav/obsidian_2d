@@ -11,6 +11,7 @@
 #include "BufferImage.h"
 #include "VertexBuffer.h"
 #include "RenderPass.h"
+#include "DescriptorSet.h"
 
 #define APP_NAME "Obsidian2D"
 
@@ -31,9 +32,9 @@ namespace Obsidian2D
 
 				delete render_pass;
 
-                vkDestroyImage(device, texture_image, nullptr);
-                vkDestroyImageView(device,texture_image_view, nullptr);
-                vkDestroySampler(device, texture_sampler, nullptr);
+                //vkDestroyImage(device, texture_image, nullptr);
+                //vkDestroyImageView(device,texture_image_view, nullptr);
+                //vkDestroySampler(device, texture_sampler, nullptr);
 
                 if (surface != VK_NULL_HANDLE)
                 {
@@ -42,7 +43,7 @@ namespace Obsidian2D
 
 				vkDestroyPipeline(device, vkPipeline, NULL);
 				vkDestroyPipelineCache(device, pPipelineCache, NULL);
-				vkDestroyDescriptorPool(device, desc_pool, NULL);
+				//vkDestroyDescriptorPool(device, desc_pool, NULL);
 
 				// Destroy buffers
 
@@ -50,7 +51,7 @@ namespace Obsidian2D
 				{
 					delete v_buff;
 				}
-				delete uniform_buffer;
+				//delete uniform_buffer;
 
 				// Destroy shaders
 				vkDestroyShaderModule(device, shaderStages[0].module, NULL);
@@ -60,8 +61,8 @@ namespace Obsidian2D
 				//vkDestroyRenderPass(device, render_pass, NULL);
 
 				// Destroy descriptor and pipeline layouts
-				for (i = 0; i < 1; i++) vkDestroyDescriptorSetLayout(device, desc_layout[i], NULL);
-				vkDestroyPipelineLayout(device, pipeline_layout, NULL);
+				//for (i = 0; i < 1; i++) vkDestroyDescriptorSetLayout(device, desc_layout[i], NULL);
+				//vkDestroyPipelineLayout(device, pipeline_layout, NULL);
 
 				vkFreeCommandBuffers(device, _command_pool, (u_int32_t)command_buffer.size(), command_buffer.data());
 
@@ -84,7 +85,7 @@ namespace Obsidian2D
                 VkResult res;
 				VkSwapchainKHR swap_c = render_pass->getSwapChain()->getSwapChainKHR();
 
-                uniform_buffer->updateCamera(device);
+                descriptor_set->getUniformBuffer()->updateCamera(device);
 
                 res = vkAcquireNextImageKHR(device, swap_c, UINT64_MAX, imageAcquiredSemaphore, VK_NULL_HANDLE, &current_buffer);
                 assert(res == VK_SUCCESS);
@@ -140,8 +141,6 @@ namespace Obsidian2D
 			VkSemaphore         					renderSemaphore;
 			std::vector<VkFence>					drawFence;
 			VkPipelineShaderStageCreateInfo 		shaderStages[2];
-			std::vector<VkDescriptorSetLayout> 		desc_layout;
-			VkPipelineLayout 						pipeline_layout;
 			VkCommandPool							_command_pool;
 			VkDevice 								device;
 			std::vector<VkCommandBuffer>			command_buffer;
@@ -152,14 +151,11 @@ namespace Obsidian2D
 			std::vector<VkQueueFamilyProperties> 	queue_family_props;
 			VkPipeline 								vkPipeline;
 			VkPipelineCache 						pPipelineCache;
-			VkDescriptorPool 						desc_pool;
-            VkSampler                               texture_sampler = nullptr;
-            VkImage                                 texture_image = nullptr;
-            VkImageView                             texture_image_view = nullptr;
-			RenderPass* render_pass;
+
+			RenderPass* 							render_pass;
 		protected:
             std::vector<VertexBuffer *>             vertex_buffer;
-            UniformBuffer*                          uniform_buffer;
+			DescriptorSet* 							descriptor_set;
 
 			void createInstance()
 			{
@@ -313,65 +309,19 @@ namespace Obsidian2D
 
 				render_pass->create(rp_attachments);
 
+				/* Descriptor Set */
 
-				/*  create Uniform Buffer  */
+				descriptor_set = new DescriptorSet(device);
 
-                struct BufferData uniformBufferData = {};
+				struct DescriptorSetParams ds_params = {};
+				ds_params.width 				= static_cast<u_int32_t >(width);
+				ds_params.height 				= static_cast<u_int32_t >(height);
+				ds_params.memory_properties		= memory_properties;
+				ds_params.command_pool			= _command_pool;
+				ds_params.gpu					= gpu_vector[0];
+				ds_params.graphic_queue			= render_pass->getSwapChain()->getGraphicQueue();
 
-                uniformBufferData.device            = device;
-                uniformBufferData.usage             = VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT;
-                uniformBufferData.physicalDevice    = gpu_vector[0];
-                uniformBufferData.properties        = VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT;
-                uniformBufferData.size              = sizeof(glm::mat4);
-
-                uniform_buffer = new UniformBuffer(uniformBufferData);
-                uniform_buffer->initModelView(static_cast<uint32_t>(width), static_cast<uint32_t>(height));
-                glm::mat4 MVP = uniform_buffer->getMVP();
-
-
-
-				bool use_texture = true;
-				std::vector<VkDescriptorSetLayoutBinding>layout_bindings = {};
-                layout_bindings.resize(2);
-				layout_bindings[0].binding 								= 0;
-				layout_bindings[0].descriptorType 						= VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-				layout_bindings[0].descriptorCount 						= 1;
-				layout_bindings[0].stageFlags 							= VK_SHADER_STAGE_VERTEX_BIT;
-				layout_bindings[0].pImmutableSamplers					= NULL;
-
-				if (use_texture) {
-					layout_bindings[1].binding 							= 1;
-					layout_bindings[1].descriptorType 					= VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-					layout_bindings[1].descriptorCount 					= 1;
-					layout_bindings[1].stageFlags 						= VK_SHADER_STAGE_FRAGMENT_BIT;
-					layout_bindings[1].pImmutableSamplers 				= NULL;
-				}
-
-				/* Next take layout bindings and use them to create a descriptor set layout
-				 */
-				VkDescriptorSetLayoutCreateInfo descriptor_layout = {};
-				descriptor_layout.sType 								= VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
-				descriptor_layout.pNext 								= NULL;
-				descriptor_layout.bindingCount 							= use_texture ? 2 : 1;
-				descriptor_layout.pBindings 							= layout_bindings.data();
-
-				desc_layout.resize(1);
-				res = vkCreateDescriptorSetLayout(device, &descriptor_layout, NULL, desc_layout.data());
-				assert(res == VK_SUCCESS);
-
-				/* Now use the descriptor layout to create a pipeline layout */
-				VkPipelineLayoutCreateInfo pPipelineLayoutCreateInfo = {};
-				pPipelineLayoutCreateInfo.sType                         = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-				pPipelineLayoutCreateInfo.pNext                         = NULL;
-				pPipelineLayoutCreateInfo.pushConstantRangeCount        = 0;
-				pPipelineLayoutCreateInfo.pPushConstantRanges           = NULL;
-				pPipelineLayoutCreateInfo.setLayoutCount                = 1;
-				pPipelineLayoutCreateInfo.pSetLayouts                   = desc_layout.data();
-
-				res = vkCreatePipelineLayout(device, &pPipelineLayoutCreateInfo, NULL, &pipeline_layout);
-				assert(res == VK_SUCCESS);
-
-
+				descriptor_set->create(ds_params);
 
 
 				// Vertex shader
@@ -418,87 +368,6 @@ namespace Obsidian2D
                 vi_attribs[2].location 									= 2;
                 vi_attribs[2].format 									= VK_FORMAT_R32G32B32_SFLOAT;
                 vi_attribs[2].offset 									= offsetof(Vertex, normal);
-
-				VkDescriptorPoolSize type_count[2];
-				type_count[0].type 										= VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-				type_count[0].descriptorCount 							= 1;
-				if (use_texture) {
-					type_count[1].type 									= VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-					type_count[1].descriptorCount 						= 1;
-				}
-
-				VkDescriptorPoolCreateInfo descriptor_pool = {};
-				descriptor_pool.sType 									= VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
-				descriptor_pool.pNext 									= NULL;
-				descriptor_pool.maxSets 								= 1;
-				descriptor_pool.poolSizeCount 							= use_texture ? 2 : 1;
-				descriptor_pool.pPoolSizes 								= type_count;
-
-
-
-				res = vkCreateDescriptorPool(device, &descriptor_pool, NULL, &desc_pool);
-				assert(res == VK_SUCCESS);
-
-				VkDescriptorSetAllocateInfo _alloc_info[1];
-				_alloc_info[0].sType 									= VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
-				_alloc_info[0].pNext 									= NULL;
-				_alloc_info[0].descriptorPool 							= desc_pool;
-				_alloc_info[0].descriptorSetCount 						= 1;
-				_alloc_info[0].pSetLayouts 								= desc_layout.data();
-
-                VkDescriptorSet desc_set;
-				res = vkAllocateDescriptorSets(device, _alloc_info, &desc_set);
-				assert(res == VK_SUCCESS);
-
-				texture_image = Textures::createTextureImage(gpu_vector[0], device, "../../include/Obsidian2D/Renderer/shaders/baleog.jpg",
-															 _command_pool, render_pass->getSwapChain()->getGraphicQueue(), memory_properties);
-				texture_image_view = Textures::createImageView(device, texture_image, VK_FORMAT_R8G8B8A8_UNORM);
-
-                VkSamplerCreateInfo sampler = {};
-				sampler.sType 											= VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
-				sampler.maxAnisotropy 									= 1.0f;
-				sampler.magFilter 										= VK_FILTER_LINEAR;
-				sampler.minFilter 										= VK_FILTER_LINEAR;
-				sampler.mipmapMode 										= VK_SAMPLER_MIPMAP_MODE_LINEAR;
-				sampler.addressModeU 									= VK_SAMPLER_ADDRESS_MODE_REPEAT;
-				sampler.addressModeV 									= VK_SAMPLER_ADDRESS_MODE_REPEAT;
-				sampler.addressModeW 									= VK_SAMPLER_ADDRESS_MODE_REPEAT;
-				sampler.mipLodBias 										= 0.0f;
-				sampler.compareOp 										= VK_COMPARE_OP_NEVER;
-				sampler.minLod 											= 0.0f;
-				sampler.maxLod 											= 0.0f;
-				sampler.maxAnisotropy 									= 1.0;
-				sampler.anisotropyEnable 								= VK_FALSE;
-				sampler.borderColor 									= VK_BORDER_COLOR_FLOAT_OPAQUE_WHITE;
-
-                assert(vkCreateSampler(device, &sampler, nullptr, &texture_sampler) == VK_SUCCESS);
-
-				VkDescriptorImageInfo texture_info;
-				texture_info.imageLayout 								= VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-				texture_info.imageView 									= texture_image_view;
-				texture_info.sampler 									= texture_sampler;
-
-                VkWriteDescriptorSet writes[2];
-                writes[0] = {};
-				writes[0].sType 										= VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-				writes[0].pNext 										= NULL;
-				writes[0].dstSet 										= desc_set;
-				writes[0].descriptorCount 								= 1;
-				writes[0].descriptorType 								= VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-				writes[0].pBufferInfo 									= &uniform_buffer->buffer_info;
-				writes[0].dstArrayElement 								= 0;
-				writes[0].dstBinding 									= 0;
-
-				writes[1] = {};
-				writes[1].sType 										= VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-				writes[1].dstSet 										= desc_set;
-				writes[1].dstBinding 									= 1;
-				writes[1].descriptorCount 								= 1;
-				writes[1].descriptorType 								= VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-				writes[1].pImageInfo 									= &texture_info;
-				writes[1].dstArrayElement 								= 0;
-
-				vkUpdateDescriptorSets(device, 2, writes, 0, NULL);
 
 				VkPipelineCacheCreateInfo pipelineCache;
 				pipelineCache.sType 									= VK_STRUCTURE_TYPE_PIPELINE_CACHE_CREATE_INFO;
@@ -643,7 +512,7 @@ namespace Obsidian2D
 				VkGraphicsPipelineCreateInfo pipeline;
 				pipeline.sType 													= VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
 				pipeline.pNext 													= NULL;
-				pipeline.layout 												= pipeline_layout;
+				pipeline.layout 												= descriptor_set->getPipelineLayout();
 				pipeline.basePipelineHandle 									= VK_NULL_HANDLE;
 				pipeline.basePipelineIndex 										= 0;
 				pipeline.flags 													= 0;
@@ -719,7 +588,7 @@ namespace Obsidian2D
 					vkCmdBeginRenderPass(command_buffer[i], &rp_begin, VK_SUBPASS_CONTENTS_INLINE);
 					vkCmdBindPipeline(command_buffer[i], VK_PIPELINE_BIND_POINT_GRAPHICS, vkPipeline);
 					vkCmdBindDescriptorSets(command_buffer[i], VK_PIPELINE_BIND_POINT_GRAPHICS,
-                                            pipeline_layout, 0, 1, &desc_set, 0, NULL);
+											descriptor_set->getPipelineLayout(), 0, 1, descriptor_set->getDescriptorSet(), 0, NULL);
 
 					const VkDeviceSize offsets[1] = {0};
 
