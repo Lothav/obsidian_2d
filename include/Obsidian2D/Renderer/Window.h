@@ -29,13 +29,7 @@ namespace Obsidian2D
 			{
 				uint32_t i;
 
-               /* if (swap_chain != VK_NULL_HANDLE)
-                {
-                    for (i = 0; i < swapchainImageCount; i++)
-                    {
-                        vkDestroyImageView(device, buffers[i].view, nullptr);
-                    }
-                }*/
+				delete render_pass;
 
                 vkDestroyImage(device, texture_image, nullptr);
                 vkDestroyImageView(device,texture_image_view, nullptr);
@@ -43,7 +37,6 @@ namespace Obsidian2D
 
                 if (surface != VK_NULL_HANDLE)
                 {
-                  //  vkDestroySwapchainKHR(device, swap_chain, nullptr);
                     vkDestroySurfaceKHR(instance, surface, nullptr);
                 }
 
@@ -59,12 +52,6 @@ namespace Obsidian2D
 				}
 				delete uniform_buffer;
 
-				// Destroy frame buffer
-				/*for (i = 0; i < swapchainImageCount; i++) {
-					vkDestroyFramebuffer(device, framebuffers[i], NULL);
-				}
-				free(framebuffers);*/
-
 				// Destroy shaders
 				vkDestroyShaderModule(device, shaderStages[0].module, NULL);
 				vkDestroyShaderModule(device, shaderStages[1].module, NULL);
@@ -75,9 +62,6 @@ namespace Obsidian2D
 				// Destroy descriptor and pipeline layouts
 				for (i = 0; i < 1; i++) vkDestroyDescriptorSetLayout(device, desc_layout[i], NULL);
 				vkDestroyPipelineLayout(device, pipeline_layout, NULL);
-
-				// Destroy depth buffer
-				delete depth_buffer;
 
 				vkFreeCommandBuffers(device, _command_pool, (u_int32_t)command_buffer.size(), command_buffer.data());
 
@@ -172,7 +156,6 @@ namespace Obsidian2D
             VkSampler                               texture_sampler = nullptr;
             VkImage                                 texture_image = nullptr;
             VkImageView                             texture_image_view = nullptr;
-			BufferImage* depth_buffer;
 			RenderPass* render_pass;
 		protected:
             std::vector<VertexBuffer *>             vertex_buffer;

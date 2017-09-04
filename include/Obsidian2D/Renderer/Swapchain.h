@@ -49,6 +49,18 @@ namespace Obsidian2D
 				_swap_chain_params = swap_chain_params;
 			}
 
+			~SwapChain()
+			{
+				if (_swap_chain != VK_NULL_HANDLE) {
+					if(_swap_chain_buffer.size() == _image_count)
+						for (u_int32_t i = 0; i < _image_count; i++){
+							vkDestroyImageView(_swap_chain_params.device, (_swap_chain_buffer.data()[i])->view, nullptr);
+							free(_swap_chain_buffer[i]);
+						}
+					vkDestroySwapchainKHR(_swap_chain_params.device, _swap_chain, nullptr);
+				}
+			}
+
 			void createSwapChain()
 			{
 				VkResult res;

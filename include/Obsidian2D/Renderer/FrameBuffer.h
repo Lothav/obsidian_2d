@@ -17,13 +17,13 @@ namespace Obsidian2D
 
 			VkDevice 					instance_device;
 			SwapChain* 					_swap_chain = nullptr;
+			struct SwapChainParams 		_sc_params;
 
 		private:
 
 			BufferImage* 				_depth_buffer;
 			VkFramebuffer* 				_frame_buffer;
 			VkFormat 					_depth_format;
-			struct SwapChainParams 		_sc_params;
 
 		public:
 
@@ -36,6 +36,16 @@ namespace Obsidian2D
 				_swap_chain->createSwapChain();
 
 				createDepthBuffer();
+			}
+
+			virtual ~FrameBuffer()
+			{
+				for (u_int32_t i = 0; i < _swap_chain->getImageCount(); i++) {
+					vkDestroyFramebuffer(_sc_params.device, _frame_buffer[i], NULL);
+				}
+				free(_frame_buffer);
+				delete _depth_buffer;
+				delete _swap_chain;
 			}
 
 			void createFrameBuffer(VkRenderPass render_pass)

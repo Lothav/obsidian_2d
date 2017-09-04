@@ -26,6 +26,11 @@ namespace Obsidian2D
 
 			RenderPass(VkDevice device, struct SwapChainParams sc_params) : FrameBuffer(device, sc_params) {}
 
+			~RenderPass()
+			{
+				vkDestroyRenderPass(_sc_params.device, _render_pass, NULL);
+			}
+
 			void create(std::vector<struct rpAttachments> att_vector)
 			{
 				std::array<VkAttachmentDescription, 2> attachments = {};
