@@ -33,7 +33,7 @@ namespace Obsidian2D
 			VkDeviceMemory 								mem;
 			VkDescriptorBufferInfo 						buffer_info;
 
-			~Buffer()
+			virtual ~Buffer()
 			{
 				vkDestroyBuffer(_instance_device, buf, nullptr);
 				vkFreeMemory(_instance_device, mem, nullptr);

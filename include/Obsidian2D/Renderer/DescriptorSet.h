@@ -36,7 +36,7 @@ namespace Obsidian2D
 
             UniformBuffer*                              _uniform_buffer = nullptr;
 
-            BufferImage*                                _textel_image = nullptr;
+            BufferImage*                                _textel_buffer = nullptr;
             VkSampler                                   _texture_sampler = nullptr;
 
             VkDevice                                    _instance_device;
@@ -47,6 +47,18 @@ namespace Obsidian2D
             {
                 _instance_device = device;
             }
+
+			~DescriptorSet()
+			{
+				delete _textel_buffer;
+				delete _uniform_buffer;
+				vkDestroySampler(_instance_device, _texture_sampler, nullptr);
+				vkDestroyDescriptorPool(_instance_device, _desc_pool, nullptr);
+				for (u_int32_t i = 0; i < _desc_layout.size(); i++) {
+					vkDestroyDescriptorSetLayout(_instance_device, _desc_layout[i], NULL);
+				}
+				vkDestroyPipelineLayout(_instance_device, _pipeline_layout, NULL);
+			}
 
             void create(struct DescriptorSetParams ds_params)
             {
@@ -81,7 +93,7 @@ namespace Obsidian2D
 
                 /*  create Textel Buffer  */
 
-                _textel_image = new BufferImage(mem_props, img_props, &texture_image);
+                _textel_buffer = new BufferImage(mem_props, img_props, &texture_image);
                 createSampler();
 
                 updateDescriptorSet();
@@ -208,7 +220,7 @@ namespace Obsidian2D
             {
                 VkDescriptorImageInfo texture_info;
                 texture_info.imageLayout 								= VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-                texture_info.imageView 									= _textel_image->view;
+                texture_info.imageView 									= _textel_buffer->view;
                 texture_info.sampler 									= _texture_sampler;
 
                 VkWriteDescriptorSet writes[2];

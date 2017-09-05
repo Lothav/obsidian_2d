@@ -32,10 +32,6 @@ namespace Obsidian2D
 
 				delete render_pass;
 
-                //vkDestroyImage(device, texture_image, nullptr);
-                //vkDestroyImageView(device,texture_image_view, nullptr);
-                //vkDestroySampler(device, texture_sampler, nullptr);
-
                 if (surface != VK_NULL_HANDLE)
                 {
                     vkDestroySurfaceKHR(instance, surface, nullptr);
@@ -43,7 +39,6 @@ namespace Obsidian2D
 
 				vkDestroyPipeline(device, vkPipeline, NULL);
 				vkDestroyPipelineCache(device, pPipelineCache, NULL);
-				//vkDestroyDescriptorPool(device, desc_pool, NULL);
 
 				// Destroy buffers
 
@@ -51,18 +46,12 @@ namespace Obsidian2D
 				{
 					delete v_buff;
 				}
-				//delete uniform_buffer;
+
+				delete descriptor_set;
 
 				// Destroy shaders
 				vkDestroyShaderModule(device, shaderStages[0].module, NULL);
 				vkDestroyShaderModule(device, shaderStages[1].module, NULL);
-
-				// Destroy render pass
-				//vkDestroyRenderPass(device, render_pass, NULL);
-
-				// Destroy descriptor and pipeline layouts
-				//for (i = 0; i < 1; i++) vkDestroyDescriptorSetLayout(device, desc_layout[i], NULL);
-				//vkDestroyPipelineLayout(device, pipeline_layout, NULL);
 
 				vkFreeCommandBuffers(device, _command_pool, (u_int32_t)command_buffer.size(), command_buffer.data());
 
@@ -450,33 +439,13 @@ namespace Obsidian2D
 				vp.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
 				vp.pNext = NULL;
 				vp.flags = 0;
-#ifndef __ANDROID__
 				vp.viewportCount 										= 1;
 				dynamicStateEnables[dynamicState.dynamicStateCount++] 	= VK_DYNAMIC_STATE_VIEWPORT;
 				vp.scissorCount 										= 1;
 				dynamicStateEnables[dynamicState.dynamicStateCount++] 	= VK_DYNAMIC_STATE_SCISSOR;
 				vp.pScissors 											= NULL;
 				vp.pViewports 											= NULL;
-#else
-				// Temporary disabling dynamic viewport on Android because some of drivers doesn't
-    // support the feature.
-    VkViewport viewports;
-    viewports.minDepth = 0.0f;
-    viewports.maxDepth = 1.0f;
-    viewports.x = 0;
-    viewports.y = 0;
-    viewports.width = info.width;
-    viewports.height = info.height;
-    VkRect2D scissor;
-    scissor.extent.width = info.width;
-    scissor.extent.height = info.height;
-    scissor.offset.x = 0;
-    scissor.offset.y = 0;
-    vp.viewportCount = NUM_VIEWPORTS;
-    vp.scissorCount = NUM_SCISSORS;
-    vp.pScissors = &scissor;
-    vp.pViewports = &viewports;
-#endif
+
 				VkPipelineDepthStencilStateCreateInfo ds;
 				ds.sType 												= VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO;
 				ds.pNext 												= NULL;
