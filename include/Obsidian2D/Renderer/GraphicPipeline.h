@@ -14,35 +14,55 @@ namespace Obsidian2D
 		class GraphicPipeline: public Util {
 
 		private:
-			VkPipelineCache 						pPipelineCache;
-			VkPipeline 								vkPipeline;
-			VkPipelineShaderStageCreateInfo 		shaderStages[2];
+
+            VkPipelineCache 						            _pipeline_cache;
+			VkPipeline 								            _vk_pipeline;
+			std::vector<VkPipelineShaderStageCreateInfo> 		shaderStages;
+
+            VkDevice                                            _instance_device;
 
 		public:
 
-			GraphicPipeline() {}
+			GraphicPipeline(VkDevice device)
+            {
+                _instance_device = device;
+            }
+
+            ~GraphicPipeline()
+            {
+                vkDestroyPipeline(_instance_device, _vk_pipeline, nullptr);
+                vkDestroyPipelineCache(_instance_device, _pipeline_cache, nullptr);
+
+                for(u_int32_t i = 0; i < shaderStages.size(); i++)
+                {
+                    vkDestroyShaderModule(_instance_device, shaderStages[i].module, nullptr);
+                }
+
+            }
 
 			VkPipeline getPipeline()
 			{
-				return vkPipeline;
+				return _vk_pipeline;
 			}
 
-			void create(VkDevice device, VkPipelineLayout pipeline_layout, VkRenderPass render_pass)
+			void create(VkPipelineLayout pipeline_layout, VkRenderPass render_pass)
 			{
+
+                shaderStages.resize(2);
+
 				shaderStages[0].sType 		= VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
 				shaderStages[0].stage 		= VK_SHADER_STAGE_VERTEX_BIT;
-				shaderStages[0].module 		= loadSPIRVShader(getAssetPath() + "shaders/triangle/vert.spv", device);
+				shaderStages[0].module 		= loadSPIRVShader(getAssetPath() + "shaders/triangle/vert.spv", _instance_device);
 				shaderStages[0].pName 		= "main";
 				assert(shaderStages[0].module != VK_NULL_HANDLE);
 
 				shaderStages[1].sType 		= VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
 				shaderStages[1].stage 		= VK_SHADER_STAGE_FRAGMENT_BIT;
-				shaderStages[1].module 		= loadSPIRVShader(getAssetPath() + "shaders/triangle/frag.spv", device);
+				shaderStages[1].module 		= loadSPIRVShader(getAssetPath() + "shaders/triangle/frag.spv", _instance_device);
 				shaderStages[1].pName 		= "main";
 				assert(shaderStages[1].module != VK_NULL_HANDLE);
 
 
-				VkPipelineCache 						pPipelineCache;
 				VkVertexInputBindingDescription 		vi_binding;
 
 
@@ -74,7 +94,7 @@ namespace Obsidian2D
 				pipelineCache.initialDataSize 							= 0;
 				pipelineCache.pInitialData 								= NULL;
 				pipelineCache.flags 									= 0;
-				VkResult res = vkCreatePipelineCache(device, &pipelineCache, NULL, &pPipelineCache);
+				VkResult res = vkCreatePipelineCache(_instance_device, &pipelineCache, NULL, &_pipeline_cache);
 				assert(res == VK_SUCCESS);
 
 
@@ -201,12 +221,12 @@ namespace Obsidian2D
 				pipeline.pDynamicState 									= &dynamicState;
 				pipeline.pViewportState 								= &vp;
 				pipeline.pDepthStencilState 							= &ds;
-				pipeline.pStages 										= shaderStages;
+				pipeline.pStages 										= shaderStages.data();
 				pipeline.stageCount 									= 2;
 				pipeline.renderPass 									= render_pass;
 				pipeline.subpass 										= 0;
 
-				res = vkCreateGraphicsPipelines(device, pPipelineCache, 1, &pipeline, NULL, &vkPipeline);
+				res = vkCreateGraphicsPipelines(_instance_device, _pipeline_cache, 1, &pipeline, NULL, &_vk_pipeline);
 				assert(res == VK_SUCCESS);
 			}
 		};

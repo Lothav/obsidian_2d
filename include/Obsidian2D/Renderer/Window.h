@@ -20,218 +20,213 @@
 
 namespace Obsidian2D
 {
-	namespace Renderer
-	{
-		class Window : public Layers {
+    namespace Renderer
+    {
+        class Window : public Layers {
 
-		public:
+        public:
 
-			VkInstance 								instance;
-			VkSurfaceKHR 							surface;
+            VkInstance 								instance;
+            VkSurfaceKHR 							surface;
 
-			~Window()
-			{
-				uint32_t i;
+            ~Window()
+            {
+                uint32_t i;
 
-				delete render_pass;
+                delete render_pass;
 
-				if (surface != VK_NULL_HANDLE)
-				{
-					vkDestroySurfaceKHR(instance, surface, nullptr);
-				}
+                if (surface != VK_NULL_HANDLE)
+                {
+                    vkDestroySurfaceKHR(instance, surface, nullptr);
+                }
 
-				//vkDestroyPipeline(device, vkPipeline, NULL);
-				//vkDestroyPipelineCache(device, pPipelineCache, NULL);
+                delete descriptor_set;
+                delete graphic_pipeline;
+                delete vertex_buffer;
 
-				delete descriptor_set;
-				delete vertex_buffer;
+                //vkFreeCommandBuffers(device, _command_pool, (u_int32_t)command_buffer.size(), command_buffer.data());
 
-				// Destroy shaders
-				//vkDestroyShaderModule(device, shaderStages[0].module, NULL);
-				//vkDestroyShaderModule(device, shaderStages[1].module, NULL);
+                vkDestroySemaphore(device, imageAcquiredSemaphore, nullptr);
+                vkDestroySemaphore(device, renderSemaphore, nullptr);
 
-				//vkFreeCommandBuffers(device, _command_pool, (u_int32_t)command_buffer.size(), command_buffer.data());
+                //for(i = 0; i < drawFence.size(); i++){
+                //	vkDestroyFence(device, drawFence[i], nullptr);
+                //}
 
-				vkDestroySemaphore(device, imageAcquiredSemaphore, nullptr);
-				vkDestroySemaphore(device, renderSemaphore, nullptr);
+                vkFreeMemory(device, Textures::textureImageMemory, nullptr);
 
-				//for(i = 0; i < drawFence.size(); i++){
-				//	vkDestroyFence(device, drawFence[i], nullptr);
-				//}
+                //vkDestroyCommandPool(device, _command_pool, NULL);
+                vkDestroyDevice(this->device, NULL);
+                vkDestroyInstance(instance, NULL);
+            }
 
-				vkFreeMemory(device, Textures::textureImageMemory, nullptr);
+            void draw()
+            {
+                VkResult res;
+                VkSwapchainKHR swap_c = render_pass->getSwapChain()->getSwapChainKHR();
 
-				//vkDestroyCommandPool(device, _command_pool, NULL);
-				vkDestroyDevice(this->device, NULL);
-				vkDestroyInstance(instance, NULL);
-			}
+                descriptor_set->getUniformBuffer()->updateCamera(device);
 
-			void draw()
-			{
-				VkResult res;
-				VkSwapchainKHR swap_c = render_pass->getSwapChain()->getSwapChainKHR();
+                res = vkAcquireNextImageKHR(device, swap_c, UINT64_MAX, imageAcquiredSemaphore, VK_NULL_HANDLE, &current_buffer);
+                assert(res == VK_SUCCESS);
 
-				descriptor_set->getUniformBuffer()->updateCamera(device);
+                current_buffer = 0;
 
-				res = vkAcquireNextImageKHR(device, swap_c, UINT64_MAX, imageAcquiredSemaphore, VK_NULL_HANDLE, &current_buffer);
-				assert(res == VK_SUCCESS);
+                VkPipelineStageFlags pipe_stage_flags = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
 
-				current_buffer = 0;
+                VkSubmitInfo submit_info;
+                submit_info.pNext                     = NULL;
+                submit_info.sType                     = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+                submit_info.waitSemaphoreCount        = 1;
+                submit_info.pWaitSemaphores           = &imageAcquiredSemaphore;
+                submit_info.pWaitDstStageMask         = &pipe_stage_flags;
+                submit_info.commandBufferCount        = 1;
+                submit_info.pCommandBuffers           = command_buffer[current_buffer]->getCommandBuffer();
+                submit_info.signalSemaphoreCount      = 1;
+                submit_info.pSignalSemaphores         = &renderSemaphore;
 
-				VkPipelineStageFlags pipe_stage_flags = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+                res = vkQueueSubmit(render_pass->getSwapChain()->getGraphicQueue(), 1, &submit_info, *sync_primitives->getFence(current_buffer));
+                assert(res == VK_SUCCESS);
 
-				VkSubmitInfo submit_info;
-				submit_info.pNext                     = NULL;
-				submit_info.sType                     = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-				submit_info.waitSemaphoreCount        = 1;
-				submit_info.pWaitSemaphores           = &imageAcquiredSemaphore;
-				submit_info.pWaitDstStageMask         = &pipe_stage_flags;
-				submit_info.commandBufferCount        = 1;
-				submit_info.pCommandBuffers           = command_buffer[current_buffer]->getCommandBuffer();
-				submit_info.signalSemaphoreCount      = 1;
-				submit_info.pSignalSemaphores         = &renderSemaphore;
+                do {
+                    res = vkWaitForFences(device, 1, sync_primitives->getFence(current_buffer), VK_TRUE, VK_SAMPLE_COUNT_1_BIT);
+                } while (res == VK_TIMEOUT);
+                assert(res == VK_SUCCESS);
+                vkResetFences(device, 1, sync_primitives->getFence(current_buffer));
 
-				res = vkQueueSubmit(render_pass->getSwapChain()->getGraphicQueue(), 1, &submit_info, *sync_primitives->getFence(current_buffer));
-				assert(res == VK_SUCCESS);
+                VkPresentInfoKHR present;
 
-				do {
-					res = vkWaitForFences(device, 1, sync_primitives->getFence(current_buffer), VK_TRUE, VK_SAMPLE_COUNT_1_BIT);
-				} while (res == VK_TIMEOUT);
-				assert(res == VK_SUCCESS);
-				vkResetFences(device, 1, sync_primitives->getFence(current_buffer));
+                present.sType 				           = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
+                present.pNext 				           = NULL;
+                present.swapchainCount 		           = 1;
+                present.pSwapchains 		           = &swap_c;
+                present.pImageIndices 		           = &current_buffer;
+                present.pWaitSemaphores 	           = NULL;
+                present.waitSemaphoreCount 	           = 0;
+                present.pResults                       = NULL;
 
-				VkPresentInfoKHR present;
+                if (renderSemaphore != VK_NULL_HANDLE)
+                {
+                    present.pWaitSemaphores = &renderSemaphore;
+                    present.waitSemaphoreCount = 1;
+                }
 
-				present.sType 				           = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
-				present.pNext 				           = NULL;
-				present.swapchainCount 		           = 1;
-				present.pSwapchains 		           = &swap_c;
-				present.pImageIndices 		           = &current_buffer;
-				present.pWaitSemaphores 	           = NULL;
-				present.waitSemaphoreCount 	           = 0;
-				present.pResults                       = NULL;
+                res = vkQueuePresentKHR(render_pass->getSwapChain()->getPresentQueue(), &present);
+                assert(res == VK_SUCCESS);
 
-				if (renderSemaphore != VK_NULL_HANDLE)
-				{
-					present.pWaitSemaphores = &renderSemaphore;
-					present.waitSemaphoreCount = 1;
-				}
+                vkDeviceWaitIdle(device);
+            }
 
-				res = vkQueuePresentKHR(render_pass->getSwapChain()->getPresentQueue(), &present);
-				assert(res == VK_SUCCESS);
+        private:
+            VkPhysicalDeviceProperties 				gpu_props;
+            VkSemaphore         					imageAcquiredSemaphore;
+            VkSemaphore         					renderSemaphore;
+            VkDevice 								device;
+            VkPhysicalDeviceMemoryProperties 		memory_properties;
+            uint32_t 								current_buffer = 0;
+            std::vector<VkPhysicalDevice> 			gpu_vector;
+            u_int32_t							 	queue_family_count;
+            std::vector<VkQueueFamilyProperties> 	queue_family_props;
 
-				vkDeviceWaitIdle(device);
-			}
+            GraphicPipeline*                        graphic_pipeline;
+            std::vector<CommandBuffers *>			command_buffer;
+            SyncPrimitives* 						sync_primitives;
+            RenderPass* 							render_pass;
+        protected:
+            VertexBuffer *             				vertex_buffer;
+            DescriptorSet* 							descriptor_set;
 
-		private:
-			VkPhysicalDeviceProperties 				gpu_props;
-			VkSemaphore         					imageAcquiredSemaphore;
-			VkSemaphore         					renderSemaphore;
-			VkDevice 								device;
-			VkPhysicalDeviceMemoryProperties 		memory_properties;
-			uint32_t 								current_buffer = 0;
-			std::vector<VkPhysicalDevice> 			gpu_vector;
-			u_int32_t							 	queue_family_count;
-			std::vector<VkQueueFamilyProperties> 	queue_family_props;
+            void createInstance()
+            {
+                std::vector<const char *> _layer_names = this->getLayerNames();
+                std::vector<const char *> _instance_extension_names;
 
-			std::vector<CommandBuffers *>			command_buffer;
-			SyncPrimitives* 						sync_primitives;
-			RenderPass* 							render_pass;
-		protected:
-			VertexBuffer *             				vertex_buffer;
-			DescriptorSet* 							descriptor_set;
+                _instance_extension_names.push_back(VK_KHR_SURFACE_EXTENSION_NAME);
+                //@TODO extension for win32 VK_KHR_WIN32_SURFACE_EXTENSION_NAME
+                _instance_extension_names.push_back("VK_KHR_xcb_surface");
 
-			void createInstance()
-			{
-				std::vector<const char *> _layer_names = this->getLayerNames();
-				std::vector<const char *> _instance_extension_names;
+                VkApplicationInfo _app_info = {};
+                _app_info.sType 				= VK_STRUCTURE_TYPE_APPLICATION_INFO;
+                _app_info.pNext 				= NULL;
+                _app_info.pApplicationName 		= APP_NAME;
+                _app_info.applicationVersion 	= 1;
+                _app_info.pEngineName 			= APP_NAME;
+                _app_info.engineVersion 		= 1;
+                _app_info.apiVersion 			= VK_API_VERSION_1_0;
 
-				_instance_extension_names.push_back(VK_KHR_SURFACE_EXTENSION_NAME);
-				//@TODO extension for win32 VK_KHR_WIN32_SURFACE_EXTENSION_NAME
-				_instance_extension_names.push_back("VK_KHR_xcb_surface");
+                VkInstanceCreateInfo _inst_info = {};
+                _inst_info.sType 					= VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
+                _inst_info.pNext 					= NULL;
+                _inst_info.flags 					= 0;
+                _inst_info.pApplicationInfo 		= &_app_info;
+                _inst_info.enabledLayerCount 		= (uint32_t) _layer_names.size();
+                _inst_info.ppEnabledLayerNames 		= _layer_names.size() ? _layer_names.data() : NULL;
+                _inst_info.enabledExtensionCount 	= (uint32_t) _instance_extension_names.size();
+                _inst_info.ppEnabledExtensionNames 	= _instance_extension_names.data();
 
-				VkApplicationInfo _app_info = {};
-				_app_info.sType 				= VK_STRUCTURE_TYPE_APPLICATION_INFO;
-				_app_info.pNext 				= NULL;
-				_app_info.pApplicationName 		= APP_NAME;
-				_app_info.applicationVersion 	= 1;
-				_app_info.pEngineName 			= APP_NAME;
-				_app_info.engineVersion 		= 1;
-				_app_info.apiVersion 			= VK_API_VERSION_1_0;
+                VkResult res = vkCreateInstance(&_inst_info, NULL, &instance);
+                assert(res == VK_SUCCESS);
+            }
 
-				VkInstanceCreateInfo _inst_info = {};
-				_inst_info.sType 					= VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
-				_inst_info.pNext 					= NULL;
-				_inst_info.flags 					= 0;
-				_inst_info.pApplicationInfo 		= &_app_info;
-				_inst_info.enabledLayerCount 		= (uint32_t) _layer_names.size();
-				_inst_info.ppEnabledLayerNames 		= _layer_names.size() ? _layer_names.data() : NULL;
-				_inst_info.enabledExtensionCount 	= (uint32_t) _instance_extension_names.size();
-				_inst_info.ppEnabledExtensionNames 	= _instance_extension_names.data();
+            void createLogicalDeviceAndCommandBuffer()
+            {
 
-				VkResult res = vkCreateInstance(&_inst_info, NULL, &instance);
-				assert(res == VK_SUCCESS);
-			}
+                VkResult res = vkEnumeratePhysicalDevices(instance, &queue_family_count, NULL);
+                assert(res == VK_SUCCESS && queue_family_count);
+                gpu_vector.resize(queue_family_count);
+                res = vkEnumeratePhysicalDevices(instance, &queue_family_count, gpu_vector.data());
+                assert(res == VK_SUCCESS);
 
-			void createLogicalDeviceAndCommandBuffer()
-			{
+                vkGetPhysicalDeviceQueueFamilyProperties(gpu_vector[0], &queue_family_count, NULL);
+                assert(queue_family_count >= 1);
 
-				VkResult res = vkEnumeratePhysicalDevices(instance, &queue_family_count, NULL);
-				assert(res == VK_SUCCESS && queue_family_count);
-				gpu_vector.resize(queue_family_count);
-				res = vkEnumeratePhysicalDevices(instance, &queue_family_count, gpu_vector.data());
-				assert(res == VK_SUCCESS);
+                queue_family_props.resize(queue_family_count);
+                vkGetPhysicalDeviceQueueFamilyProperties(gpu_vector[0], &queue_family_count, queue_family_props.data());
+                assert(queue_family_count >= 1);
 
-				vkGetPhysicalDeviceQueueFamilyProperties(gpu_vector[0], &queue_family_count, NULL);
-				assert(queue_family_count >= 1);
-
-				queue_family_props.resize(queue_family_count);
-				vkGetPhysicalDeviceQueueFamilyProperties(gpu_vector[0], &queue_family_count, queue_family_props.data());
-				assert(queue_family_count >= 1);
-
-				vkGetPhysicalDeviceMemoryProperties(gpu_vector[0], &memory_properties);
-				vkGetPhysicalDeviceProperties(gpu_vector[0], &gpu_props);
+                vkGetPhysicalDeviceMemoryProperties(gpu_vector[0], &memory_properties);
+                vkGetPhysicalDeviceProperties(gpu_vector[0], &gpu_props);
 
 
-				bool found = false;
-				u_int32_t queueFamilyIndex = UINT_MAX;
-				for (unsigned int i = 0; i < queue_family_count; i++) {
-					if (queue_family_props[i].queueFlags & VK_QUEUE_GRAPHICS_BIT) {
-						queueFamilyIndex = i;
-						found = true;
-						break;
-					}
-				}
-				assert(found && queueFamilyIndex != UINT_MAX);
+                bool found = false;
+                u_int32_t queueFamilyIndex = UINT_MAX;
+                for (unsigned int i = 0; i < queue_family_count; i++) {
+                    if (queue_family_props[i].queueFlags & VK_QUEUE_GRAPHICS_BIT) {
+                        queueFamilyIndex = i;
+                        found = true;
+                        break;
+                    }
+                }
+                assert(found && queueFamilyIndex != UINT_MAX);
 
-				float queue_priorities[1] = {0.0};
+                float queue_priorities[1] = {0.0};
 
-				VkDeviceQueueCreateInfo queue_info = {};
-				queue_info.sType 			= VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
-				queue_info.pNext 			= NULL;
-				queue_info.queueCount 		= 1;
-				queue_info.pQueuePriorities = queue_priorities;
-				queue_info.queueFamilyIndex = queueFamilyIndex;
+                VkDeviceQueueCreateInfo queue_info = {};
+                queue_info.sType 			= VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
+                queue_info.pNext 			= NULL;
+                queue_info.queueCount 		= 1;
+                queue_info.pQueuePriorities = queue_priorities;
+                queue_info.queueFamilyIndex = queueFamilyIndex;
 
-				std::vector<const char *> device_extension_names;
-				device_extension_names.push_back(VK_KHR_SWAPCHAIN_EXTENSION_NAME);
+                std::vector<const char *> device_extension_names;
+                device_extension_names.push_back(VK_KHR_SWAPCHAIN_EXTENSION_NAME);
 
-				VkDeviceCreateInfo device_info = {};
-				device_info.sType 					= VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
-				device_info.pNext 					= NULL;
-				device_info.queueCreateInfoCount 	= 1;
-				device_info.pQueueCreateInfos 		= &queue_info;
-				device_info.enabledExtensionCount 	= (uint32_t)device_extension_names.size();
-				device_info.ppEnabledExtensionNames = device_info.enabledExtensionCount ? device_extension_names.data() : NULL;
-				device_info.enabledLayerCount 		= 0;
-				device_info.ppEnabledLayerNames 	= NULL;
-				device_info.pEnabledFeatures 		= NULL;
+                VkDeviceCreateInfo device_info = {};
+                device_info.sType 					= VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
+                device_info.pNext 					= NULL;
+                device_info.queueCreateInfoCount 	= 1;
+                device_info.pQueueCreateInfos 		= &queue_info;
+                device_info.enabledExtensionCount 	= (uint32_t)device_extension_names.size();
+                device_info.ppEnabledExtensionNames = device_info.enabledExtensionCount ? device_extension_names.data() : NULL;
+                device_info.enabledLayerCount 		= 0;
+                device_info.ppEnabledLayerNames 	= NULL;
+                device_info.pEnabledFeatures 		= NULL;
 
-				res = vkCreateDevice(gpu_vector[0], &device_info, NULL, &device);
-				assert(res == VK_SUCCESS);
+                res = vkCreateDevice(gpu_vector[0], &device_info, NULL, &device);
+                assert(res == VK_SUCCESS);
 
-				/* Push Command Buffer */
-				command_buffer.push_back( new CommandBuffers(device, queueFamilyIndex) );
+                /* Push Command Buffer */
+                command_buffer.push_back( new CommandBuffers(device, queueFamilyIndex) );
 
 /*				VkCommandPoolCreateInfo cmd_pool_info = {};
 				cmd_pool_info.sType 			= VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
@@ -253,156 +248,98 @@ namespace Obsidian2D
 
 				res = vkAllocateCommandBuffers(device, &cmd, command_buffer.data());
 				assert(res == VK_SUCCESS);*/
-			}
+            }
 
-			void initGraphicPipeline (const bool depthPresent)
-			{
-				VkResult U_ASSERT_ONLY 	res;
+            void initGraphicPipeline (const bool depthPresent)
+            {
+                VkResult U_ASSERT_ONLY 	res;
 
-				/* Render Pass */
+                /* Render Pass */
 
-				struct SwapChainParams sc_params = {};
-				sc_params.gpu 					= gpu_vector[0];
-				sc_params.width 				= static_cast<u_int32_t >(width);
-				sc_params.height 				= static_cast<u_int32_t >(height);
-				sc_params.device 				= device;
-				sc_params.queue_family_count 	= queue_family_count;
-				sc_params.queue_family_props 	= queue_family_props;
-				sc_params.surface 				= surface;
-				sc_params.memory_props 			= memory_properties;
-				render_pass = new RenderPass(device, sc_params);
+                struct SwapChainParams sc_params = {};
+                sc_params.gpu 					= gpu_vector[0];
+                sc_params.width 				= static_cast<u_int32_t >(width);
+                sc_params.height 				= static_cast<u_int32_t >(height);
+                sc_params.device 				= device;
+                sc_params.queue_family_count 	= queue_family_count;
+                sc_params.queue_family_props 	= queue_family_props;
+                sc_params.surface 				= surface;
+                sc_params.memory_props 			= memory_properties;
+                render_pass = new RenderPass(device, sc_params);
 
-				std::vector< struct rpAttachments > rp_attachments = {};
-				struct rpAttachments attch = {};
-				/* Color Attach */
-				attch.format = render_pass->getSwapChain()->getSwapChainFormat();
-				attch.clear  = true;
-				rp_attachments.push_back(attch);
-				/* Depth Attach */
-				attch.format = render_pass->getDepthBufferFormat();
-				attch.clear  = true;
-				rp_attachments.push_back(attch);
+                std::vector< struct rpAttachments > rp_attachments = {};
+                struct rpAttachments attch = {};
+                /* Color Attach */
+                attch.format = render_pass->getSwapChain()->getSwapChainFormat();
+                attch.clear  = true;
+                rp_attachments.push_back(attch);
+                /* Depth Attach */
+                attch.format = render_pass->getDepthBufferFormat();
+                attch.clear  = true;
+                rp_attachments.push_back(attch);
 
-				render_pass->create(rp_attachments);
+                render_pass->create(rp_attachments);
 
-				/* Descriptor Set */
+                /* Descriptor Set */
 
-				descriptor_set = new DescriptorSet(device);
+                descriptor_set = new DescriptorSet(device);
 
-				struct DescriptorSetParams ds_params = {};
-				ds_params.width 				= static_cast<u_int32_t >(width);
-				ds_params.height 				= static_cast<u_int32_t >(height);
-				ds_params.memory_properties		= memory_properties;
-				ds_params.command_pool			= command_buffer[0]->getCommandPool();
-				ds_params.gpu					= gpu_vector[0];
-				ds_params.graphic_queue			= render_pass->getSwapChain()->getGraphicQueue();
+                struct DescriptorSetParams ds_params = {};
+                ds_params.width 				= static_cast<u_int32_t >(width);
+                ds_params.height 				= static_cast<u_int32_t >(height);
+                ds_params.memory_properties		= memory_properties;
+                ds_params.command_pool			= command_buffer[0]->getCommandPool();
+                ds_params.gpu					= gpu_vector[0];
+                ds_params.graphic_queue			= render_pass->getSwapChain()->getGraphicQueue();
 
-				descriptor_set->create(ds_params);
-
-
-				/* Vertex Buffer */
-
-				struct BufferData vertexBufferData = {};
-
-				vertexBufferData.device            = device;
-				vertexBufferData.usage             = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT;
-				vertexBufferData.physicalDevice    = gpu_vector[0];
-				vertexBufferData.properties        = VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT;
-				vertexBufferData.size              = vertexData.size() * sizeof(Vertex);
-
-				vertex_buffer = new VertexBuffer(vertexBufferData);
+                descriptor_set->create(ds_params);
 
 
-                GraphicPipeline* graphic_pipeline = new GraphicPipeline();
-                graphic_pipeline->create(device, descriptor_set->getPipelineLayout(), render_pass->getRenderPass());
+                /* Vertex Buffer */
+
+                struct BufferData vertexBufferData = {};
+
+                vertexBufferData.device            = device;
+                vertexBufferData.usage             = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT;
+                vertexBufferData.physicalDevice    = gpu_vector[0];
+                vertexBufferData.properties        = VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT;
+                vertexBufferData.size              = vertexData.size() * sizeof(Vertex);
+
+                vertex_buffer = new VertexBuffer(vertexBufferData);
 
 
-				sync_primitives = new SyncPrimitives(device);
-				sync_primitives->createFence();
+                graphic_pipeline = new GraphicPipeline(device);
+                graphic_pipeline->create(descriptor_set->getPipelineLayout(), render_pass->getRenderPass());
 
 
-				VkSemaphoreCreateInfo imageAcquiredSemaphoreCreateInfo;
-				imageAcquiredSemaphoreCreateInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
-				imageAcquiredSemaphoreCreateInfo.pNext = NULL;
-				imageAcquiredSemaphoreCreateInfo.flags = 0;
+                sync_primitives = new SyncPrimitives(device);
+                sync_primitives->createFence();
 
-				res = vkCreateSemaphore(device, &imageAcquiredSemaphoreCreateInfo, NULL, &imageAcquiredSemaphore);
-				assert(res == VK_SUCCESS);
 
-				res = vkCreateSemaphore(device, &imageAcquiredSemaphoreCreateInfo, NULL, &renderSemaphore);
-				assert(res == VK_SUCCESS);
+                VkSemaphoreCreateInfo imageAcquiredSemaphoreCreateInfo;
+                imageAcquiredSemaphoreCreateInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
+                imageAcquiredSemaphoreCreateInfo.pNext = NULL;
+                imageAcquiredSemaphoreCreateInfo.flags = 0;
 
-				command_buffer[command_buffer.size()-1]->bindCommandBuffer(
-						render_pass,
-						descriptor_set,
-						graphic_pipeline->getPipeline(),
-						current_buffer,
-						static_cast<uint32_t>(width),
-						static_cast<uint32_t>(height),
-						sync_primitives,
-						vertex_buffer
-				);
-				/*
-				VkClearValue clear_values[2];
-				clear_values[0].color.float32[0] = 0.2f;
-				clear_values[0].color.float32[1] = 0.2f;
-				clear_values[0].color.float32[2] = 0.2f;
-				clear_values[0].color.float32[3] = 0.2f;
-				clear_values[1].depthStencil.depth = 1.0f;
-				clear_values[1].depthStencil.stencil = 0;
+                res = vkCreateSemaphore(device, &imageAcquiredSemaphoreCreateInfo, NULL, &imageAcquiredSemaphore);
+                assert(res == VK_SUCCESS);
 
-				VkRenderPassBeginInfo rp_begin;
-				rp_begin.sType 											= VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
-				rp_begin.pNext 											= NULL;
-				rp_begin.renderPass 									= render_pass->getRenderPass();
-				rp_begin.renderArea.offset.x 							= 0;
-				rp_begin.renderArea.offset.y 							= 0;
-				rp_begin.renderArea.extent.width 						= (uint32_t)width;
-				rp_begin.renderArea.extent.height 						= (uint32_t)height;
-				rp_begin.clearValueCount 								= 2;
-				rp_begin.pClearValues 									= clear_values;
+                res = vkCreateSemaphore(device, &imageAcquiredSemaphoreCreateInfo, NULL, &renderSemaphore);
+                assert(res == VK_SUCCESS);
 
-				VkFenceCreateInfo fenceInfo;
-				fenceInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
-				fenceInfo.pNext = NULL;
-				fenceInfo.flags = 0;
-
-				VkCommandBufferBeginInfo cmd_buf_info = {};
-				cmd_buf_info.sType 							= VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-				cmd_buf_info.pNext 							= NULL;
-				cmd_buf_info.flags 							= 0;
-				cmd_buf_info.pInheritanceInfo 				= NULL;
-
-				drawFence.resize(command_buffer.size());
-				for (u_int32_t i = 0; i < command_buffer.size(); i++){
-					rp_begin.framebuffer = render_pass->getFrameBuffer()[i];
-
-					res = vkBeginCommandBuffer(command_buffer[i], &cmd_buf_info);
-					assert(res == VK_SUCCESS);
-
-					vkCreateFence(device, &fenceInfo, NULL, &drawFence[i]);
-
-					vkCmdBeginRenderPass(command_buffer[i], &rp_begin, VK_SUBPASS_CONTENTS_INLINE);
-					vkCmdBindPipeline(command_buffer[i], VK_PIPELINE_BIND_POINT_GRAPHICS, vkPipeline);
-					vkCmdBindDescriptorSets(command_buffer[i], VK_PIPELINE_BIND_POINT_GRAPHICS,
-											descriptor_set->getPipelineLayout(), 0, 1, descriptor_set->getDescriptorSet(), 0, NULL);
-
-					const VkDeviceSize offsets[1] = {0};
-
-					//std::vector<VkBuffer> buffers = VertexBuffer::getBuffersFromVector(vertex_buffer);
-					vkCmdBindVertexBuffers(command_buffer[i], 0, 1, &vertex_buffer->buf, offsets);
-
-					this->init_viewports(command_buffer[i]);
-					this->init_scissors(command_buffer[i]);
-
-					vkCmdDraw(command_buffer[i], static_cast<uint32_t>(vertexData.size()), 1, 0, 0);
-					vkCmdEndRenderPass(command_buffer[i]);
-					res = vkEndCommandBuffer(command_buffer[i]);
-					assert(res == VK_SUCCESS);
-
-				}*/
-			}
-		};
-	}
+                command_buffer[command_buffer.size()-1]
+                        ->bindCommandBuffer(
+                                render_pass,
+                                descriptor_set,
+                                graphic_pipeline->getPipeline(),
+                                current_buffer,
+                                static_cast<uint32_t>(width),
+                                static_cast<uint32_t>(height),
+                                sync_primitives,
+                                vertex_buffer
+                        );
+            }
+        };
+    }
 }
 #endif //OBSIDIAN2D_CORE_WINDOW2_H
