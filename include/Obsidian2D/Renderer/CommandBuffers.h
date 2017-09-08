@@ -67,7 +67,7 @@ namespace Obsidian2D
 					uint32_t 		height,
 					SyncPrimitives* sync_primitives,
 					VertexBuffer* 	vertex_buffer
-			) {
+            ) {
 				VkResult res;
 
 				VkClearValue clear_values[2];
@@ -95,8 +95,7 @@ namespace Obsidian2D
 				cmd_buf_info.flags 							= 0;
 				cmd_buf_info.pInheritanceInfo 				= nullptr;
 
-				rp_begin.framebuffer =  render_pass->getFrameBuffer()
-				[buffer_index];
+				rp_begin.framebuffer =  render_pass->getFrameBuffer()[buffer_index];
 
 				res = vkBeginCommandBuffer(_command_buffer, &cmd_buf_info);
 				assert(res == VK_SUCCESS);
@@ -116,7 +115,7 @@ namespace Obsidian2D
 				util->init_viewports(_command_buffer);
 				util->init_scissors(_command_buffer);
 
-				vkCmdDraw(_command_buffer, static_cast<uint32_t>(vertexData.size()), 1, 0, 0);
+				vkCmdDraw(_command_buffer, static_cast<uint32_t>(vertex_buffer->getVertexSize()), 1, 0, 0);
 				vkCmdEndRenderPass(_command_buffer);
 				res = vkEndCommandBuffer(_command_buffer);
 

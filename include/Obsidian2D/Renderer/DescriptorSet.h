@@ -16,6 +16,7 @@ struct DescriptorSetParams {
     VkQueue                             graphic_queue;
     VkCommandPool                       command_pool;
     VkPhysicalDeviceMemoryProperties    memory_properties;
+    const char*                         path;
 };
 
 
@@ -82,7 +83,7 @@ namespace Obsidian2D
                 _uniform_buffer->initModelView(ds_params.width, ds_params.height);
 
 
-                VkImage texture_image = Textures::createTextureImage(ds_params.gpu, _instance_device, "../../include/Obsidian2D/Renderer/shaders/baleog.jpg",
+                VkImage texture_image = Textures::createTextureImage(ds_params.gpu, _instance_device, ds_params.path,
                                                                      ds_params.command_pool, ds_params.graphic_queue, ds_params.memory_properties);
                 struct MemoryProps mem_props = {};
                 mem_props.device = _instance_device;

@@ -117,16 +117,15 @@ namespace Obsidian2D
 
 			void bootstrap()
 			{
-				this->createInstance();
-				this->createLogicalDeviceAndCommandBuffer();
+				this->createApplication();
 				this->setConnection();
 				this->createWindow();
 				this->createSurface();
 				this->initGraphicPipeline();
 
-				camera_center   = descriptor_set->getUniformBuffer()->getCameraDefaultCenter();
-				camera_eye      = descriptor_set->getUniformBuffer()->getCameraDefaultEye();
-				camera_up       = descriptor_set->getUniformBuffer()->getCameraDefaultUp();
+				camera_center   = descriptor_set[descriptor_set.size()-1]->getUniformBuffer()->getCameraDefaultCenter();
+				camera_eye      = descriptor_set[descriptor_set.size()-1]->getUniformBuffer()->getCameraDefaultEye();
+				camera_up       = descriptor_set[descriptor_set.size()-1]->getUniformBuffer()->getCameraDefaultUp();
 			}
 
 			::Obsidian2D::Core::WindowEvent poolEvent()
@@ -195,9 +194,9 @@ namespace Obsidian2D
 						}
 
 						std::cout << kp->detail << std::endl;
-						descriptor_set->getUniformBuffer()->setCameraViewCenter(glm::vec3(camera_center[0], camera_center[1], camera_center[2]));
-						descriptor_set->getUniformBuffer()->setCameraViewEye(glm::vec3(camera_eye[0], camera_eye[1], camera_eye[2]));
-						descriptor_set->getUniformBuffer()->setCameraViewUp(glm::vec3(camera_up[0], camera_up[1], camera_up[2]));
+						descriptor_set[descriptor_set.size()-1]->getUniformBuffer()->setCameraViewCenter(glm::vec3(camera_center[0], camera_center[1], camera_center[2]));
+						descriptor_set[descriptor_set.size()-1]->getUniformBuffer()->setCameraViewEye(glm::vec3(camera_eye[0], camera_eye[1], camera_eye[2]));
+						descriptor_set[descriptor_set.size()-1]->getUniformBuffer()->setCameraViewUp(glm::vec3(camera_up[0], camera_up[1], camera_up[2]));
 
 						return ::Obsidian2D::Core::WindowEvent::ButtonDown;
 					} else if((e->response_type & ~0x80) == XCB_KEY_RELEASE) {

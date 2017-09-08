@@ -9,17 +9,6 @@
 #include "Memory.h"
 #include "Buffer.h"
 
-std::vector<Vertex> vertexData = {
-        { { -1.0f,  1.0f, 0.0f }, { 0.0f, 1.0f },{ 0.0f, 0.0f, 1.0f } },
-        { { -1.0f, -1.0f, 0.0f }, { 0.0f, 0.0f },{ 0.0f, 0.0f, 1.0f } },
-        { {  1.0f,  1.0f, 0.0f }, { 1.0f, 1.0f },{ 0.0f, 0.0f, 1.0f } },
-
-        { {  1.0f,  1.0f, 0.0f }, { 1.0f, 1.0f },{ 0.0f, 0.0f, 1.0f } },
-        { { -1.0f, -1.0f, 0.0f }, { 0.0f, 0.0f },{ 0.0f, 0.0f, 1.0f } },
-        { {  1.0f, -1.0f, 0.0f }, { 1.0f, 0.0f },{ 0.0f, 0.0f, 1.0f } }
-
-};
-
 namespace Obsidian2D
 {
     namespace Renderer
@@ -36,16 +25,10 @@ namespace Obsidian2D
 
         public:
 
-            VertexBuffer(struct BufferData buffer_data): Buffer(buffer_data)
+            VertexBuffer(struct BufferData buffer_data, std::vector<Vertex> vertexData): Buffer(buffer_data)
             {
                 this->_vertexData = vertexData;
                 updateMemoryWithData();
-            }
-
-            void push(Vertex vertex)
-            {
-                _vertexData.push_back(vertex);
-                this->updateMemoryWithData();
             }
 
             void update(std::vector<Vertex> vertex)
@@ -54,10 +37,9 @@ namespace Obsidian2D
                 this->updateMemoryWithData();
             }
 
-            void remove(int index)
+            unsigned long getVertexSize()
             {
-                _vertexData.erase(_vertexData.begin() + index);
-                this->updateMemoryWithData();
+                return _vertexData.size();
             }
 
             static std::vector<VkBuffer> getBuffersFromVector(std::vector<VertexBuffer *> vector)
