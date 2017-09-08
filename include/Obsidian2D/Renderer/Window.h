@@ -275,7 +275,7 @@ namespace Obsidian2D
                     };
 
                 pushVertex(vertexData);
-                startRecordingCommand();
+                recordCommandBuffer();
             }
 
             void pushVertex(std::vector<Vertex> vertexData)
@@ -310,7 +310,7 @@ namespace Obsidian2D
                 graphic_pipeline[ graphic_pipeline.size()-1 ]->create(descriptor_set[ descriptor_set.size()-1 ]->getPipelineLayout(), render_pass->getRenderPass());
             }
 
-            void startRecordingCommand()
+            void recordCommandBuffer()
             {
                 command_buffer[ command_buffer.size()-1 ]
                     ->bindCommandBuffer (
