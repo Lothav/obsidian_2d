@@ -27,6 +27,16 @@ namespace Obsidian2D
 				_instance_device = device;
 			}
 
+			~SyncPrimitives()
+			{
+				u_int32_t i;
+
+				for (i = 0; i < _fences.size(); i++)
+				{
+					vkDestroyFence(_instance_device, _fences[i], nullptr);
+				}
+			}
+
 			void createSemaphore(){}
 
 			void createFence()

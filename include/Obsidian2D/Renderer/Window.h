@@ -43,19 +43,18 @@ namespace Obsidian2D
                 delete descriptor_set;
                 delete graphic_pipeline;
                 delete vertex_buffer;
+                delete sync_primitives;
 
-                //vkFreeCommandBuffers(device, _command_pool, (u_int32_t)command_buffer.size(), command_buffer.data());
+                for (i = 0; i < command_buffer.size(); i++)
+                {
+                    delete command_buffer[i];
+                }
 
                 vkDestroySemaphore(device, imageAcquiredSemaphore, nullptr);
                 vkDestroySemaphore(device, renderSemaphore, nullptr);
 
-                //for(i = 0; i < drawFence.size(); i++){
-                //	vkDestroyFence(device, drawFence[i], nullptr);
-                //}
-
                 vkFreeMemory(device, Textures::textureImageMemory, nullptr);
 
-                //vkDestroyCommandPool(device, _command_pool, NULL);
                 vkDestroyDevice(this->device, NULL);
                 vkDestroyInstance(instance, NULL);
             }
@@ -227,30 +226,9 @@ namespace Obsidian2D
 
                 /* Push Command Buffer */
                 command_buffer.push_back( new CommandBuffers(device, queueFamilyIndex) );
-
-/*				VkCommandPoolCreateInfo cmd_pool_info = {};
-				cmd_pool_info.sType 			= VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
-				cmd_pool_info.pNext 			= NULL;
-				cmd_pool_info.queueFamilyIndex  = queueFamilyIndex;
-				cmd_pool_info.flags 			= 0;
-
-				res = vkCreateCommandPool(device, &cmd_pool_info, NULL, &_command_pool);
-				assert(res == VK_SUCCESS);
-
-				command_buffer.resize(3);
-
-				VkCommandBufferAllocateInfo cmd = {};
-				cmd.sType 				= VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
-				cmd.pNext 			 	= NULL;
-				cmd.commandPool 	 	= _command_pool;
-				cmd.level 			 	= VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-				cmd.commandBufferCount  = 3;
-
-				res = vkAllocateCommandBuffers(device, &cmd, command_buffer.data());
-				assert(res == VK_SUCCESS);*/
             }
 
-            void initGraphicPipeline (const bool depthPresent)
+            void initGraphicPipeline ()
             {
                 VkResult U_ASSERT_ONLY 	res;
 
@@ -269,11 +247,9 @@ namespace Obsidian2D
 
                 std::vector< struct rpAttachments > rp_attachments = {};
                 struct rpAttachments attch = {};
-                /* Color Attach */
                 attch.format = render_pass->getSwapChain()->getSwapChainFormat();
                 attch.clear  = true;
                 rp_attachments.push_back(attch);
-                /* Depth Attach */
                 attch.format = render_pass->getDepthBufferFormat();
                 attch.clear  = true;
                 rp_attachments.push_back(attch);

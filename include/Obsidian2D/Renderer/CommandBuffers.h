@@ -52,6 +52,12 @@ namespace Obsidian2D
 				assert(vkAllocateCommandBuffers(_instance_device, &cmd, &_command_buffer) == VK_SUCCESS);
 			}
 
+            ~CommandBuffers()
+            {
+                vkFreeCommandBuffers(_instance_device, _command_pool, 1, &_command_buffer);
+                vkDestroyCommandPool(_instance_device, _command_pool, nullptr);
+            }
+
 			void bindCommandBuffer (
 					RenderPass* 	render_pass,
 					DescriptorSet* 	descriptor_set,
