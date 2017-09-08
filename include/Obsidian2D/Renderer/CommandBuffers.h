@@ -9,6 +9,10 @@
 #include <Obsidian2D/Renderer/vulkan/vulkan.h>
 #include <vector>
 #include <assert.h>
+#include "RenderPass.h"
+#include "DescriptorSet.h"
+#include "SyncPrimitives.h"
+#include "VertexBuffer.h"
 
 namespace Obsidian2D
 {
@@ -22,8 +26,7 @@ namespace Obsidian2D
 			VkDevice 							_instance_device;
 
 			VkCommandPool 						_command_pool = nullptr;
-			std::vector<VkCommandBuffer> 		_command_buffers = {};
-			int 								_index;
+			VkCommandBuffer 					_command_buffer = nullptr;
 
 		public:
 
@@ -38,61 +41,92 @@ namespace Obsidian2D
 				cmd_pool_info.flags 			= 0;
 
 				assert(vkCreateCommandPool(device, &cmd_pool_info, nullptr, &_command_pool) == VK_SUCCESS);
-			}
-
-			void createCommandBuffer()
-			{
-				VkCommandBuffer cmd_buffer;
 
 				VkCommandBufferAllocateInfo cmd = {};
-				cmd.sType 				= VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
-				cmd.pNext 			 	= nullptr;
-				cmd.commandPool 	 	= _command_pool;
-				cmd.level 			 	= VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-				cmd.commandBufferCount  = 1;
+				cmd.sType 						= VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+				cmd.pNext 			 			= nullptr;
+				cmd.commandPool 	 			= _command_pool;
+				cmd.level 			 			= VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+				cmd.commandBufferCount  		= 1;
 
-				assert(vkAllocateCommandBuffers(_instance_device, &cmd, &cmd_buffer) == VK_SUCCESS);
-
-				_command_buffers.push_back(cmd_buffer);
+				assert(vkAllocateCommandBuffers(_instance_device, &cmd, &_command_buffer) == VK_SUCCESS);
 			}
 
-			void bindCommandBuffer()
-			{
-				int i;
+			void bindCommandBuffer (
+					RenderPass* 	render_pass,
+					DescriptorSet* 	descriptor_set,
+					VkPipeline 		vkPipeline,
+					int 			buffer_index,
+					uint32_t 		width,
+					uint32_t 		height,
+					SyncPrimitives* sync_primitives,
+					VertexBuffer* 	vertex_buffer
+			) {
 				VkResult res;
-/*
+
+				VkClearValue clear_values[2];
+				clear_values[0].color.float32[0] = 0.2f;
+				clear_values[0].color.float32[1] = 0.2f;
+				clear_values[0].color.float32[2] = 0.2f;
+				clear_values[0].color.float32[3] = 0.2f;
+				clear_values[1].depthStencil.depth = 1.0f;
+				clear_values[1].depthStencil.stencil = 0;
+
+				VkRenderPassBeginInfo rp_begin;
+				rp_begin.sType 								= VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+				rp_begin.pNext 								= nullptr;
+				rp_begin.renderPass 						= render_pass->getRenderPass();
+				rp_begin.renderArea.offset.x 				= 0;
+				rp_begin.renderArea.offset.y 				= 0;
+				rp_begin.renderArea.extent.width 			= width;
+				rp_begin.renderArea.extent.height 			= height;
+				rp_begin.clearValueCount 					= 2;
+				rp_begin.pClearValues 						= clear_values;
+
 				VkCommandBufferBeginInfo cmd_buf_info = {};
 				cmd_buf_info.sType 							= VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-				cmd_buf_info.pNext 							= NULL;
+				cmd_buf_info.pNext 							= nullptr;
 				cmd_buf_info.flags 							= 0;
-				cmd_buf_info.pInheritanceInfo 				= NULL;
+				cmd_buf_info.pInheritanceInfo 				= nullptr;
 
-				res = vkBeginCommandBuffer(_command_buffers[_index], &cmd_buf_info);
+				rp_begin.framebuffer =  render_pass->getFrameBuffer()
+				[buffer_index];
+
+				res = vkBeginCommandBuffer(_command_buffer, &cmd_buf_info);
 				assert(res == VK_SUCCESS);
-				vkCmdBeginRenderPass(_command_buffers[_index], &rp_begin, VK_SUBPASS_CONTENTS_INLINE);
 
-				//@TODO create sync primitives
-				//vkCreateFence(_instance_device, &fenceInfo, NULL, &drawFence[i]);
-
-				vkCmdBindPipeline(_command_buffers[_index], VK_PIPELINE_BIND_POINT_GRAPHICS, vkPipeline);
-				vkCmdBindDescriptorSets(_command_buffers[_index], VK_PIPELINE_BIND_POINT_GRAPHICS,
-										pipeline_layout, 0, 1, &desc_set, 0, NULL);
+				vkCmdBeginRenderPass(_command_buffer, &rp_begin, VK_SUBPASS_CONTENTS_INLINE);
+				vkCmdBindPipeline(_command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, vkPipeline);
+				vkCmdBindDescriptorSets(_command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS,
+										descriptor_set->getPipelineLayout(), 0, 1,
+										descriptor_set->getDescriptorSet(), 0, nullptr);
 
 				const VkDeviceSize offsets[1] = {0};
 
-				std::vector<VkBuffer> buffers = VertexBuffer::getBuffersFromVector(vertex_buffer);
-				vkCmdBindVertexBuffers(_command_buffers[_index], 0, static_cast<uint32_t >(buffers.size()), buffers.data(), offsets);
+				//std::vector<VkBuffer> buffers = VertexBuffer::getBuffersFromVector(vertex_buffer);
+				vkCmdBindVertexBuffers(_command_buffer, 0, 1, &vertex_buffer->buf, offsets);
 
-				this->init_viewports(_command_buffers[_index]);
-				this->init_scissors(_command_buffers[_index]);
+				Util* util  = new Util(width, height);
+				util->init_viewports(_command_buffer);
+				util->init_scissors(_command_buffer);
 
-				vkCmdDraw(_command_buffers[_index], static_cast<uint32_t>(vertexData.size()), 1, 0, 0);
-				vkCmdEndRenderPass(_command_buffers[_index]);
-				res = vkEndCommandBuffer(_command_buffers[_index]);
-				assert(res == VK_SUCCESS);*/
+				vkCmdDraw(_command_buffer, static_cast<uint32_t>(vertexData.size()), 1, 0, 0);
+				vkCmdEndRenderPass(_command_buffer);
+				res = vkEndCommandBuffer(_command_buffer);
+
+				delete util;
+				assert(res == VK_SUCCESS);
 			}
 
+			VkCommandBuffer* getCommandBuffer()
+			{
+				return &_command_buffer;
+			}
 
+			VkCommandPool getCommandPool()
+			{
+				return _command_pool;
+			}
 		};
 	}
 }

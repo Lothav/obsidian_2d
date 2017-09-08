@@ -1,13 +1,7 @@
 #ifndef OBSIDIAN2D_CORE_LAYERS_H
 #define OBSIDIAN2D_CORE_LAYERS_H
 
-#include <vulkan/vulkan.h>
-#include <xcb/xcb.h>
-#include <vector>
-#include "glm/glm.hpp"
-#include <glm/gtc/matrix_transform.hpp>
-#include <fstream>
-#include <cstring>
+#include "Util.h"
 
 namespace Obsidian2D
 {
@@ -20,7 +14,7 @@ namespace Obsidian2D
 		} LayerProperties;
 
 
-		class Layers : public Obsidian2D::Util::Loggable
+		class Layers : public Util
 		{
 
 		public:
