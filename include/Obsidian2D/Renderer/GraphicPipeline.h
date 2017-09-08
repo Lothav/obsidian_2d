@@ -15,8 +15,8 @@ namespace Obsidian2D
 
 		private:
 			VkPipelineCache 						pPipelineCache;
-			VkPipeline vkPipeline;
-
+			VkPipeline 								vkPipeline;
+			VkPipelineShaderStageCreateInfo 		shaderStages[2];
 
 		public:
 
@@ -27,12 +27,25 @@ namespace Obsidian2D
 				return vkPipeline;
 			}
 
-			void create(VkDevice device, VkPipelineLayout pipeline_layout, VkRenderPass render_pass, VkPipelineShaderStageCreateInfo* shaderStages)
+			void create(VkDevice device, VkPipelineLayout pipeline_layout, VkRenderPass render_pass)
 			{
+				shaderStages[0].sType 		= VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+				shaderStages[0].stage 		= VK_SHADER_STAGE_VERTEX_BIT;
+				shaderStages[0].module 		= loadSPIRVShader(getAssetPath() + "shaders/triangle/vert.spv", device);
+				shaderStages[0].pName 		= "main";
+				assert(shaderStages[0].module != VK_NULL_HANDLE);
+
+				shaderStages[1].sType 		= VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+				shaderStages[1].stage 		= VK_SHADER_STAGE_FRAGMENT_BIT;
+				shaderStages[1].module 		= loadSPIRVShader(getAssetPath() + "shaders/triangle/frag.spv", device);
+				shaderStages[1].pName 		= "main";
+				assert(shaderStages[1].module != VK_NULL_HANDLE);
+
 
 				VkPipelineCache 						pPipelineCache;
-				VkPipeline vkPipeline;
-				VkVertexInputBindingDescription vi_binding;
+				VkVertexInputBindingDescription 		vi_binding;
+
+
 				vi_binding.binding 										= 0;
 				vi_binding.inputRate 									= VK_VERTEX_INPUT_RATE_VERTEX;
 				vi_binding.stride 										= sizeof(Vertex);

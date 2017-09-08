@@ -28,7 +28,6 @@ struct Vertex {
     float normal[3];
 };
 
-#endif //OBSIDIAN2D_CORE_UTIL_H
 namespace Obsidian2D
 {
 	namespace Renderer
@@ -122,3 +121,4 @@ namespace Obsidian2D
 		};
 	}
 }
+#endif //OBSIDIAN2D_CORE_UTIL_H
