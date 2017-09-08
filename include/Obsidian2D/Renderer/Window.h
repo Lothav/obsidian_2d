@@ -50,9 +50,6 @@ namespace Obsidian2D
                     delete command_buffer[i];
                 }
 
-                vkDestroySemaphore(device, imageAcquiredSemaphore, nullptr);
-                vkDestroySemaphore(device, renderSemaphore, nullptr);
-
                 vkFreeMemory(device, Textures::textureImageMemory, nullptr);
 
                 vkDestroyDevice(this->device, NULL);
@@ -66,7 +63,7 @@ namespace Obsidian2D
 
                 descriptor_set->getUniformBuffer()->updateCamera(device);
 
-                res = vkAcquireNextImageKHR(device, swap_c, UINT64_MAX, imageAcquiredSemaphore, VK_NULL_HANDLE, &current_buffer);
+                res = vkAcquireNextImageKHR(device, swap_c, UINT64_MAX, sync_primitives->imageAcquiredSemaphore, VK_NULL_HANDLE, &current_buffer);
                 assert(res == VK_SUCCESS);
 
                 current_buffer = 0;
@@ -77,12 +74,12 @@ namespace Obsidian2D
                 submit_info.pNext                     = NULL;
                 submit_info.sType                     = VK_STRUCTURE_TYPE_SUBMIT_INFO;
                 submit_info.waitSemaphoreCount        = 1;
-                submit_info.pWaitSemaphores           = &imageAcquiredSemaphore;
+                submit_info.pWaitSemaphores           = &sync_primitives->imageAcquiredSemaphore;
                 submit_info.pWaitDstStageMask         = &pipe_stage_flags;
                 submit_info.commandBufferCount        = 1;
                 submit_info.pCommandBuffers           = command_buffer[current_buffer]->getCommandBuffer();
                 submit_info.signalSemaphoreCount      = 1;
-                submit_info.pSignalSemaphores         = &renderSemaphore;
+                submit_info.pSignalSemaphores         = &sync_primitives->renderSemaphore;
 
                 res = vkQueueSubmit(render_pass->getSwapChain()->getGraphicQueue(), 1, &submit_info, *sync_primitives->getFence(current_buffer));
                 assert(res == VK_SUCCESS);
@@ -104,9 +101,9 @@ namespace Obsidian2D
                 present.waitSemaphoreCount 	           = 0;
                 present.pResults                       = NULL;
 
-                if (renderSemaphore != VK_NULL_HANDLE)
+                if (sync_primitives->renderSemaphore != VK_NULL_HANDLE)
                 {
-                    present.pWaitSemaphores = &renderSemaphore;
+                    present.pWaitSemaphores = &sync_primitives->renderSemaphore;
                     present.waitSemaphoreCount = 1;
                 }
 
@@ -118,8 +115,6 @@ namespace Obsidian2D
 
         private:
             VkPhysicalDeviceProperties 				gpu_props;
-            VkSemaphore         					imageAcquiredSemaphore;
-            VkSemaphore         					renderSemaphore;
             VkDevice 								device;
             VkPhysicalDeviceMemoryProperties 		memory_properties;
             uint32_t 								current_buffer = 0;
@@ -283,25 +278,12 @@ namespace Obsidian2D
 
                 vertex_buffer = new VertexBuffer(vertexBufferData);
 
-
                 graphic_pipeline = new GraphicPipeline(device);
                 graphic_pipeline->create(descriptor_set->getPipelineLayout(), render_pass->getRenderPass());
 
-
                 sync_primitives = new SyncPrimitives(device);
                 sync_primitives->createFence();
-
-
-                VkSemaphoreCreateInfo imageAcquiredSemaphoreCreateInfo;
-                imageAcquiredSemaphoreCreateInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
-                imageAcquiredSemaphoreCreateInfo.pNext = NULL;
-                imageAcquiredSemaphoreCreateInfo.flags = 0;
-
-                res = vkCreateSemaphore(device, &imageAcquiredSemaphoreCreateInfo, NULL, &imageAcquiredSemaphore);
-                assert(res == VK_SUCCESS);
-
-                res = vkCreateSemaphore(device, &imageAcquiredSemaphoreCreateInfo, NULL, &renderSemaphore);
-                assert(res == VK_SUCCESS);
+                sync_primitives->createSemaphore();
 
                 command_buffer[command_buffer.size()-1]
                         ->bindCommandBuffer(

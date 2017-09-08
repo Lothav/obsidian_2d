@@ -228,34 +228,6 @@ namespace Obsidian2D
 				return textureImage;
 			}
 
-			static VkImageView createImageView(
-					VkDevice device,
-					VkImage image,
-					VkFormat format,
-					VkImageAspectFlags aspectMask = VK_IMAGE_ASPECT_COLOR_BIT)
-			{
-				VkResult res;
-
-				VkImageViewCreateInfo viewInfo = {};
-				viewInfo.sType 								= VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
-				viewInfo.image 								= image;
-				viewInfo.viewType 							= VK_IMAGE_VIEW_TYPE_2D;
-				viewInfo.format 							= format;
-				viewInfo.subresourceRange.aspectMask 		= aspectMask;
-				viewInfo.subresourceRange.baseMipLevel 		= 0;
-				viewInfo.subresourceRange.levelCount 		= 1;
-				viewInfo.subresourceRange.baseArrayLayer 	= 0;
-				viewInfo.subresourceRange.layerCount 		= 1;
-
-				VkImageView imageView;
-
-				res = vkCreateImageView(device, &viewInfo, nullptr, &imageView);
-
-				assert(res == VK_SUCCESS);
-
-				return imageView;
-			}
-
 		};
 
 		VkDeviceMemory Textures::textureImageMemory;

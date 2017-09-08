@@ -117,14 +117,12 @@ namespace Obsidian2D
 
 			void bootstrap()
 			{
-				const bool depthPresent = true;
-
 				this->createInstance();
 				this->createLogicalDeviceAndCommandBuffer();
 				this->setConnection();
 				this->createWindow();
 				this->createSurface();
-				this->initGraphicPipeline(depthPresent);
+				this->initGraphicPipeline();
 
 				camera_center   = descriptor_set->getUniformBuffer()->getCameraDefaultCenter();
 				camera_eye      = descriptor_set->getUniformBuffer()->getCameraDefaultEye();

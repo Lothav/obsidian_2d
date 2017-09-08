@@ -17,10 +17,12 @@ namespace Obsidian2D
 		private:
 
 			VkDevice 						_instance_device;
-			std::vector<VkSemaphore> 		_semaphores = {};
 			std::vector<VkFence> 			_fences = {};
 
 		public:
+
+			VkSemaphore  					imageAcquiredSemaphore;
+			VkSemaphore 					renderSemaphore;
 
 			SyncPrimitives(VkDevice device)
 			{
@@ -30,14 +32,27 @@ namespace Obsidian2D
 			~SyncPrimitives()
 			{
 				u_int32_t i;
-
 				for (i = 0; i < _fences.size(); i++)
 				{
 					vkDestroyFence(_instance_device, _fences[i], nullptr);
 				}
+				vkDestroySemaphore(_instance_device, imageAcquiredSemaphore, nullptr);
+				vkDestroySemaphore(_instance_device, renderSemaphore, nullptr);
 			}
 
-			void createSemaphore(){}
+			void createSemaphore()
+			{
+				VkSemaphoreCreateInfo imageAcquiredSemaphoreCreateInfo;
+				imageAcquiredSemaphoreCreateInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
+				imageAcquiredSemaphoreCreateInfo.pNext = NULL;
+				imageAcquiredSemaphoreCreateInfo.flags = 0;
+
+				VkResult res = vkCreateSemaphore(_instance_device, &imageAcquiredSemaphoreCreateInfo, NULL, &imageAcquiredSemaphore);
+				assert(res == VK_SUCCESS);
+
+				res = vkCreateSemaphore(_instance_device, &imageAcquiredSemaphoreCreateInfo, NULL, &renderSemaphore);
+				assert(res == VK_SUCCESS);
+			}
 
 			void createFence()
 			{
