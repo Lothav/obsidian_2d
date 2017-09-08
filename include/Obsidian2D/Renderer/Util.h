@@ -22,10 +22,11 @@
 
 #include "Obsidian2D/Util/Loggable.h"
 
-typedef struct _swap_chain_buffers {
-	VkImage image;
-	VkImageView view;
-} swap_chain_buffer;
+struct Vertex {
+    float pos[3];
+    float uv[2];
+    float normal[3];
+};
 
 #endif //OBSIDIAN2D_CORE_UTIL_H
 namespace Obsidian2D

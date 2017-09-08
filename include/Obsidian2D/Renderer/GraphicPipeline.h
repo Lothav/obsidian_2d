@@ -5,12 +5,6 @@
 #ifndef OBSIDIAN2D_GRAPHICPIPELINE_H
 #define OBSIDIAN2D_GRAPHICPIPELINE_H
 
-struct VertexA {
-	float pos[3];
-	float uv[2];
-	float normal[3];
-};
-
 #include "Util.h"
 
 namespace Obsidian2D
@@ -41,7 +35,7 @@ namespace Obsidian2D
 				VkVertexInputBindingDescription vi_binding;
 				vi_binding.binding 										= 0;
 				vi_binding.inputRate 									= VK_VERTEX_INPUT_RATE_VERTEX;
-				vi_binding.stride 										= sizeof(VertexA);
+				vi_binding.stride 										= sizeof(Vertex);
 
 				std::vector<VkVertexInputAttributeDescription> vi_attribs;
 				vi_attribs.resize(3);
@@ -49,17 +43,17 @@ namespace Obsidian2D
 				vi_attribs[0].binding 									= 0;
 				vi_attribs[0].location 									= 0;
 				vi_attribs[0].format 									= VK_FORMAT_R32G32B32_SFLOAT;
-				vi_attribs[0].offset 									= offsetof(VertexA, pos);
+				vi_attribs[0].offset 									= offsetof(Vertex, pos);
 
 				vi_attribs[1].binding 									= 0;
 				vi_attribs[1].location 									= 1;
 				vi_attribs[1].format 									= VK_FORMAT_R32G32_SFLOAT;
-				vi_attribs[1].offset 									= offsetof(VertexA, uv);
+				vi_attribs[1].offset 									= offsetof(Vertex, uv);
 
 				vi_attribs[2].binding 									= 0;
 				vi_attribs[2].location 									= 2;
 				vi_attribs[2].format 									= VK_FORMAT_R32G32B32_SFLOAT;
-				vi_attribs[2].offset 									= offsetof(VertexA, normal);
+				vi_attribs[2].offset 									= offsetof(Vertex, normal);
 
 				VkPipelineCacheCreateInfo pipelineCache;
 				pipelineCache.sType 									= VK_STRUCTURE_TYPE_PIPELINE_CACHE_CREATE_INFO;

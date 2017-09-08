@@ -9,12 +9,6 @@
 #include "Memory.h"
 #include "Buffer.h"
 
-struct Vertex {
-    float pos[3];
-    float uv[2];
-    float normal[3];
-};
-
 std::vector<Vertex> vertexData = {
         { { -1.0f,  1.0f, 0.0f }, { 0.0f, 1.0f },{ 0.0f, 0.0f, 1.0f } },
         { { -1.0f, -1.0f, 0.0f }, { 0.0f, 0.0f },{ 0.0f, 0.0f, 1.0f } },
