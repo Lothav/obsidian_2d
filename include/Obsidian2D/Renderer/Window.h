@@ -128,6 +128,7 @@ namespace Obsidian2D
             std::vector<VkPhysicalDevice> 			gpu_vector;
             u_int32_t							 	queue_family_count;
             std::vector<VkQueueFamilyProperties> 	queue_family_props;
+            u_int32_t                               queueFamilyIndex = UINT_MAX;
 
             std::vector<GraphicPipeline *>          graphic_pipeline;
             std::vector<CommandBuffers *>			command_buffer;
@@ -186,7 +187,6 @@ namespace Obsidian2D
                 vkGetPhysicalDeviceMemoryProperties(gpu_vector[0], &memory_properties);
 
                 bool found = false;
-                u_int32_t queueFamilyIndex = UINT_MAX;
                 for (unsigned int i = 0; i < queue_family_count; i++) {
                     if (queue_family_props[i].queueFlags & VK_QUEUE_GRAPHICS_BIT) {
                         queueFamilyIndex = i;
@@ -221,9 +221,6 @@ namespace Obsidian2D
 
                 res = vkCreateDevice(gpu_vector[0], &device_info, NULL, &device);
                 assert(res == VK_SUCCESS);
-
-                /* Push Command Buffer */
-                command_buffer.push_back( new CommandBuffers(device, queueFamilyIndex) );
 
                 sync_primitives = new SyncPrimitives(device);
                 sync_primitives->createFence();
@@ -293,6 +290,9 @@ namespace Obsidian2D
 
             void pushTexture(const char* path)
             {
+                /* Push Command Buffer */
+                command_buffer.push_back( new CommandBuffers(device, queueFamilyIndex) );
+
                 descriptor_set.push_back( new DescriptorSet(device) );
 
                 struct DescriptorSetParams ds_params = {};
