@@ -106,7 +106,7 @@ namespace Obsidian2D
 				return _default_up;
 			};
 
-			void updateCamera(VkDevice device)
+			void updateMVP(VkDevice device)
 			{
 				VkResult res;
 				Memory::copyMemory(device, this->mem, &this->_mvp, sizeof(this->_mvp));

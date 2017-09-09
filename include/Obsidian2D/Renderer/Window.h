@@ -57,7 +57,8 @@ namespace Obsidian2D
                     delete command_buffer[i];
                 }
 
-                vkFreeMemory(device, Textures::textureImageMemory, nullptr);
+				vkDestroyCommandPool(device, command_pool, nullptr);
+				vkFreeMemory(device, Textures::textureImageMemory, nullptr);
 
                 vkDestroyDevice(this->device, NULL);
                 vkDestroyInstance(instance, NULL);
@@ -68,8 +69,6 @@ namespace Obsidian2D
                 VkResult res;
                 VkSwapchainKHR swap_c = render_pass->getSwapChain()->getSwapChainKHR();
 
-                descriptor_set[ 1 ]->getUniformBuffer()->updateCamera(device);
-
                 res = vkAcquireNextImageKHR(device, swap_c, UINT64_MAX, sync_primitives->imageAcquiredSemaphore, VK_NULL_HANDLE, &current_buffer);
                 assert(res == VK_SUCCESS);
 
@@ -78,7 +77,8 @@ namespace Obsidian2D
                 std::vector<VkCommandBuffer> cmd_buff = {};
                 for (int i = 0; i < command_buffer.size(); ++i)
                 {
-                    cmd_buff.push_back(command_buffer[i]->getCommandBufferRef());
+					descriptor_set[ i ]->getUniformBuffer()->updateMVP(device);
+					cmd_buff.push_back(command_buffer[i]->getCommandBuffer());
                 }
 
                 VkSubmitInfo submit_info;
@@ -134,6 +134,7 @@ namespace Obsidian2D
 			u_int32_t							 	queue_family_count;
 			std::vector<VkQueueFamilyProperties> 	queue_family_props;
 			u_int32_t                               queueFamilyIndex = UINT_MAX;
+			VkCommandPool 							command_pool;
 
             std::vector<GraphicPipeline *>          graphic_pipeline;
             std::vector<CommandBuffers *>			command_buffer;
@@ -226,7 +227,15 @@ namespace Obsidian2D
 
                 res = vkCreateDevice(gpu_vector[0], &device_info, NULL, &device);
                 assert(res == VK_SUCCESS);
-            }
+
+				VkCommandPoolCreateInfo cmd_pool_info = {};
+				cmd_pool_info.sType 			= VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
+				cmd_pool_info.pNext 			= nullptr;
+				cmd_pool_info.queueFamilyIndex  = queueFamilyIndex;
+				cmd_pool_info.flags 			= 0;
+
+				assert(vkCreateCommandPool(device, &cmd_pool_info, nullptr, &command_pool) == VK_SUCCESS);
+			}
 
             void initGraphicPipeline ()
             {
@@ -260,46 +269,12 @@ namespace Obsidian2D
 				sync_primitives = new SyncPrimitives(device);
 				sync_primitives->createSemaphore();
 				sync_primitives->createFence(render_pass->getSwapChain()->getImageCount());
-
-				createCommandBuffer();
-                pushTexture("../../include/Obsidian2D/Renderer/shaders/baleog.jpg");
-                std::vector<Vertex> vertexData =
-                    {
-                        { { -1.0f,  1.0f, 0.0f }, { 0.0f, 1.0f },{ 0.0f, 0.0f, 1.0f } },
-                        { { -1.0f, -1.0f, 0.0f }, { 0.0f, 0.0f },{ 0.0f, 0.0f, 1.0f } },
-                        { {  1.0f,  1.0f, 0.0f }, { 1.0f, 1.0f },{ 0.0f, 0.0f, 1.0f } },
-
-                        { {  1.0f,  1.0f, 0.0f }, { 1.0f, 1.0f },{ 0.0f, 0.0f, 1.0f } },
-                        { { -1.0f, -1.0f, 0.0f }, { 0.0f, 0.0f },{ 0.0f, 0.0f, 1.0f } },
-                        { {  1.0f, -1.0f, 0.0f }, { 1.0f, 0.0f },{ 0.0f, 0.0f, 1.0f } }
-                    };
-                pushVertex(vertexData);
-                recordCommandBuffer();
-
-
-				createCommandBuffer();
-				pushTexture("../../include/Obsidian2D/Renderer/shaders/baleog.jpg");
-				std::vector<Vertex> vertexData2 =
-						{
-								{ { -2.0f,  0.0f, 0.0f }, { 0.0f, 1.0f },{ 0.0f, 0.0f, 1.0f } },
-								{ { -1.0f, -1.0f, 0.0f }, { 0.0f, 0.0f },{ 0.0f, 0.0f, 1.0f } },
-								{ {  1.0f,  1.0f, 0.0f }, { 1.0f, 1.0f },{ 0.0f, 0.0f, 1.0f } },
-
-								{ {  1.0f,  1.0f, 0.0f }, { 1.0f, 1.0f },{ 0.0f, 0.0f, 1.0f } },
-								{ { -1.0f, -1.0f, 0.0f }, { 0.0f, 0.0f },{ 0.0f, 0.0f, 1.0f } },
-								{ {  1.0f, -1.0f, 0.0f }, { 1.0f, 0.0f },{ 0.0f, 0.0f, 1.0f } }
-						};
-				pushVertex(vertexData2);
-				recordCommandBuffer();
-
             }
 
 			void createCommandBuffer()
 			{
-				command_buffer.push_back( new CommandBuffers(device, queueFamilyIndex) );
+				command_buffer.push_back( new CommandBuffers(device, queueFamilyIndex, command_pool) );
 			}
-
-
 
             void pushTexture(const char* path)
             {
@@ -310,7 +285,7 @@ namespace Obsidian2D
                 ds_params.width 				= static_cast<u_int32_t>(width);
                 ds_params.height 				= static_cast<u_int32_t>(height);
                 ds_params.memory_properties		= memory_properties;
-                ds_params.command_pool			= command_buffer[0]->getCommandPool();
+                ds_params.command_pool			= command_pool;
                 ds_params.gpu					= gpu_vector[0];
                 ds_params.graphic_queue			= render_pass->getSwapChain()->getGraphicQueue();
                 ds_params.path                  = path;
@@ -342,7 +317,6 @@ namespace Obsidian2D
                         render_pass,
                         descriptor_set[ cm_count ],
                         graphic_pipeline[ cm_count ]->getPipeline(),
-                        current_buffer,
                         static_cast<uint32_t>(width),
                         static_cast<uint32_t>(height),
                         sync_primitives,

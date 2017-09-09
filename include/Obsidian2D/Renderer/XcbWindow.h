@@ -123,6 +123,38 @@ namespace Obsidian2D
 				this->createSurface();
 				this->initGraphicPipeline();
 
+				/* Fist Data */
+				createCommandBuffer();
+				pushTexture("../../include/Obsidian2D/Renderer/shaders/baleog.jpg");
+				std::vector<Vertex> vertexData =
+						{
+								{ { -1.0f,  1.0f, 0.0f }, { 0.0f, 1.0f },{ 0.0f, 0.0f, 1.0f } },
+								{ { -1.0f, -1.0f, 0.0f }, { 0.0f, 0.0f },{ 0.0f, 0.0f, 1.0f } },
+								{ {  1.0f,  1.0f, 0.0f }, { 1.0f, 1.0f },{ 0.0f, 0.0f, 1.0f } },
+
+								{ {  1.0f,  1.0f, 0.0f }, { 1.0f, 1.0f },{ 0.0f, 0.0f, 1.0f } },
+								{ { -1.0f, -1.0f, 0.0f }, { 0.0f, 0.0f },{ 0.0f, 0.0f, 1.0f } },
+								{ {  1.0f, -1.0f, 0.0f }, { 1.0f, 0.0f },{ 0.0f, 0.0f, 1.0f } }
+						};
+				pushVertex(vertexData);
+				recordCommandBuffer();
+
+				/* Second Data */
+				createCommandBuffer();
+				pushTexture("../../include/Obsidian2D/Renderer/shaders/baleog.jpg");
+				std::vector<Vertex> vertexData2 =
+						{
+								{ { -2.0f,  0.0f, 0.0f }, { 0.0f, 1.0f },{ 0.0f, 0.0f, 1.0f } },
+								{ { -1.0f, -1.0f, 0.0f }, { 0.0f, 0.0f },{ 0.0f, 0.0f, 1.0f } },
+								{ {  1.0f,  1.0f, 0.0f }, { 1.0f, 1.0f },{ 0.0f, 0.0f, 1.0f } },
+
+								{ {  1.0f,  1.0f, 0.0f }, { 1.0f, 1.0f },{ 0.0f, 0.0f, 1.0f } },
+								{ { -1.0f, -1.0f, 0.0f }, { 0.0f, 0.0f },{ 0.0f, 0.0f, 1.0f } },
+								{ {  1.0f, -1.0f, 0.0f }, { 1.0f, 0.0f },{ 0.0f, 0.0f, 1.0f } }
+						};
+				pushVertex(vertexData2);
+				recordCommandBuffer();
+
 				camera_center   = descriptor_set[descriptor_set.size()-1]->getUniformBuffer()->getCameraDefaultCenter();
 				camera_eye      = descriptor_set[descriptor_set.size()-1]->getUniformBuffer()->getCameraDefaultEye();
 				camera_up       = descriptor_set[descriptor_set.size()-1]->getUniformBuffer()->getCameraDefaultUp();

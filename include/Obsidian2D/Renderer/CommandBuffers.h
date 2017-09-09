@@ -30,22 +30,15 @@ namespace Obsidian2D
 
 		public:
 
-			CommandBuffers(VkDevice device, uint32_t queueFamilyIndex)
+			CommandBuffers(VkDevice device, uint32_t queueFamilyIndex, VkCommandPool command_pool)
 			{
 				_instance_device = device;
-
-				VkCommandPoolCreateInfo cmd_pool_info = {};
-				cmd_pool_info.sType 			= VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
-				cmd_pool_info.pNext 			= nullptr;
-				cmd_pool_info.queueFamilyIndex  = queueFamilyIndex;
-				cmd_pool_info.flags 			= 0;
-
-				assert(vkCreateCommandPool(device, &cmd_pool_info, nullptr, &_command_pool) == VK_SUCCESS);
+				_command_pool = command_pool;
 
 				VkCommandBufferAllocateInfo cmd = {};
 				cmd.sType 						= VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
 				cmd.pNext 			 			= nullptr;
-				cmd.commandPool 	 			= _command_pool;
+				cmd.commandPool 	 			= command_pool;
 				cmd.level 			 			= VK_COMMAND_BUFFER_LEVEL_PRIMARY;
 				cmd.commandBufferCount  		= 1;
 
@@ -55,14 +48,12 @@ namespace Obsidian2D
             ~CommandBuffers()
             {
                 vkFreeCommandBuffers(_instance_device, _command_pool, 1, &_command_buffer);
-                vkDestroyCommandPool(_instance_device, _command_pool, nullptr);
             }
 
 			void bindCommandBuffer (
 					RenderPass* 	render_pass,
 					DescriptorSet* 	descriptor_set,
 					VkPipeline 		vkPipeline,
-					int 			buffer_index,
 					uint32_t 		width,
 					uint32_t 		height,
 					SyncPrimitives* sync_primitives,
@@ -111,7 +102,6 @@ namespace Obsidian2D
 
 					const VkDeviceSize offsets[1] = {0};
 
-					//std::vector<VkBuffer> buffers = VertexBuffer::getBuffersFromVector(vertex_buffer);
 					vkCmdBindVertexBuffers(_command_buffer, 0, 1, &vertex_buffer->buf, offsets);
 
 					util->init_viewports(_command_buffer);
@@ -128,20 +118,11 @@ namespace Obsidian2D
 
 			}
 
-			VkCommandBuffer* getCommandBuffer()
-			{
-				return &_command_buffer;
-			}
-
-			VkCommandBuffer getCommandBufferRef()
+			VkCommandBuffer getCommandBuffer()
 			{
 				return _command_buffer;
 			}
 
-			VkCommandPool getCommandPool()
-			{
-				return _command_pool;
-			}
 		};
 	}
 }
