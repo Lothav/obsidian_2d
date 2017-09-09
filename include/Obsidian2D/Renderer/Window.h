@@ -122,6 +122,8 @@ namespace Obsidian2D
                 assert(res == VK_SUCCESS);
 
                 vkDeviceWaitIdle(device);
+
+                cmd_buff.clear();
             }
 
         private:
@@ -258,7 +260,7 @@ namespace Obsidian2D
                 std::vector< struct rpAttachments > rp_attachments = {};
                 struct rpAttachments attch = {};
                 attch.format = render_pass->getSwapChain()->getSwapChainFormat();
-                attch.clear  = true;
+                attch.clear  = false;
                 rp_attachments.push_back(attch);
                 attch.format = render_pass->getDepthBufferFormat();
                 attch.clear  = true;

@@ -125,16 +125,16 @@ namespace Obsidian2D
 
 				/* Fist Data */
 				createCommandBuffer();
-				pushTexture("../../include/Obsidian2D/Renderer/shaders/baleog.jpg");
+				pushTexture("../../include/Obsidian2D/Renderer/shaders/medivh.jpg");
 				std::vector<Vertex> vertexData =
 						{
-								{ { -1.0f,  1.0f, 0.0f }, { 0.0f, 1.0f },{ 0.0f, 0.0f, 1.0f } },
-								{ { -1.0f, -1.0f, 0.0f }, { 0.0f, 0.0f },{ 0.0f, 0.0f, 1.0f } },
-								{ {  1.0f,  1.0f, 0.0f }, { 1.0f, 1.0f },{ 0.0f, 0.0f, 1.0f } },
+								{ { -4.0f,  4.0f, 0.0f }, { 0.0f, 1.0f },{ 0.0f, 0.0f, 1.0f } },
+								{ { -4.0f, -4.0f, 0.0f }, { 0.0f, 0.0f },{ 0.0f, 0.0f, 1.0f } },
+								{ {  4.0f,  4.0f, 0.0f }, { 1.0f, 1.0f },{ 0.0f, 0.0f, 1.0f } },
 
-								{ {  1.0f,  1.0f, 0.0f }, { 1.0f, 1.0f },{ 0.0f, 0.0f, 1.0f } },
-								{ { -1.0f, -1.0f, 0.0f }, { 0.0f, 0.0f },{ 0.0f, 0.0f, 1.0f } },
-								{ {  1.0f, -1.0f, 0.0f }, { 1.0f, 0.0f },{ 0.0f, 0.0f, 1.0f } }
+								{ {  4.0f,  4.0f, 0.0f }, { 1.0f, 1.0f },{ 0.0f, 0.0f, 1.0f } },
+								{ { -4.0f, -4.0f, 0.0f }, { 0.0f, 0.0f },{ 0.0f, 0.0f, 1.0f } },
+								{ {  4.0f, -4.0f, 0.0f }, { 1.0f, 0.0f },{ 0.0f, 0.0f, 1.0f } }
 						};
 				pushVertex(vertexData);
 				recordCommandBuffer();
@@ -226,9 +226,12 @@ namespace Obsidian2D
 						}
 
 						std::cout << kp->detail << std::endl;
-						descriptor_set[descriptor_set.size()-1]->getUniformBuffer()->setCameraViewCenter(glm::vec3(camera_center[0], camera_center[1], camera_center[2]));
-						descriptor_set[descriptor_set.size()-1]->getUniformBuffer()->setCameraViewEye(glm::vec3(camera_eye[0], camera_eye[1], camera_eye[2]));
-						descriptor_set[descriptor_set.size()-1]->getUniformBuffer()->setCameraViewUp(glm::vec3(camera_up[0], camera_up[1], camera_up[2]));
+						for(int i =0; i < descriptor_set.size(); i++)
+						{
+							descriptor_set[1]->getUniformBuffer()->setCameraViewCenter(glm::vec3(camera_center[0], camera_center[1], camera_center[2]));
+							descriptor_set[1]->getUniformBuffer()->setCameraViewEye(glm::vec3(camera_eye[0], camera_eye[1], camera_eye[2]));
+							descriptor_set[1]->getUniformBuffer()->setCameraViewUp(glm::vec3(camera_up[0], camera_up[1], camera_up[2]));
+						}
 
 						return ::Obsidian2D::Core::WindowEvent::ButtonDown;
 					} else if((e->response_type & ~0x80) == XCB_KEY_RELEASE) {
