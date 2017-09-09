@@ -45,7 +45,6 @@ namespace Obsidian2D
 			}
 
 		public:
-			VkMemoryRequirements mem_reqs;
 
 			void initModelView(u_int32_t width, u_int32_t height)
 			{

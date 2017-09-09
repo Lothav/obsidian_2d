@@ -95,37 +95,47 @@ namespace Obsidian2D
 				cmd_buf_info.flags 							= 0;
 				cmd_buf_info.pInheritanceInfo 				= nullptr;
 
-				rp_begin.framebuffer =  render_pass->getFrameBuffer()[buffer_index];
 
+				Util* util = new Util(width, height);
 				res = vkBeginCommandBuffer(_command_buffer, &cmd_buf_info);
 				assert(res == VK_SUCCESS);
 
-				vkCmdBeginRenderPass(_command_buffer, &rp_begin, VK_SUBPASS_CONTENTS_INLINE);
-				vkCmdBindPipeline(_command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, vkPipeline);
-				vkCmdBindDescriptorSets(_command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS,
-										descriptor_set->getPipelineLayout(), 0, 1,
-										descriptor_set->getDescriptorSet(), 0, nullptr);
+				for(uint32_t i = 0; i < render_pass->getSwapChain()->getImageCount(); i++)
+				{
+					rp_begin.framebuffer =  render_pass->getFrameBuffer()[i];
+					vkCmdBeginRenderPass(_command_buffer, &rp_begin, VK_SUBPASS_CONTENTS_INLINE);
+					vkCmdBindPipeline(_command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, vkPipeline);
+					vkCmdBindDescriptorSets(_command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS,
+											descriptor_set->getPipelineLayout(), 0, 1,
+											descriptor_set->getDescriptorSet(), 0, nullptr);
 
-				const VkDeviceSize offsets[1] = {0};
+					const VkDeviceSize offsets[1] = {0};
 
-				//std::vector<VkBuffer> buffers = VertexBuffer::getBuffersFromVector(vertex_buffer);
-				vkCmdBindVertexBuffers(_command_buffer, 0, 1, &vertex_buffer->buf, offsets);
+					//std::vector<VkBuffer> buffers = VertexBuffer::getBuffersFromVector(vertex_buffer);
+					vkCmdBindVertexBuffers(_command_buffer, 0, 1, &vertex_buffer->buf, offsets);
 
-				Util* util  = new Util(width, height);
-				util->init_viewports(_command_buffer);
-				util->init_scissors(_command_buffer);
+					util->init_viewports(_command_buffer);
+					util->init_scissors(_command_buffer);
 
-				vkCmdDraw(_command_buffer, static_cast<uint32_t>(vertex_buffer->getVertexSize()), 1, 0, 0);
-				vkCmdEndRenderPass(_command_buffer);
+					vkCmdDraw(_command_buffer, static_cast<uint32_t>(vertex_buffer->getVertexSize()), 1, 0, 0);
+					vkCmdEndRenderPass(_command_buffer);
+				}
+
 				res = vkEndCommandBuffer(_command_buffer);
+				assert(res == VK_SUCCESS);
 
 				delete util;
-				assert(res == VK_SUCCESS);
+
 			}
 
 			VkCommandBuffer* getCommandBuffer()
 			{
 				return &_command_buffer;
+			}
+
+			VkCommandBuffer getCommandBufferRef()
+			{
+				return _command_buffer;
 			}
 
 			VkCommandPool getCommandPool()

@@ -68,17 +68,17 @@ namespace Obsidian2D
                 VkResult res;
                 VkSwapchainKHR swap_c = render_pass->getSwapChain()->getSwapChainKHR();
 
-                descriptor_set[ descriptor_set.size()-1 ]->getUniformBuffer()->updateCamera(device);
+                descriptor_set[ 1 ]->getUniformBuffer()->updateCamera(device);
 
                 res = vkAcquireNextImageKHR(device, swap_c, UINT64_MAX, sync_primitives->imageAcquiredSemaphore, VK_NULL_HANDLE, &current_buffer);
                 assert(res == VK_SUCCESS);
 
                 VkPipelineStageFlags pipe_stage_flags = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
 
-                std::vector<VkCommandBuffer *> cmd_buff = {};
+                std::vector<VkCommandBuffer> cmd_buff = {};
                 for (int i = 0; i < command_buffer.size(); ++i)
                 {
-                    cmd_buff.push_back(command_buffer[i]->getCommandBuffer());
+                    cmd_buff.push_back(command_buffer[i]->getCommandBufferRef());
                 }
 
                 VkSubmitInfo submit_info;
@@ -88,7 +88,7 @@ namespace Obsidian2D
                 submit_info.pWaitSemaphores           = &sync_primitives->imageAcquiredSemaphore;
                 submit_info.pWaitDstStageMask         = &pipe_stage_flags;
                 submit_info.commandBufferCount        = static_cast<uint32_t>(cmd_buff.size());
-                submit_info.pCommandBuffers           = *cmd_buff.data();
+                submit_info.pCommandBuffers           = cmd_buff.data();
                 submit_info.signalSemaphoreCount      = 1;
                 submit_info.pSignalSemaphores         = &sync_primitives->renderSemaphore;
 
@@ -129,10 +129,11 @@ namespace Obsidian2D
             VkDevice 								device;
             VkPhysicalDeviceMemoryProperties 		memory_properties;
             uint32_t 								current_buffer = 0;
+			u_int32_t								cm_count = 0;
 			std::vector<VkPhysicalDevice> 			gpu_vector;
-            u_int32_t							 	queue_family_count;
-            std::vector<VkQueueFamilyProperties> 	queue_family_props;
-            u_int32_t                               queueFamilyIndex = UINT_MAX;
+			u_int32_t							 	queue_family_count;
+			std::vector<VkQueueFamilyProperties> 	queue_family_props;
+			u_int32_t                               queueFamilyIndex = UINT_MAX;
 
             std::vector<GraphicPipeline *>          graphic_pipeline;
             std::vector<CommandBuffers *>			command_buffer;
@@ -225,9 +226,6 @@ namespace Obsidian2D
 
                 res = vkCreateDevice(gpu_vector[0], &device_info, NULL, &device);
                 assert(res == VK_SUCCESS);
-
-                sync_primitives = new SyncPrimitives(device);
-                sync_primitives->createSemaphore();
             }
 
             void initGraphicPipeline ()
@@ -259,12 +257,12 @@ namespace Obsidian2D
 
                 render_pass->create(rp_attachments);
 
+				sync_primitives = new SyncPrimitives(device);
+				sync_primitives->createSemaphore();
 				sync_primitives->createFence(render_pass->getSwapChain()->getImageCount());
 
-				/* Descriptor Set */
-
+				createCommandBuffer();
                 pushTexture("../../include/Obsidian2D/Renderer/shaders/baleog.jpg");
-
                 std::vector<Vertex> vertexData =
                     {
                         { { -1.0f,  1.0f, 0.0f }, { 0.0f, 1.0f },{ 0.0f, 0.0f, 1.0f } },
@@ -275,28 +273,36 @@ namespace Obsidian2D
                         { { -1.0f, -1.0f, 0.0f }, { 0.0f, 0.0f },{ 0.0f, 0.0f, 1.0f } },
                         { {  1.0f, -1.0f, 0.0f }, { 1.0f, 0.0f },{ 0.0f, 0.0f, 1.0f } }
                     };
-
                 pushVertex(vertexData);
                 recordCommandBuffer();
+
+
+				createCommandBuffer();
+				pushTexture("../../include/Obsidian2D/Renderer/shaders/baleog.jpg");
+				std::vector<Vertex> vertexData2 =
+						{
+								{ { -2.0f,  0.0f, 0.0f }, { 0.0f, 1.0f },{ 0.0f, 0.0f, 1.0f } },
+								{ { -1.0f, -1.0f, 0.0f }, { 0.0f, 0.0f },{ 0.0f, 0.0f, 1.0f } },
+								{ {  1.0f,  1.0f, 0.0f }, { 1.0f, 1.0f },{ 0.0f, 0.0f, 1.0f } },
+
+								{ {  1.0f,  1.0f, 0.0f }, { 1.0f, 1.0f },{ 0.0f, 0.0f, 1.0f } },
+								{ { -1.0f, -1.0f, 0.0f }, { 0.0f, 0.0f },{ 0.0f, 0.0f, 1.0f } },
+								{ {  1.0f, -1.0f, 0.0f }, { 1.0f, 0.0f },{ 0.0f, 0.0f, 1.0f } }
+						};
+				pushVertex(vertexData2);
+				recordCommandBuffer();
+
             }
 
-            void pushVertex(std::vector<Vertex> vertexData)
-            {
-                struct BufferData vertexBufferData = {};
+			void createCommandBuffer()
+			{
+				command_buffer.push_back( new CommandBuffers(device, queueFamilyIndex) );
+			}
 
-                vertexBufferData.device            = device;
-                vertexBufferData.usage             = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT;
-                vertexBufferData.physicalDevice    = gpu_vector[0];
-                vertexBufferData.properties        = VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT;
-                vertexBufferData.size              = vertexData.size() * sizeof(Vertex);
 
-                vertex_buffer.push_back( new VertexBuffer(vertexBufferData, vertexData) );
-            }
 
             void pushTexture(const char* path)
             {
-                /* Push Command Buffer */
-                command_buffer.push_back( new CommandBuffers(device, queueFamilyIndex) );
 
                 descriptor_set.push_back( new DescriptorSet(device) );
 
@@ -309,26 +315,41 @@ namespace Obsidian2D
                 ds_params.graphic_queue			= render_pass->getSwapChain()->getGraphicQueue();
                 ds_params.path                  = path;
 
-                descriptor_set[ descriptor_set.size()-1 ]->create(ds_params);
+                descriptor_set[ cm_count ]->create(ds_params);
 
                 graphic_pipeline.push_back( new GraphicPipeline(device) );
-                graphic_pipeline[ graphic_pipeline.size()-1 ]->
-						create( descriptor_set[ descriptor_set.size()-1 ]->getPipelineLayout(), render_pass->getRenderPass() );
+                graphic_pipeline[ cm_count ]->
+						create( descriptor_set[ cm_count ]->getPipelineLayout(), render_pass->getRenderPass() );
             }
+
+			void pushVertex(std::vector<Vertex> vertexData)
+			{
+				struct BufferData vertexBufferData = {};
+
+				vertexBufferData.device            = device;
+				vertexBufferData.usage             = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT;
+				vertexBufferData.physicalDevice    = gpu_vector[0];
+				vertexBufferData.properties        = VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT;
+				vertexBufferData.size              = vertexData.size() * sizeof(Vertex);
+
+				vertex_buffer.push_back( new VertexBuffer(vertexBufferData, vertexData) );
+			}
 
             void recordCommandBuffer()
             {
-                command_buffer[ command_buffer.size()-1 ]
+                command_buffer[ cm_count ]
                     ->bindCommandBuffer (
                         render_pass,
-                        descriptor_set[ descriptor_set.size()-1 ],
-                        graphic_pipeline[ graphic_pipeline.size()-1 ]->getPipeline(),
+                        descriptor_set[ cm_count ],
+                        graphic_pipeline[ cm_count ]->getPipeline(),
                         current_buffer,
                         static_cast<uint32_t>(width),
                         static_cast<uint32_t>(height),
                         sync_primitives,
-                        vertex_buffer[ vertex_buffer.size()-1 ]
+                        vertex_buffer[ cm_count ]
                     );
+
+				cm_count++;
             }
 
         };
