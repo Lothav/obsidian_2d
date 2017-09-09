@@ -54,17 +54,21 @@ namespace Obsidian2D
 				assert(res == VK_SUCCESS);
 			}
 
-			void createFence()
+			void createFence(uint32_t size)
 			{
 
-				_fences.resize(_fences.size() + 1);
+				_fences.resize(size);
 
 				VkFenceCreateInfo fenceInfo;
 				fenceInfo.sType 			= VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
 				fenceInfo.pNext 			= NULL;
 				fenceInfo.flags 			= 0;
 
-				vkCreateFence(_instance_device, &fenceInfo, NULL, &_fences[_fences.size()-1]);
+				for(u_int32_t i = 0; i< size; i++)
+				{
+					vkCreateFence(_instance_device, &fenceInfo, NULL, &_fences[i]);
+				}
+
 			}
 
 			VkFence* getFence(u_int32_t i)

@@ -73,9 +73,13 @@ namespace Obsidian2D
                 res = vkAcquireNextImageKHR(device, swap_c, UINT64_MAX, sync_primitives->imageAcquiredSemaphore, VK_NULL_HANDLE, &current_buffer);
                 assert(res == VK_SUCCESS);
 
-                current_buffer = 0;
-
                 VkPipelineStageFlags pipe_stage_flags = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+
+                std::vector<VkCommandBuffer *> cmd_buff = {};
+                for (int i = 0; i < command_buffer.size(); ++i)
+                {
+                    cmd_buff.push_back(command_buffer[i]->getCommandBuffer());
+                }
 
                 VkSubmitInfo submit_info;
                 submit_info.pNext                     = NULL;
@@ -83,8 +87,8 @@ namespace Obsidian2D
                 submit_info.waitSemaphoreCount        = 1;
                 submit_info.pWaitSemaphores           = &sync_primitives->imageAcquiredSemaphore;
                 submit_info.pWaitDstStageMask         = &pipe_stage_flags;
-                submit_info.commandBufferCount        = 1;
-                submit_info.pCommandBuffers           = command_buffer[current_buffer]->getCommandBuffer();
+                submit_info.commandBufferCount        = static_cast<uint32_t>(cmd_buff.size());
+                submit_info.pCommandBuffers           = *cmd_buff.data();
                 submit_info.signalSemaphoreCount      = 1;
                 submit_info.pSignalSemaphores         = &sync_primitives->renderSemaphore;
 
@@ -125,7 +129,7 @@ namespace Obsidian2D
             VkDevice 								device;
             VkPhysicalDeviceMemoryProperties 		memory_properties;
             uint32_t 								current_buffer = 0;
-            std::vector<VkPhysicalDevice> 			gpu_vector;
+			std::vector<VkPhysicalDevice> 			gpu_vector;
             u_int32_t							 	queue_family_count;
             std::vector<VkQueueFamilyProperties> 	queue_family_props;
             u_int32_t                               queueFamilyIndex = UINT_MAX;
@@ -223,7 +227,6 @@ namespace Obsidian2D
                 assert(res == VK_SUCCESS);
 
                 sync_primitives = new SyncPrimitives(device);
-                sync_primitives->createFence();
                 sync_primitives->createSemaphore();
             }
 
@@ -256,7 +259,9 @@ namespace Obsidian2D
 
                 render_pass->create(rp_attachments);
 
-                /* Descriptor Set */
+				sync_primitives->createFence(render_pass->getSwapChain()->getImageCount());
+
+				/* Descriptor Set */
 
                 pushTexture("../../include/Obsidian2D/Renderer/shaders/baleog.jpg");
 
@@ -296,8 +301,8 @@ namespace Obsidian2D
                 descriptor_set.push_back( new DescriptorSet(device) );
 
                 struct DescriptorSetParams ds_params = {};
-                ds_params.width 				= static_cast<u_int32_t >(width);
-                ds_params.height 				= static_cast<u_int32_t >(height);
+                ds_params.width 				= static_cast<u_int32_t>(width);
+                ds_params.height 				= static_cast<u_int32_t>(height);
                 ds_params.memory_properties		= memory_properties;
                 ds_params.command_pool			= command_buffer[0]->getCommandPool();
                 ds_params.gpu					= gpu_vector[0];
@@ -307,7 +312,8 @@ namespace Obsidian2D
                 descriptor_set[ descriptor_set.size()-1 ]->create(ds_params);
 
                 graphic_pipeline.push_back( new GraphicPipeline(device) );
-                graphic_pipeline[ graphic_pipeline.size()-1 ]->create(descriptor_set[ descriptor_set.size()-1 ]->getPipelineLayout(), render_pass->getRenderPass());
+                graphic_pipeline[ graphic_pipeline.size()-1 ]->
+						create( descriptor_set[ descriptor_set.size()-1 ]->getPipelineLayout(), render_pass->getRenderPass() );
             }
 
             void recordCommandBuffer()
