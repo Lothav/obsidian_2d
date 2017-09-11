@@ -97,16 +97,6 @@ namespace Obsidian2D
 				VkResult res = vkCreatePipelineCache(_instance_device, &pipelineCache, NULL, &_pipeline_cache);
 				assert(res == VK_SUCCESS);
 
-
-				VkDynamicState dynamicStateEnables[VK_DYNAMIC_STATE_RANGE_SIZE];
-				VkPipelineDynamicStateCreateInfo dynamicState = {};
-				memset(dynamicStateEnables, 0, sizeof dynamicStateEnables);
-
-				dynamicState.sType 										= VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO;
-				dynamicState.pNext 										= NULL;
-				dynamicState.pDynamicStates 							= dynamicStateEnables;
-				dynamicState.dynamicStateCount 							= 0;
-
 				VkPipelineVertexInputStateCreateInfo vi;
 				memset(&vi, 0, sizeof(vi));
 				vi.sType 												= VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
@@ -139,22 +129,22 @@ namespace Obsidian2D
 				rs.depthBiasSlopeFactor 								= 0;
 				rs.lineWidth 											= 1.0f;
 
-				VkPipelineColorBlendStateCreateInfo cb;
-				cb.sType 												= VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;
-				cb.flags 												= 0;
-				cb.pNext 												= NULL;
-
-				VkPipelineColorBlendAttachmentState att_state[1];
+				std::array<VkPipelineColorBlendAttachmentState, 1> att_state = {};
 				att_state[0].colorWriteMask 							= 0xf;
-				att_state[0].blendEnable 								= VK_FALSE;
-				att_state[0].alphaBlendOp 								= VK_BLEND_OP_ADD;
-				att_state[0].colorBlendOp 								= VK_BLEND_OP_ADD;
-				att_state[0].srcColorBlendFactor 						= VK_BLEND_FACTOR_ZERO;
-				att_state[0].dstColorBlendFactor 						= VK_BLEND_FACTOR_ZERO;
-				att_state[0].srcAlphaBlendFactor 						= VK_BLEND_FACTOR_ZERO;
-				att_state[0].dstAlphaBlendFactor 						= VK_BLEND_FACTOR_ZERO;
-				cb.attachmentCount 										= 1;
-				cb.pAttachments 										= att_state;
+				att_state[0].blendEnable 								= VK_TRUE;
+				att_state[0].srcColorBlendFactor                        = VK_BLEND_FACTOR_SRC_ALPHA;
+				att_state[0].dstColorBlendFactor                        = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;
+				att_state[0].colorBlendOp                               = VK_BLEND_OP_ADD;
+                att_state[0].alphaBlendOp                               = VK_BLEND_OP_ADD;
+                att_state[0].srcAlphaBlendFactor                        = VK_BLEND_FACTOR_ONE;
+                att_state[0].dstAlphaBlendFactor                        = VK_BLEND_FACTOR_ZERO;
+
+                VkPipelineColorBlendStateCreateInfo cb;
+                cb.sType 												= VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;
+                cb.flags 												= 0;
+                cb.pNext 												= NULL;
+                cb.attachmentCount 										= static_cast<uint32_t>(att_state.size());
+				cb.pAttachments 										= att_state.data();
 				cb.logicOpEnable 										= VK_FALSE;
 				cb.logicOp 												= VK_LOGIC_OP_NO_OP;
 				cb.blendConstants[0] 									= 1.0f;
@@ -162,16 +152,22 @@ namespace Obsidian2D
 				cb.blendConstants[2] 									= 1.0f;
 				cb.blendConstants[3] 									= 1.0f;
 
+				std::vector<VkDynamicState> dynamicStateEnables = {VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_SCISSOR};
+
 				VkPipelineViewportStateCreateInfo vp = {};
 				vp.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
 				vp.pNext = NULL;
 				vp.flags = 0;
 				vp.viewportCount 										= 1;
-				dynamicStateEnables[dynamicState.dynamicStateCount++] 	= VK_DYNAMIC_STATE_VIEWPORT;
-				vp.scissorCount 										= 1;
-				dynamicStateEnables[dynamicState.dynamicStateCount++] 	= VK_DYNAMIC_STATE_SCISSOR;
+                vp.scissorCount 										= 1;
 				vp.pScissors 											= NULL;
 				vp.pViewports 											= NULL;
+
+				VkPipelineDynamicStateCreateInfo dynamicState = {};
+				dynamicState.sType 										= VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO;
+				dynamicState.pNext 										= nullptr;
+				dynamicState.pDynamicStates 							= dynamicStateEnables.data();
+				dynamicState.dynamicStateCount 							= static_cast<uint32_t>(dynamicStateEnables.size());
 
 				VkPipelineDepthStencilStateCreateInfo ds;
 				ds.sType 												= VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO;
@@ -207,7 +203,7 @@ namespace Obsidian2D
 
 				VkGraphicsPipelineCreateInfo pipeline;
 				pipeline.sType 											= VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
-				pipeline.pNext 											= NULL;
+				pipeline.pNext 											= nullptr;
 				pipeline.layout 										= pipeline_layout;
 				pipeline.basePipelineHandle 							= VK_NULL_HANDLE;
 				pipeline.basePipelineIndex 								= 0;
@@ -222,7 +218,7 @@ namespace Obsidian2D
 				pipeline.pViewportState 								= &vp;
 				pipeline.pDepthStencilState 							= &ds;
 				pipeline.pStages 										= shaderStages.data();
-				pipeline.stageCount 									= 2;
+				pipeline.stageCount 									= static_cast<uint32_t>(shaderStages.size());
 				pipeline.renderPass 									= render_pass;
 				pipeline.subpass 										= 0;
 

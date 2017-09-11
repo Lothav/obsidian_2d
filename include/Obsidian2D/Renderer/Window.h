@@ -58,10 +58,15 @@ namespace Obsidian2D
                 }
 
 				vkDestroyCommandPool(device, command_pool, nullptr);
-				vkFreeMemory(device, Textures::textureImageMemory, nullptr);
 
-                vkDestroyDevice(this->device, NULL);
-                vkDestroyInstance(instance, NULL);
+                for (i = 0; i < Textures::textureImageMemory.size(); i++)
+                {
+                    vkFreeMemory(device, Textures::textureImageMemory[i], nullptr);
+                }
+
+                vkDeviceWaitIdle(device);
+                vkDestroyDevice(device, nullptr);
+                vkDestroyInstance(instance, nullptr);
             }
 
             void draw()
@@ -120,9 +125,6 @@ namespace Obsidian2D
 
                 res = vkQueuePresentKHR(render_pass->getSwapChain()->getPresentQueue(), &present);
                 assert(res == VK_SUCCESS);
-
-                vkDeviceWaitIdle(device);
-
                 cmd_buff.clear();
             }
 

@@ -17,6 +17,13 @@ namespace Obsidian2D
 		class Layers : public Util
 		{
 
+		private:
+
+			const std::vector<const char *> DESIRED_LAYERS = {
+					"VK_LAYER_LUNARG_standard_validation",
+					"VK_LAYER_LUNARG_object_tracker"
+			};
+
 		public:
 
 			Layers()
@@ -33,12 +40,17 @@ namespace Obsidian2D
 			{
 				std::cout << "Layers available:" << std::endl;
 				std::vector<const char *> _layer_names;
-				for(auto i : this->_instanceLayerProps){
+				for(auto i : this->_instanceLayerProps)
+				{
 					std::cout << i.properties.layerName << std::endl;
+					for(auto j : DESIRED_LAYERS)
+					{
+						if(0 == strcmp(j, i.properties.layerName))
+						{
+							_layer_names.push_back(j);
+						}
+					}
 				}
-
-				_layer_names.push_back( "VK_LAYER_LUNARG_standard_validation" );
-				//_layer_names.push_back( "VK_LAYER_LUNARG_object_tracker" );
 
 				std::cout << "Using Layers:" << std::endl;
 				for(auto i : _layer_names) {

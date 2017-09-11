@@ -23,7 +23,7 @@ namespace Obsidian2D
 			static void createImage(VkDevice device, uint32_t width, uint32_t height, VkFormat format,
 								  	VkImageTiling tiling, VkImageUsageFlags usage,
 									VkMemoryPropertyFlags properties, VkImage& image,
-									VkDeviceMemory& imageMemory, VkPhysicalDeviceMemoryProperties memory_properties)
+                                    VkPhysicalDeviceMemoryProperties memory_properties)
 			{
 				VkResult res;
 
@@ -59,10 +59,11 @@ namespace Obsidian2D
 						&allocInfo.memoryTypeIndex
 				);
 
-				res = vkAllocateMemory(device, &allocInfo, nullptr, &imageMemory);
+                textureImageMemory.resize(textureImageMemory.size() + 1);
+				res = vkAllocateMemory(device, &allocInfo, nullptr, &textureImageMemory[ textureImageMemory.size()-1 ]);
 				assert(res == VK_SUCCESS);
 
-				vkBindImageMemory(device, image, imageMemory, 0);
+				vkBindImageMemory(device, image, textureImageMemory[ textureImageMemory.size()-1 ], 0);
 			}
 
 			static VkCommandBuffer beginSingleTimeCommands(VkCommandPool commandPool, VkDevice device)
@@ -178,7 +179,7 @@ namespace Obsidian2D
 
 		public:
 
-			static VkDeviceMemory textureImageMemory;
+			static std::vector<VkDeviceMemory> textureImageMemory ;
 
 			static VkImage createTextureImage(
 					VkPhysicalDevice physicalDevice,
@@ -217,7 +218,7 @@ namespace Obsidian2D
 				createImage(device, static_cast<uint32_t>(texWidth), static_cast<uint32_t>(texHeight),
 							VK_FORMAT_R8G8B8A8_UNORM, VK_IMAGE_TILING_OPTIMAL,
 							VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT,
-							VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, textureImage, textureImageMemory, memory_properties);
+							VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, textureImage, memory_properties);
 
 				transitionImageLayout(textureImage, VK_FORMAT_R8G8B8A8_UNORM, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, commandPool, graphicQueue, device);
 				copyBufferToImage(staging_buffer->buf, textureImage, static_cast<uint32_t>(texWidth), static_cast<uint32_t>(texHeight), commandPool, graphicQueue, device);
@@ -230,7 +231,7 @@ namespace Obsidian2D
 
 		};
 
-		VkDeviceMemory Textures::textureImageMemory;
+		std::vector<VkDeviceMemory> Textures::textureImageMemory;
 	}
 }
 

@@ -141,7 +141,7 @@ namespace Obsidian2D
 
 				/* Second Data */
 				createCommandBuffer();
-				pushTexture("../../include/Obsidian2D/Renderer/shaders/baleog.jpg");
+				pushTexture("../../include/Obsidian2D/Renderer/shaders/wahre.png");
 				std::vector<Vertex> vertexData2 =
 						{
 								{ { -2.0f,  0.0f, 0.0f }, { 0.0f, 1.0f },{ 0.0f, 0.0f, 1.0f } },
