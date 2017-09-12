@@ -57,10 +57,9 @@ namespace Obsidian2D
 				this->_view_camera.eye 	  =  glm::vec3(_default_eye[0], _default_eye[1], _default_eye[2]);
 				this->_view_camera.center =  glm::vec3(_default_center[0], _default_center[1], _default_center[2]);
 				this->_view_camera.up     =  glm::vec3(_default_up[0], _default_up[1], _default_up[2]);
+				this->_view               =  glm::lookAt(this->_view_camera.eye, this->_view_camera.center, this->_view_camera.up);
 
-				this->_view = glm::lookAt( this->_view_camera.eye, this->_view_camera.center, this->_view_camera.up );
-
-				this->_model = glm::mat4(1.0f);
+				this->_model = this->_view * glm::translate(glm::mat4(), {0, 0, 1});
 
 				this->updateMVP();
 			}
@@ -83,6 +82,14 @@ namespace Obsidian2D
 			{
 				this->_view_camera.up = up;
 				this->_view = glm::lookAt( this->_view_camera.eye, this->_view_camera.center, this->_view_camera.up );
+				this->updateMVP();
+			}
+
+			void rotateCamera(glm::vec3 rot){
+				this->_model = glm::rotate(this->_model, glm::radians(rot.x), glm::vec3(1.0f, 0.0f, 0.0f));
+				this->_model = glm::rotate(this->_model, glm::radians(rot.y), glm::vec3(0.0f, 1.0f, 0.0f));
+				this->_model = glm::rotate(this->_model, glm::radians(rot.z), glm::vec3(0.0f, 0.0f, 1.0f));
+
 				this->updateMVP();
 			}
 

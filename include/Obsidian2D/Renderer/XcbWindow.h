@@ -127,15 +127,15 @@ namespace Obsidian2D
 				createCommandBuffer();
 				pushTexture("../../include/Obsidian2D/Renderer/shaders/medivh.jpg");
 				std::vector<Vertex> vertexData =
-						{
-								{ { -4.0f,  4.0f, 0.0f }, { 0.0f, 1.0f },{ 0.0f, 0.0f, 1.0f } },
-								{ { -4.0f, -4.0f, 0.0f }, { 0.0f, 0.0f },{ 0.0f, 0.0f, 1.0f } },
-								{ {  4.0f,  4.0f, 0.0f }, { 1.0f, 1.0f },{ 0.0f, 0.0f, 1.0f } },
+					{
+						{ { -4.0f,  3.0f, 0.0f }, { 0.0f, 1.0f },{ 0.0f, 0.0f, 1.0f } },
+						{ { -4.0f, -3.0f, 0.0f }, { 0.0f, 0.0f },{ 0.0f, 0.0f, 1.0f } },
+						{ {  4.0f,  3.0f, 0.0f }, { 1.0f, 1.0f },{ 0.0f, 0.0f, 1.0f } },
 
-								{ {  4.0f,  4.0f, 0.0f }, { 1.0f, 1.0f },{ 0.0f, 0.0f, 1.0f } },
-								{ { -4.0f, -4.0f, 0.0f }, { 0.0f, 0.0f },{ 0.0f, 0.0f, 1.0f } },
-								{ {  4.0f, -4.0f, 0.0f }, { 1.0f, 0.0f },{ 0.0f, 0.0f, 1.0f } }
-						};
+						{ {  4.0f,  3.0f, 0.0f }, { 1.0f, 1.0f },{ 0.0f, 0.0f, 1.0f } },
+						{ { -4.0f, -3.0f, 0.0f }, { 0.0f, 0.0f },{ 0.0f, 0.0f, 1.0f } },
+						{ {  4.0f, -3.0f, 0.0f }, { 1.0f, 0.0f },{ 0.0f, 0.0f, 1.0f } }
+					};
 				pushVertex(vertexData);
 				recordCommandBuffer();
 
@@ -143,15 +143,15 @@ namespace Obsidian2D
 				createCommandBuffer();
 				pushTexture("../../include/Obsidian2D/Renderer/shaders/wahre.png");
 				std::vector<Vertex> vertexData2 =
-						{
-								{ { -2.0f,  0.0f, 0.0f }, { 0.0f, 1.0f },{ 0.0f, 0.0f, 1.0f } },
-								{ { -1.0f, -1.0f, 0.0f }, { 0.0f, 0.0f },{ 0.0f, 0.0f, 1.0f } },
-								{ {  1.0f,  1.0f, 0.0f }, { 1.0f, 1.0f },{ 0.0f, 0.0f, 1.0f } },
+					{
+						{ { -2.0f,  0.0f, 0.0f }, { 0.0f, 1.0f },{ 0.0f, 0.0f, 1.0f } },
+						{ { -1.0f, -1.0f, 0.0f }, { 0.0f, 0.0f },{ 0.0f, 0.0f, 1.0f } },
+						{ {  1.0f,  1.0f, 0.0f }, { 1.0f, 1.0f },{ 0.0f, 0.0f, 1.0f } },
 
-								{ {  1.0f,  1.0f, 0.0f }, { 1.0f, 1.0f },{ 0.0f, 0.0f, 1.0f } },
-								{ { -1.0f, -1.0f, 0.0f }, { 0.0f, 0.0f },{ 0.0f, 0.0f, 1.0f } },
-								{ {  1.0f, -1.0f, 0.0f }, { 1.0f, 0.0f },{ 0.0f, 0.0f, 1.0f } }
-						};
+						{ {  1.0f,  1.0f, 0.0f }, { 1.0f, 1.0f },{ 0.0f, 0.0f, 1.0f } },
+						{ { -1.0f, -1.0f, 0.0f }, { 0.0f, 0.0f },{ 0.0f, 0.0f, 1.0f } },
+						{ {  1.0f, -1.0f, 0.0f }, { 1.0f, 0.0f },{ 0.0f, 0.0f, 1.0f } }
+					};
 				pushVertex(vertexData2);
 				recordCommandBuffer();
 
@@ -183,7 +183,6 @@ namespace Obsidian2D
 						xcb_key_press_event_t * kp = (xcb_key_press_event_t *)e;
 
 						if( kp->detail == 'O'){
-
 							camera_center[0]-= 0.1f;
 						}else if(kp->detail == 'P'){
 							camera_center[1] += 0.1f;
@@ -198,17 +197,17 @@ namespace Obsidian2D
 						}
 
 						if( kp->detail == 'W'){
-							camera_center[0]-= 0.1f;
+                            camera_eye[0]-= 0.1f;
 						}else if(kp->detail == 'X'){
-							camera_center[1]-= 0.1f;
+                            camera_eye[1]-= 0.1f;
 						}else if(kp->detail == 'Y'){
-							camera_center[0] += 0.1f;
+                            camera_eye[0] += 0.1f;
 						}else if(kp->detail == 'T'){
-							camera_center[1] += 0.1f;
+                            camera_eye[1] += 0.1f;
 						}else if(kp->detail == 'S'){
-							camera_center[2]-= 0.1f;
+                            camera_eye[2]-= 0.1f;
 						}else if(kp->detail == 'U'){
-							camera_center[2] += 0.1f;
+                            camera_eye[2] += 0.1f;
 						}
 
 						if( kp->detail == 'r'){
@@ -228,6 +227,7 @@ namespace Obsidian2D
 						std::cout << kp->detail << std::endl;
 						for(int i =0; i < descriptor_set.size(); i++)
 						{
+                            descriptor_set[1]->getUniformBuffer()->rotateCamera(glm::vec3(1,0,0));
 							descriptor_set[1]->getUniformBuffer()->setCameraViewCenter(glm::vec3(camera_center[0], camera_center[1], camera_center[2]));
 							descriptor_set[1]->getUniformBuffer()->setCameraViewEye(glm::vec3(camera_eye[0], camera_eye[1], camera_eye[2]));
 							descriptor_set[1]->getUniformBuffer()->setCameraViewUp(glm::vec3(camera_up[0], camera_up[1], camera_up[2]));

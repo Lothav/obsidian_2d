@@ -64,7 +64,6 @@ namespace Obsidian2D
                     vkFreeMemory(device, Textures::textureImageMemory[i], nullptr);
                 }
 
-                vkDeviceWaitIdle(device);
                 vkDestroyDevice(device, nullptr);
                 vkDestroyInstance(instance, nullptr);
             }
