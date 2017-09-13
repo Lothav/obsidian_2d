@@ -1,0 +1,1381 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.0" orientation="isometric" renderorder="right-down" width="20" height="20" tilewidth="256" tileheight="149" nextobjectid="1">
+ <tileset firstgid="1" name="proto" tilewidth="256" tileheight="512" tilecount="432">
+  <tile id="0">
+   <image width="256" height="512" source="../tiles/prototype/blockHuge_E.png"/>
+  </tile>
+  <tile id="1">
+   <image width="256" height="512" source="../tiles/prototype/blockHuge_N.png"/>
+  </tile>
+  <tile id="2">
+   <image width="256" height="512" source="../tiles/prototype/blockHuge_S.png"/>
+  </tile>
+  <tile id="3">
+   <image width="256" height="512" source="../tiles/prototype/blockHuge_W.png"/>
+  </tile>
+  <tile id="4">
+   <image width="256" height="512" source="../tiles/prototype/blockHugeCornerInner_E.png"/>
+  </tile>
+  <tile id="5">
+   <image width="256" height="512" source="../tiles/prototype/blockHugeCornerInner_N.png"/>
+  </tile>
+  <tile id="6">
+   <image width="256" height="512" source="../tiles/prototype/blockHugeCornerInner_S.png"/>
+  </tile>
+  <tile id="7">
+   <image width="256" height="512" source="../tiles/prototype/blockHugeCornerInner_W.png"/>
+  </tile>
+  <tile id="8">
+   <image width="256" height="512" source="../tiles/prototype/blockHugeCornerOuter_E.png"/>
+  </tile>
+  <tile id="9">
+   <image width="256" height="512" source="../tiles/prototype/blockHugeCornerOuter_N.png"/>
+  </tile>
+  <tile id="10">
+   <image width="256" height="512" source="../tiles/prototype/blockHugeCornerOuter_S.png"/>
+  </tile>
+  <tile id="11">
+   <image width="256" height="512" source="../tiles/prototype/blockHugeCornerOuter_W.png"/>
+  </tile>
+  <tile id="12">
+   <image width="256" height="512" source="../tiles/prototype/blockHugeSlant_E.png"/>
+  </tile>
+  <tile id="13">
+   <image width="256" height="512" source="../tiles/prototype/blockHugeSlant_N.png"/>
+  </tile>
+  <tile id="14">
+   <image width="256" height="512" source="../tiles/prototype/blockHugeSlant_S.png"/>
+  </tile>
+  <tile id="15">
+   <image width="256" height="512" source="../tiles/prototype/blockHugeSlant_W.png"/>
+  </tile>
+  <tile id="16">
+   <image width="256" height="512" source="../tiles/prototype/blockLarge_E.png"/>
+  </tile>
+  <tile id="17">
+   <image width="256" height="512" source="../tiles/prototype/blockLarge_N.png"/>
+  </tile>
+  <tile id="18">
+   <image width="256" height="512" source="../tiles/prototype/blockLarge_S.png"/>
+  </tile>
+  <tile id="19">
+   <image width="256" height="512" source="../tiles/prototype/blockLarge_W.png"/>
+  </tile>
+  <tile id="20">
+   <image width="256" height="512" source="../tiles/prototype/blockLargeSlant_E.png"/>
+  </tile>
+  <tile id="21">
+   <image width="256" height="512" source="../tiles/prototype/blockLargeSlant_N.png"/>
+  </tile>
+  <tile id="22">
+   <image width="256" height="512" source="../tiles/prototype/blockLargeSlant_S.png"/>
+  </tile>
+  <tile id="23">
+   <image width="256" height="512" source="../tiles/prototype/blockLargeSlant_W.png"/>
+  </tile>
+  <tile id="24">
+   <image width="256" height="512" source="../tiles/prototype/blockSmall_E.png"/>
+  </tile>
+  <tile id="25">
+   <image width="256" height="512" source="../tiles/prototype/blockSmall_N.png"/>
+  </tile>
+  <tile id="26">
+   <image width="256" height="512" source="../tiles/prototype/blockSmall_S.png"/>
+  </tile>
+  <tile id="27">
+   <image width="256" height="512" source="../tiles/prototype/blockSmall_W.png"/>
+  </tile>
+  <tile id="28">
+   <image width="256" height="512" source="../tiles/prototype/button_E.png"/>
+  </tile>
+  <tile id="29">
+   <image width="256" height="512" source="../tiles/prototype/button_N.png"/>
+  </tile>
+  <tile id="30">
+   <image width="256" height="512" source="../tiles/prototype/button_S.png"/>
+  </tile>
+  <tile id="31">
+   <image width="256" height="512" source="../tiles/prototype/button_W.png"/>
+  </tile>
+  <tile id="32">
+   <image width="256" height="512" source="../tiles/prototype/buttonPressed_E.png"/>
+  </tile>
+  <tile id="33">
+   <image width="256" height="512" source="../tiles/prototype/buttonPressed_N.png"/>
+  </tile>
+  <tile id="34">
+   <image width="256" height="512" source="../tiles/prototype/buttonPressed_S.png"/>
+  </tile>
+  <tile id="35">
+   <image width="256" height="512" source="../tiles/prototype/buttonPressed_W.png"/>
+  </tile>
+  <tile id="36">
+   <image width="256" height="512" source="../tiles/prototype/column_E.png"/>
+  </tile>
+  <tile id="37">
+   <image width="256" height="512" source="../tiles/prototype/column_N.png"/>
+  </tile>
+  <tile id="38">
+   <image width="256" height="512" source="../tiles/prototype/column_S.png"/>
+  </tile>
+  <tile id="39">
+   <image width="256" height="512" source="../tiles/prototype/column_W.png"/>
+  </tile>
+  <tile id="40">
+   <image width="256" height="512" source="../tiles/prototype/columnBlocks_E.png"/>
+  </tile>
+  <tile id="41">
+   <image width="256" height="512" source="../tiles/prototype/columnBlocks_N.png"/>
+  </tile>
+  <tile id="42">
+   <image width="256" height="512" source="../tiles/prototype/columnBlocks_S.png"/>
+  </tile>
+  <tile id="43">
+   <image width="256" height="512" source="../tiles/prototype/columnBlocks_W.png"/>
+  </tile>
+  <tile id="44">
+   <image width="256" height="512" source="../tiles/prototype/columnCorner_E.png"/>
+  </tile>
+  <tile id="45">
+   <image width="256" height="512" source="../tiles/prototype/columnCorner_N.png"/>
+  </tile>
+  <tile id="46">
+   <image width="256" height="512" source="../tiles/prototype/columnCorner_S.png"/>
+  </tile>
+  <tile id="47">
+   <image width="256" height="512" source="../tiles/prototype/columnCorner_W.png"/>
+  </tile>
+  <tile id="48">
+   <image width="256" height="512" source="../tiles/prototype/floor_E.png"/>
+  </tile>
+  <tile id="49">
+   <image width="256" height="512" source="../tiles/prototype/floor_N.png"/>
+  </tile>
+  <tile id="50">
+   <image width="256" height="512" source="../tiles/prototype/floor_S.png"/>
+  </tile>
+  <tile id="51">
+   <image width="256" height="512" source="../tiles/prototype/floor_W.png"/>
+  </tile>
+  <tile id="52">
+   <image width="256" height="512" source="../tiles/prototype/floorGrass_E.png"/>
+  </tile>
+  <tile id="53">
+   <image width="256" height="512" source="../tiles/prototype/floorGrass_N.png"/>
+  </tile>
+  <tile id="54">
+   <image width="256" height="512" source="../tiles/prototype/floorGrass_S.png"/>
+  </tile>
+  <tile id="55">
+   <image width="256" height="512" source="../tiles/prototype/floorGrass_W.png"/>
+  </tile>
+  <tile id="56">
+   <image width="256" height="512" source="../tiles/prototype/floorGrassRound_E.png"/>
+  </tile>
+  <tile id="57">
+   <image width="256" height="512" source="../tiles/prototype/floorGrassRound_N.png"/>
+  </tile>
+  <tile id="58">
+   <image width="256" height="512" source="../tiles/prototype/floorGrassRound_S.png"/>
+  </tile>
+  <tile id="59">
+   <image width="256" height="512" source="../tiles/prototype/floorGrassRound_W.png"/>
+  </tile>
+  <tile id="60">
+   <image width="256" height="512" source="../tiles/prototype/floorHalf_E.png"/>
+  </tile>
+  <tile id="61">
+   <image width="256" height="512" source="../tiles/prototype/floorHalf_N.png"/>
+  </tile>
+  <tile id="62">
+   <image width="256" height="512" source="../tiles/prototype/floorHalf_S.png"/>
+  </tile>
+  <tile id="63">
+   <image width="256" height="512" source="../tiles/prototype/floorHalf_W.png"/>
+  </tile>
+  <tile id="64">
+   <image width="256" height="512" source="../tiles/prototype/floorQuarter_E.png"/>
+  </tile>
+  <tile id="65">
+   <image width="256" height="512" source="../tiles/prototype/floorQuarter_N.png"/>
+  </tile>
+  <tile id="66">
+   <image width="256" height="512" source="../tiles/prototype/floorQuarter_S.png"/>
+  </tile>
+  <tile id="67">
+   <image width="256" height="512" source="../tiles/prototype/floorQuarter_W.png"/>
+  </tile>
+  <tile id="68">
+   <image width="256" height="512" source="../tiles/prototype/ladder_E.png"/>
+  </tile>
+  <tile id="69">
+   <image width="256" height="512" source="../tiles/prototype/ladder_N.png"/>
+  </tile>
+  <tile id="70">
+   <image width="256" height="512" source="../tiles/prototype/ladder_S.png"/>
+  </tile>
+  <tile id="71">
+   <image width="256" height="512" source="../tiles/prototype/ladder_W.png"/>
+  </tile>
+  <tile id="72">
+   <image width="256" height="512" source="../tiles/prototype/slab_E.png"/>
+  </tile>
+  <tile id="73">
+   <image width="256" height="512" source="../tiles/prototype/slab_N.png"/>
+  </tile>
+  <tile id="74">
+   <image width="256" height="512" source="../tiles/prototype/slab_S.png"/>
+  </tile>
+  <tile id="75">
+   <image width="256" height="512" source="../tiles/prototype/slab_W.png"/>
+  </tile>
+  <tile id="76">
+   <image width="256" height="512" source="../tiles/prototype/slabHalf_E.png"/>
+  </tile>
+  <tile id="77">
+   <image width="256" height="512" source="../tiles/prototype/slabHalf_N.png"/>
+  </tile>
+  <tile id="78">
+   <image width="256" height="512" source="../tiles/prototype/slabHalf_S.png"/>
+  </tile>
+  <tile id="79">
+   <image width="256" height="512" source="../tiles/prototype/slabHalf_W.png"/>
+  </tile>
+  <tile id="80">
+   <image width="256" height="512" source="../tiles/prototype/slabQuarter_E.png"/>
+  </tile>
+  <tile id="81">
+   <image width="256" height="512" source="../tiles/prototype/slabQuarter_N.png"/>
+  </tile>
+  <tile id="82">
+   <image width="256" height="512" source="../tiles/prototype/slabQuarter_S.png"/>
+  </tile>
+  <tile id="83">
+   <image width="256" height="512" source="../tiles/prototype/slabQuarter_W.png"/>
+  </tile>
+  <tile id="84">
+   <image width="256" height="512" source="../tiles/prototype/stepsLarge_E.png"/>
+  </tile>
+  <tile id="85">
+   <image width="256" height="512" source="../tiles/prototype/stepsLarge_N.png"/>
+  </tile>
+  <tile id="86">
+   <image width="256" height="512" source="../tiles/prototype/stepsLarge_S.png"/>
+  </tile>
+  <tile id="87">
+   <image width="256" height="512" source="../tiles/prototype/stepsLarge_W.png"/>
+  </tile>
+  <tile id="88">
+   <image width="256" height="512" source="../tiles/prototype/stepsSmall_E.png"/>
+  </tile>
+  <tile id="89">
+   <image width="256" height="512" source="../tiles/prototype/stepsSmall_N.png"/>
+  </tile>
+  <tile id="90">
+   <image width="256" height="512" source="../tiles/prototype/stepsSmall_S.png"/>
+  </tile>
+  <tile id="91">
+   <image width="256" height="512" source="../tiles/prototype/stepsSmall_W.png"/>
+  </tile>
+  <tile id="92">
+   <image width="256" height="512" source="../tiles/prototype/stepsSmallCornerInner_E.png"/>
+  </tile>
+  <tile id="93">
+   <image width="256" height="512" source="../tiles/prototype/stepsSmallCornerInner_N.png"/>
+  </tile>
+  <tile id="94">
+   <image width="256" height="512" source="../tiles/prototype/stepsSmallCornerInner_S.png"/>
+  </tile>
+  <tile id="95">
+   <image width="256" height="512" source="../tiles/prototype/stepsSmallCornerInner_W.png"/>
+  </tile>
+  <tile id="96">
+   <image width="256" height="512" source="../tiles/prototype/stepsSmallCornerOuter_E.png"/>
+  </tile>
+  <tile id="97">
+   <image width="256" height="512" source="../tiles/prototype/stepsSmallCornerOuter_N.png"/>
+  </tile>
+  <tile id="98">
+   <image width="256" height="512" source="../tiles/prototype/stepsSmallCornerOuter_S.png"/>
+  </tile>
+  <tile id="99">
+   <image width="256" height="512" source="../tiles/prototype/stepsSmallCornerOuter_W.png"/>
+  </tile>
+  <tile id="100">
+   <image width="256" height="512" source="../tiles/prototype/stepsSmallSlabs_E.png"/>
+  </tile>
+  <tile id="101">
+   <image width="256" height="512" source="../tiles/prototype/stepsSmallSlabs_N.png"/>
+  </tile>
+  <tile id="102">
+   <image width="256" height="512" source="../tiles/prototype/stepsSmallSlabs_S.png"/>
+  </tile>
+  <tile id="103">
+   <image width="256" height="512" source="../tiles/prototype/stepsSmallSlabs_W.png"/>
+  </tile>
+  <tile id="104">
+   <image width="256" height="512" source="../tiles/prototype/stepsSmallSlabsCornerInner_E.png"/>
+  </tile>
+  <tile id="105">
+   <image width="256" height="512" source="../tiles/prototype/stepsSmallSlabsCornerInner_N.png"/>
+  </tile>
+  <tile id="106">
+   <image width="256" height="512" source="../tiles/prototype/stepsSmallSlabsCornerInner_S.png"/>
+  </tile>
+  <tile id="107">
+   <image width="256" height="512" source="../tiles/prototype/stepsSmallSlabsCornerInner_W.png"/>
+  </tile>
+  <tile id="108">
+   <image width="256" height="512" source="../tiles/prototype/stepsSmallSlabsCornerOuter_E.png"/>
+  </tile>
+  <tile id="109">
+   <image width="256" height="512" source="../tiles/prototype/stepsSmallSlabsCornerOuter_N.png"/>
+  </tile>
+  <tile id="110">
+   <image width="256" height="512" source="../tiles/prototype/stepsSmallSlabsCornerOuter_S.png"/>
+  </tile>
+  <tile id="111">
+   <image width="256" height="512" source="../tiles/prototype/stepsSmallSlabsCornerOuter_W.png"/>
+  </tile>
+  <tile id="112">
+   <image width="256" height="512" source="../tiles/prototype/wallCorner_E.png"/>
+  </tile>
+  <tile id="113">
+   <image width="256" height="512" source="../tiles/prototype/wallCorner_N.png"/>
+  </tile>
+  <tile id="114">
+   <image width="256" height="512" source="../tiles/prototype/wallCorner_S.png"/>
+  </tile>
+  <tile id="115">
+   <image width="256" height="512" source="../tiles/prototype/wallCorner_W.png"/>
+  </tile>
+  <tile id="116">
+   <image width="256" height="512" source="../tiles/prototype/wallDoorClosed_E.png"/>
+  </tile>
+  <tile id="117">
+   <image width="256" height="512" source="../tiles/prototype/wallDoorClosed_N.png"/>
+  </tile>
+  <tile id="118">
+   <image width="256" height="512" source="../tiles/prototype/wallDoorClosed_S.png"/>
+  </tile>
+  <tile id="119">
+   <image width="256" height="512" source="../tiles/prototype/wallDoorClosed_W.png"/>
+  </tile>
+  <tile id="120">
+   <image width="256" height="512" source="../tiles/prototype/wallDoorOpen_E.png"/>
+  </tile>
+  <tile id="121">
+   <image width="256" height="512" source="../tiles/prototype/wallDoorOpen_N.png"/>
+  </tile>
+  <tile id="122">
+   <image width="256" height="512" source="../tiles/prototype/wallDoorOpen_S.png"/>
+  </tile>
+  <tile id="123">
+   <image width="256" height="512" source="../tiles/prototype/wallDoorOpen_W.png"/>
+  </tile>
+  <tile id="124">
+   <image width="256" height="512" source="../tiles/prototype/wallDoorway_E.png"/>
+  </tile>
+  <tile id="125">
+   <image width="256" height="512" source="../tiles/prototype/wallDoorway_N.png"/>
+  </tile>
+  <tile id="126">
+   <image width="256" height="512" source="../tiles/prototype/wallDoorway_S.png"/>
+  </tile>
+  <tile id="127">
+   <image width="256" height="512" source="../tiles/prototype/wallDoorway_W.png"/>
+  </tile>
+  <tile id="128">
+   <image width="256" height="512" source="../tiles/prototype/wallDoorwayLeft_E.png"/>
+  </tile>
+  <tile id="129">
+   <image width="256" height="512" source="../tiles/prototype/wallDoorwayLeft_N.png"/>
+  </tile>
+  <tile id="130">
+   <image width="256" height="512" source="../tiles/prototype/wallDoorwayLeft_S.png"/>
+  </tile>
+  <tile id="131">
+   <image width="256" height="512" source="../tiles/prototype/wallDoorwayLeft_W.png"/>
+  </tile>
+  <tile id="132">
+   <image width="256" height="512" source="../tiles/prototype/wallDoorwayMiddle_E.png"/>
+  </tile>
+  <tile id="133">
+   <image width="256" height="512" source="../tiles/prototype/wallDoorwayMiddle_N.png"/>
+  </tile>
+  <tile id="134">
+   <image width="256" height="512" source="../tiles/prototype/wallDoorwayMiddle_S.png"/>
+  </tile>
+  <tile id="135">
+   <image width="256" height="512" source="../tiles/prototype/wallDoorwayMiddle_W.png"/>
+  </tile>
+  <tile id="136">
+   <image width="256" height="512" source="../tiles/prototype/wallDoorwayRight_E.png"/>
+  </tile>
+  <tile id="137">
+   <image width="256" height="512" source="../tiles/prototype/wallDoorwayRight_N.png"/>
+  </tile>
+  <tile id="138">
+   <image width="256" height="512" source="../tiles/prototype/wallDoorwayRight_S.png"/>
+  </tile>
+  <tile id="139">
+   <image width="256" height="512" source="../tiles/prototype/wallDoorwayRight_W.png"/>
+  </tile>
+  <tile id="140">
+   <image width="256" height="512" source="../tiles/prototype/wallHalfCastle_E.png"/>
+  </tile>
+  <tile id="141">
+   <image width="256" height="512" source="../tiles/prototype/wallHalfCastle_N.png"/>
+  </tile>
+  <tile id="142">
+   <image width="256" height="512" source="../tiles/prototype/wallHalfCastle_S.png"/>
+  </tile>
+  <tile id="143">
+   <image width="256" height="512" source="../tiles/prototype/wallHalfCastle_W.png"/>
+  </tile>
+  <tile id="144">
+   <image width="256" height="512" source="../tiles/prototype/wallHalfCorner_E.png"/>
+  </tile>
+  <tile id="145">
+   <image width="256" height="512" source="../tiles/prototype/wallHalfCorner_N.png"/>
+  </tile>
+  <tile id="146">
+   <image width="256" height="512" source="../tiles/prototype/wallHalfCorner_S.png"/>
+  </tile>
+  <tile id="147">
+   <image width="256" height="512" source="../tiles/prototype/wallHalfCorner_W.png"/>
+  </tile>
+  <tile id="148">
+   <image width="256" height="512" source="../tiles/prototype/wallHalfStraight_E.png"/>
+  </tile>
+  <tile id="149">
+   <image width="256" height="512" source="../tiles/prototype/wallHalfStraight_N.png"/>
+  </tile>
+  <tile id="150">
+   <image width="256" height="512" source="../tiles/prototype/wallHalfStraight_S.png"/>
+  </tile>
+  <tile id="151">
+   <image width="256" height="512" source="../tiles/prototype/wallHalfStraight_W.png"/>
+  </tile>
+  <tile id="152">
+   <image width="256" height="512" source="../tiles/prototype/wallStraight_E.png"/>
+  </tile>
+  <tile id="153">
+   <image width="256" height="512" source="../tiles/prototype/wallStraight_N.png"/>
+  </tile>
+  <tile id="154">
+   <image width="256" height="512" source="../tiles/prototype/wallStraight_S.png"/>
+  </tile>
+  <tile id="155">
+   <image width="256" height="512" source="../tiles/prototype/wallStraight_W.png"/>
+  </tile>
+  <tile id="156">
+   <image width="256" height="512" source="../tiles/prototype/wallSwitchOff_E.png"/>
+  </tile>
+  <tile id="157">
+   <image width="256" height="512" source="../tiles/prototype/wallSwitchOff_N.png"/>
+  </tile>
+  <tile id="158">
+   <image width="256" height="512" source="../tiles/prototype/wallSwitchOff_S.png"/>
+  </tile>
+  <tile id="159">
+   <image width="256" height="512" source="../tiles/prototype/wallSwitchOff_W.png"/>
+  </tile>
+  <tile id="160">
+   <image width="256" height="512" source="../tiles/prototype/wallSwitchOn_E.png"/>
+  </tile>
+  <tile id="161">
+   <image width="256" height="512" source="../tiles/prototype/wallSwitchOn_N.png"/>
+  </tile>
+  <tile id="162">
+   <image width="256" height="512" source="../tiles/prototype/wallSwitchOn_S.png"/>
+  </tile>
+  <tile id="163">
+   <image width="256" height="512" source="../tiles/prototype/wallSwitchOn_W.png"/>
+  </tile>
+  <tile id="164">
+   <image width="256" height="512" source="../tiles/prototype/wallWindow_E.png"/>
+  </tile>
+  <tile id="165">
+   <image width="256" height="512" source="../tiles/prototype/wallWindow_N.png"/>
+  </tile>
+  <tile id="166">
+   <image width="256" height="512" source="../tiles/prototype/wallWindow_S.png"/>
+  </tile>
+  <tile id="167">
+   <image width="256" height="512" source="../tiles/prototype/wallWindow_W.png"/>
+  </tile>
+  <tile id="168">
+   <image width="256" height="512" source="../tiles/prototype/wallWindowLeft_E.png"/>
+  </tile>
+  <tile id="169">
+   <image width="256" height="512" source="../tiles/prototype/wallWindowLeft_N.png"/>
+  </tile>
+  <tile id="170">
+   <image width="256" height="512" source="../tiles/prototype/wallWindowLeft_S.png"/>
+  </tile>
+  <tile id="171">
+   <image width="256" height="512" source="../tiles/prototype/wallWindowLeft_W.png"/>
+  </tile>
+  <tile id="172">
+   <image width="256" height="512" source="../tiles/prototype/wallWindowMiddle_E.png"/>
+  </tile>
+  <tile id="173">
+   <image width="256" height="512" source="../tiles/prototype/wallWindowMiddle_N.png"/>
+  </tile>
+  <tile id="174">
+   <image width="256" height="512" source="../tiles/prototype/wallWindowMiddle_S.png"/>
+  </tile>
+  <tile id="175">
+   <image width="256" height="512" source="../tiles/prototype/wallWindowMiddle_W.png"/>
+  </tile>
+  <tile id="176">
+   <image width="256" height="512" source="../tiles/prototype/wallWindowRight_E.png"/>
+  </tile>
+  <tile id="177">
+   <image width="256" height="512" source="../tiles/prototype/wallWindowRight_N.png"/>
+  </tile>
+  <tile id="178">
+   <image width="256" height="512" source="../tiles/prototype/wallWindowRight_S.png"/>
+  </tile>
+  <tile id="179">
+   <image width="256" height="512" source="../tiles/prototype/wallWindowRight_W.png"/>
+  </tile>
+  <tile id="180">
+   <image width="256" height="512" source="../tiles/dungeon/barrel_E.png"/>
+  </tile>
+  <tile id="181">
+   <image width="256" height="512" source="../tiles/dungeon/barrel_N.png"/>
+  </tile>
+  <tile id="182">
+   <image width="256" height="512" source="../tiles/dungeon/barrel_S.png"/>
+  </tile>
+  <tile id="183">
+   <image width="256" height="512" source="../tiles/dungeon/barrel_W.png"/>
+  </tile>
+  <tile id="184">
+   <image width="256" height="512" source="../tiles/dungeon/barrels_E.png"/>
+  </tile>
+  <tile id="185">
+   <image width="256" height="512" source="../tiles/dungeon/barrels_N.png"/>
+  </tile>
+  <tile id="186">
+   <image width="256" height="512" source="../tiles/dungeon/barrels_S.png"/>
+  </tile>
+  <tile id="187">
+   <image width="256" height="512" source="../tiles/dungeon/barrels_W.png"/>
+  </tile>
+  <tile id="188">
+   <image width="256" height="512" source="../tiles/dungeon/barrelsStacked_E.png"/>
+  </tile>
+  <tile id="189">
+   <image width="256" height="512" source="../tiles/dungeon/barrelsStacked_N.png"/>
+  </tile>
+  <tile id="190">
+   <image width="256" height="512" source="../tiles/dungeon/barrelsStacked_S.png"/>
+  </tile>
+  <tile id="191">
+   <image width="256" height="512" source="../tiles/dungeon/barrelsStacked_W.png"/>
+  </tile>
+  <tile id="192">
+   <image width="256" height="512" source="../tiles/dungeon/bridge_E.png"/>
+  </tile>
+  <tile id="193">
+   <image width="256" height="512" source="../tiles/dungeon/bridge_N.png"/>
+  </tile>
+  <tile id="194">
+   <image width="256" height="512" source="../tiles/dungeon/bridge_S.png"/>
+  </tile>
+  <tile id="195">
+   <image width="256" height="512" source="../tiles/dungeon/bridge_W.png"/>
+  </tile>
+  <tile id="196">
+   <image width="256" height="512" source="../tiles/dungeon/bridgeBroken_E.png"/>
+  </tile>
+  <tile id="197">
+   <image width="256" height="512" source="../tiles/dungeon/bridgeBroken_N.png"/>
+  </tile>
+  <tile id="198">
+   <image width="256" height="512" source="../tiles/dungeon/bridgeBroken_S.png"/>
+  </tile>
+  <tile id="199">
+   <image width="256" height="512" source="../tiles/dungeon/bridgeBroken_W.png"/>
+  </tile>
+  <tile id="200">
+   <image width="256" height="512" source="../tiles/dungeon/chair_E.png"/>
+  </tile>
+  <tile id="201">
+   <image width="256" height="512" source="../tiles/dungeon/chair_N.png"/>
+  </tile>
+  <tile id="202">
+   <image width="256" height="512" source="../tiles/dungeon/chair_S.png"/>
+  </tile>
+  <tile id="203">
+   <image width="256" height="512" source="../tiles/dungeon/chair_W.png"/>
+  </tile>
+  <tile id="204">
+   <image width="256" height="512" source="../tiles/dungeon/chestClosed_E.png"/>
+  </tile>
+  <tile id="205">
+   <image width="256" height="512" source="../tiles/dungeon/chestClosed_N.png"/>
+  </tile>
+  <tile id="206">
+   <image width="256" height="512" source="../tiles/dungeon/chestClosed_S.png"/>
+  </tile>
+  <tile id="207">
+   <image width="256" height="512" source="../tiles/dungeon/chestClosed_W.png"/>
+  </tile>
+  <tile id="208">
+   <image width="256" height="512" source="../tiles/dungeon/chestOpen_E.png"/>
+  </tile>
+  <tile id="209">
+   <image width="256" height="512" source="../tiles/dungeon/chestOpen_N.png"/>
+  </tile>
+  <tile id="210">
+   <image width="256" height="512" source="../tiles/dungeon/chestOpen_S.png"/>
+  </tile>
+  <tile id="211">
+   <image width="256" height="512" source="../tiles/dungeon/chestOpen_W.png"/>
+  </tile>
+  <tile id="212">
+   <image width="256" height="512" source="../tiles/dungeon/dirt_E.png"/>
+  </tile>
+  <tile id="213">
+   <image width="256" height="512" source="../tiles/dungeon/dirt_N.png"/>
+  </tile>
+  <tile id="214">
+   <image width="256" height="512" source="../tiles/dungeon/dirt_S.png"/>
+  </tile>
+  <tile id="215">
+   <image width="256" height="512" source="../tiles/dungeon/dirt_W.png"/>
+  </tile>
+  <tile id="216">
+   <image width="256" height="512" source="../tiles/dungeon/dirtTiles_E.png"/>
+  </tile>
+  <tile id="217">
+   <image width="256" height="512" source="../tiles/dungeon/dirtTiles_N.png"/>
+  </tile>
+  <tile id="218">
+   <image width="256" height="512" source="../tiles/dungeon/dirtTiles_S.png"/>
+  </tile>
+  <tile id="219">
+   <image width="256" height="512" source="../tiles/dungeon/dirtTiles_W.png"/>
+  </tile>
+  <tile id="220">
+   <image width="256" height="512" source="../tiles/dungeon/planks_E.png"/>
+  </tile>
+  <tile id="221">
+   <image width="256" height="512" source="../tiles/dungeon/planks_N.png"/>
+  </tile>
+  <tile id="222">
+   <image width="256" height="512" source="../tiles/dungeon/planks_S.png"/>
+  </tile>
+  <tile id="223">
+   <image width="256" height="512" source="../tiles/dungeon/planks_W.png"/>
+  </tile>
+  <tile id="224">
+   <image width="256" height="512" source="../tiles/dungeon/planksBroken_E.png"/>
+  </tile>
+  <tile id="225">
+   <image width="256" height="512" source="../tiles/dungeon/planksBroken_N.png"/>
+  </tile>
+  <tile id="226">
+   <image width="256" height="512" source="../tiles/dungeon/planksBroken_S.png"/>
+  </tile>
+  <tile id="227">
+   <image width="256" height="512" source="../tiles/dungeon/planksBroken_W.png"/>
+  </tile>
+  <tile id="228">
+   <image width="256" height="512" source="../tiles/dungeon/planksHole_E.png"/>
+  </tile>
+  <tile id="229">
+   <image width="256" height="512" source="../tiles/dungeon/planksHole_N.png"/>
+  </tile>
+  <tile id="230">
+   <image width="256" height="512" source="../tiles/dungeon/planksHole_S.png"/>
+  </tile>
+  <tile id="231">
+   <image width="256" height="512" source="../tiles/dungeon/planksHole_W.png"/>
+  </tile>
+  <tile id="232">
+   <image width="256" height="512" source="../tiles/dungeon/stairs_E.png"/>
+  </tile>
+  <tile id="233">
+   <image width="256" height="512" source="../tiles/dungeon/stairs_N.png"/>
+  </tile>
+  <tile id="234">
+   <image width="256" height="512" source="../tiles/dungeon/stairs_S.png"/>
+  </tile>
+  <tile id="235">
+   <image width="256" height="512" source="../tiles/dungeon/stairs_W.png"/>
+  </tile>
+  <tile id="236">
+   <image width="256" height="512" source="../tiles/dungeon/stairsAged_E.png"/>
+  </tile>
+  <tile id="237">
+   <image width="256" height="512" source="../tiles/dungeon/stairsAged_N.png"/>
+  </tile>
+  <tile id="238">
+   <image width="256" height="512" source="../tiles/dungeon/stairsAged_S.png"/>
+  </tile>
+  <tile id="239">
+   <image width="256" height="512" source="../tiles/dungeon/stairsAged_W.png"/>
+  </tile>
+  <tile id="240">
+   <image width="256" height="512" source="../tiles/dungeon/stairsSpiral_E.png"/>
+  </tile>
+  <tile id="241">
+   <image width="256" height="512" source="../tiles/dungeon/stairsSpiral_N.png"/>
+  </tile>
+  <tile id="242">
+   <image width="256" height="512" source="../tiles/dungeon/stairsSpiral_S.png"/>
+  </tile>
+  <tile id="243">
+   <image width="256" height="512" source="../tiles/dungeon/stairsSpiral_W.png"/>
+  </tile>
+  <tile id="244">
+   <image width="256" height="512" source="../tiles/dungeon/stone_E.png"/>
+  </tile>
+  <tile id="245">
+   <image width="256" height="512" source="../tiles/dungeon/stone_N.png"/>
+  </tile>
+  <tile id="246">
+   <image width="256" height="512" source="../tiles/dungeon/stone_S.png"/>
+  </tile>
+  <tile id="247">
+   <image width="256" height="512" source="../tiles/dungeon/stone_W.png"/>
+  </tile>
+  <tile id="248">
+   <image width="256" height="512" source="../tiles/dungeon/stoneColumn_E.png"/>
+  </tile>
+  <tile id="249">
+   <image width="256" height="512" source="../tiles/dungeon/stoneColumn_N.png"/>
+  </tile>
+  <tile id="250">
+   <image width="256" height="512" source="../tiles/dungeon/stoneColumn_S.png"/>
+  </tile>
+  <tile id="251">
+   <image width="256" height="512" source="../tiles/dungeon/stoneColumn_W.png"/>
+  </tile>
+  <tile id="252">
+   <image width="256" height="512" source="../tiles/dungeon/stoneColumnWood_E.png"/>
+  </tile>
+  <tile id="253">
+   <image width="256" height="512" source="../tiles/dungeon/stoneColumnWood_N.png"/>
+  </tile>
+  <tile id="254">
+   <image width="256" height="512" source="../tiles/dungeon/stoneColumnWood_S.png"/>
+  </tile>
+  <tile id="255">
+   <image width="256" height="512" source="../tiles/dungeon/stoneColumnWood_W.png"/>
+  </tile>
+  <tile id="256">
+   <image width="256" height="512" source="../tiles/dungeon/stoneLeft_E.png"/>
+  </tile>
+  <tile id="257">
+   <image width="256" height="512" source="../tiles/dungeon/stoneLeft_N.png"/>
+  </tile>
+  <tile id="258">
+   <image width="256" height="512" source="../tiles/dungeon/stoneLeft_S.png"/>
+  </tile>
+  <tile id="259">
+   <image width="256" height="512" source="../tiles/dungeon/stoneLeft_W.png"/>
+  </tile>
+  <tile id="260">
+   <image width="256" height="512" source="../tiles/dungeon/stoneMissingTiles_E.png"/>
+  </tile>
+  <tile id="261">
+   <image width="256" height="512" source="../tiles/dungeon/stoneMissingTiles_N.png"/>
+  </tile>
+  <tile id="262">
+   <image width="256" height="512" source="../tiles/dungeon/stoneMissingTiles_S.png"/>
+  </tile>
+  <tile id="263">
+   <image width="256" height="512" source="../tiles/dungeon/stoneMissingTiles_W.png"/>
+  </tile>
+  <tile id="264">
+   <image width="256" height="512" source="../tiles/dungeon/stoneRight_E.png"/>
+  </tile>
+  <tile id="265">
+   <image width="256" height="512" source="../tiles/dungeon/stoneRight_N.png"/>
+  </tile>
+  <tile id="266">
+   <image width="256" height="512" source="../tiles/dungeon/stoneRight_S.png"/>
+  </tile>
+  <tile id="267">
+   <image width="256" height="512" source="../tiles/dungeon/stoneRight_W.png"/>
+  </tile>
+  <tile id="268">
+   <image width="256" height="512" source="../tiles/dungeon/stoneSide_E.png"/>
+  </tile>
+  <tile id="269">
+   <image width="256" height="512" source="../tiles/dungeon/stoneSide_N.png"/>
+  </tile>
+  <tile id="270">
+   <image width="256" height="512" source="../tiles/dungeon/stoneSide_S.png"/>
+  </tile>
+  <tile id="271">
+   <image width="256" height="512" source="../tiles/dungeon/stoneSide_W.png"/>
+  </tile>
+  <tile id="272">
+   <image width="256" height="512" source="../tiles/dungeon/stoneSideUneven_E.png"/>
+  </tile>
+  <tile id="273">
+   <image width="256" height="512" source="../tiles/dungeon/stoneSideUneven_N.png"/>
+  </tile>
+  <tile id="274">
+   <image width="256" height="512" source="../tiles/dungeon/stoneSideUneven_S.png"/>
+  </tile>
+  <tile id="275">
+   <image width="256" height="512" source="../tiles/dungeon/stoneSideUneven_W.png"/>
+  </tile>
+  <tile id="276">
+   <image width="256" height="512" source="../tiles/dungeon/stoneStep_E.png"/>
+  </tile>
+  <tile id="277">
+   <image width="256" height="512" source="../tiles/dungeon/stoneStep_N.png"/>
+  </tile>
+  <tile id="278">
+   <image width="256" height="512" source="../tiles/dungeon/stoneStep_S.png"/>
+  </tile>
+  <tile id="279">
+   <image width="256" height="512" source="../tiles/dungeon/stoneStep_W.png"/>
+  </tile>
+  <tile id="280">
+   <image width="256" height="512" source="../tiles/dungeon/stoneSteps_E.png"/>
+  </tile>
+  <tile id="281">
+   <image width="256" height="512" source="../tiles/dungeon/stoneSteps_N.png"/>
+  </tile>
+  <tile id="282">
+   <image width="256" height="512" source="../tiles/dungeon/stoneSteps_S.png"/>
+  </tile>
+  <tile id="283">
+   <image width="256" height="512" source="../tiles/dungeon/stoneSteps_W.png"/>
+  </tile>
+  <tile id="284">
+   <image width="256" height="512" source="../tiles/dungeon/stoneTile_E.png"/>
+  </tile>
+  <tile id="285">
+   <image width="256" height="512" source="../tiles/dungeon/stoneTile_N.png"/>
+  </tile>
+  <tile id="286">
+   <image width="256" height="512" source="../tiles/dungeon/stoneTile_S.png"/>
+  </tile>
+  <tile id="287">
+   <image width="256" height="512" source="../tiles/dungeon/stoneTile_W.png"/>
+  </tile>
+  <tile id="288">
+   <image width="256" height="512" source="../tiles/dungeon/stoneUneven_E.png"/>
+  </tile>
+  <tile id="289">
+   <image width="256" height="512" source="../tiles/dungeon/stoneUneven_N.png"/>
+  </tile>
+  <tile id="290">
+   <image width="256" height="512" source="../tiles/dungeon/stoneUneven_S.png"/>
+  </tile>
+  <tile id="291">
+   <image width="256" height="512" source="../tiles/dungeon/stoneUneven_W.png"/>
+  </tile>
+  <tile id="292">
+   <image width="256" height="512" source="../tiles/dungeon/stoneWall_E.png"/>
+  </tile>
+  <tile id="293">
+   <image width="256" height="512" source="../tiles/dungeon/stoneWall_N.png"/>
+  </tile>
+  <tile id="294">
+   <image width="256" height="512" source="../tiles/dungeon/stoneWall_S.png"/>
+  </tile>
+  <tile id="295">
+   <image width="256" height="512" source="../tiles/dungeon/stoneWall_W.png"/>
+  </tile>
+  <tile id="296">
+   <image width="256" height="512" source="../tiles/dungeon/stoneWallAged_E.png"/>
+  </tile>
+  <tile id="297">
+   <image width="256" height="512" source="../tiles/dungeon/stoneWallAged_N.png"/>
+  </tile>
+  <tile id="298">
+   <image width="256" height="512" source="../tiles/dungeon/stoneWallAged_S.png"/>
+  </tile>
+  <tile id="299">
+   <image width="256" height="512" source="../tiles/dungeon/stoneWallAged_W.png"/>
+  </tile>
+  <tile id="300">
+   <image width="256" height="512" source="../tiles/dungeon/stoneWallAgedLeft_E.png"/>
+  </tile>
+  <tile id="301">
+   <image width="256" height="512" source="../tiles/dungeon/stoneWallAgedLeft_N.png"/>
+  </tile>
+  <tile id="302">
+   <image width="256" height="512" source="../tiles/dungeon/stoneWallAgedLeft_S.png"/>
+  </tile>
+  <tile id="303">
+   <image width="256" height="512" source="../tiles/dungeon/stoneWallAgedLeft_W.png"/>
+  </tile>
+  <tile id="304">
+   <image width="256" height="512" source="../tiles/dungeon/stoneWallAgedRight_E.png"/>
+  </tile>
+  <tile id="305">
+   <image width="256" height="512" source="../tiles/dungeon/stoneWallAgedRight_N.png"/>
+  </tile>
+  <tile id="306">
+   <image width="256" height="512" source="../tiles/dungeon/stoneWallAgedRight_S.png"/>
+  </tile>
+  <tile id="307">
+   <image width="256" height="512" source="../tiles/dungeon/stoneWallAgedRight_W.png"/>
+  </tile>
+  <tile id="308">
+   <image width="256" height="512" source="../tiles/dungeon/stoneWallArchway_E.png"/>
+  </tile>
+  <tile id="309">
+   <image width="256" height="512" source="../tiles/dungeon/stoneWallArchway_N.png"/>
+  </tile>
+  <tile id="310">
+   <image width="256" height="512" source="../tiles/dungeon/stoneWallArchway_S.png"/>
+  </tile>
+  <tile id="311">
+   <image width="256" height="512" source="../tiles/dungeon/stoneWallArchway_W.png"/>
+  </tile>
+  <tile id="312">
+   <image width="256" height="512" source="../tiles/dungeon/stoneWallBroken_E.png"/>
+  </tile>
+  <tile id="313">
+   <image width="256" height="512" source="../tiles/dungeon/stoneWallBroken_N.png"/>
+  </tile>
+  <tile id="314">
+   <image width="256" height="512" source="../tiles/dungeon/stoneWallBroken_S.png"/>
+  </tile>
+  <tile id="315">
+   <image width="256" height="512" source="../tiles/dungeon/stoneWallBroken_W.png"/>
+  </tile>
+  <tile id="316">
+   <image width="256" height="512" source="../tiles/dungeon/stoneWallBrokenLeft_E.png"/>
+  </tile>
+  <tile id="317">
+   <image width="256" height="512" source="../tiles/dungeon/stoneWallBrokenLeft_N.png"/>
+  </tile>
+  <tile id="318">
+   <image width="256" height="512" source="../tiles/dungeon/stoneWallBrokenLeft_S.png"/>
+  </tile>
+  <tile id="319">
+   <image width="256" height="512" source="../tiles/dungeon/stoneWallBrokenLeft_W.png"/>
+  </tile>
+  <tile id="320">
+   <image width="256" height="512" source="../tiles/dungeon/stoneWallBrokenRight_E.png"/>
+  </tile>
+  <tile id="321">
+   <image width="256" height="512" source="../tiles/dungeon/stoneWallBrokenRight_N.png"/>
+  </tile>
+  <tile id="322">
+   <image width="256" height="512" source="../tiles/dungeon/stoneWallBrokenRight_S.png"/>
+  </tile>
+  <tile id="323">
+   <image width="256" height="512" source="../tiles/dungeon/stoneWallBrokenRight_W.png"/>
+  </tile>
+  <tile id="324">
+   <image width="256" height="512" source="../tiles/dungeon/stoneWallColumn_E.png"/>
+  </tile>
+  <tile id="325">
+   <image width="256" height="512" source="../tiles/dungeon/stoneWallColumn_N.png"/>
+  </tile>
+  <tile id="326">
+   <image width="256" height="512" source="../tiles/dungeon/stoneWallColumn_S.png"/>
+  </tile>
+  <tile id="327">
+   <image width="256" height="512" source="../tiles/dungeon/stoneWallColumn_W.png"/>
+  </tile>
+  <tile id="328">
+   <image width="256" height="512" source="../tiles/dungeon/stoneWallColumnIn_E.png"/>
+  </tile>
+  <tile id="329">
+   <image width="256" height="512" source="../tiles/dungeon/stoneWallColumnIn_N.png"/>
+  </tile>
+  <tile id="330">
+   <image width="256" height="512" source="../tiles/dungeon/stoneWallColumnIn_S.png"/>
+  </tile>
+  <tile id="331">
+   <image width="256" height="512" source="../tiles/dungeon/stoneWallColumnIn_W.png"/>
+  </tile>
+  <tile id="332">
+   <image width="256" height="512" source="../tiles/dungeon/stoneWallCorner_E.png"/>
+  </tile>
+  <tile id="333">
+   <image width="256" height="512" source="../tiles/dungeon/stoneWallCorner_N.png"/>
+  </tile>
+  <tile id="334">
+   <image width="256" height="512" source="../tiles/dungeon/stoneWallCorner_S.png"/>
+  </tile>
+  <tile id="335">
+   <image width="256" height="512" source="../tiles/dungeon/stoneWallCorner_W.png"/>
+  </tile>
+  <tile id="336">
+   <image width="256" height="512" source="../tiles/dungeon/stoneWallDoor_E.png"/>
+  </tile>
+  <tile id="337">
+   <image width="256" height="512" source="../tiles/dungeon/stoneWallDoor_N.png"/>
+  </tile>
+  <tile id="338">
+   <image width="256" height="512" source="../tiles/dungeon/stoneWallDoor_S.png"/>
+  </tile>
+  <tile id="339">
+   <image width="256" height="512" source="../tiles/dungeon/stoneWallDoor_W.png"/>
+  </tile>
+  <tile id="340">
+   <image width="256" height="512" source="../tiles/dungeon/stoneWallDoorBars_E.png"/>
+  </tile>
+  <tile id="341">
+   <image width="256" height="512" source="../tiles/dungeon/stoneWallDoorBars_N.png"/>
+  </tile>
+  <tile id="342">
+   <image width="256" height="512" source="../tiles/dungeon/stoneWallDoorBars_S.png"/>
+  </tile>
+  <tile id="343">
+   <image width="256" height="512" source="../tiles/dungeon/stoneWallDoorBars_W.png"/>
+  </tile>
+  <tile id="344">
+   <image width="256" height="512" source="../tiles/dungeon/stoneWallDoorClosed_E.png"/>
+  </tile>
+  <tile id="345">
+   <image width="256" height="512" source="../tiles/dungeon/stoneWallDoorClosed_N.png"/>
+  </tile>
+  <tile id="346">
+   <image width="256" height="512" source="../tiles/dungeon/stoneWallDoorClosed_S.png"/>
+  </tile>
+  <tile id="347">
+   <image width="256" height="512" source="../tiles/dungeon/stoneWallDoorClosed_W.png"/>
+  </tile>
+  <tile id="348">
+   <image width="256" height="512" source="../tiles/dungeon/stoneWallDoorOpen_E.png"/>
+  </tile>
+  <tile id="349">
+   <image width="256" height="512" source="../tiles/dungeon/stoneWallDoorOpen_N.png"/>
+  </tile>
+  <tile id="350">
+   <image width="256" height="512" source="../tiles/dungeon/stoneWallDoorOpen_S.png"/>
+  </tile>
+  <tile id="351">
+   <image width="256" height="512" source="../tiles/dungeon/stoneWallDoorOpen_W.png"/>
+  </tile>
+  <tile id="352">
+   <image width="256" height="512" source="../tiles/dungeon/stoneWallGate_E.png"/>
+  </tile>
+  <tile id="353">
+   <image width="256" height="512" source="../tiles/dungeon/stoneWallGate_N.png"/>
+  </tile>
+  <tile id="354">
+   <image width="256" height="512" source="../tiles/dungeon/stoneWallGate_S.png"/>
+  </tile>
+  <tile id="355">
+   <image width="256" height="512" source="../tiles/dungeon/stoneWallGate_W.png"/>
+  </tile>
+  <tile id="356">
+   <image width="256" height="512" source="../tiles/dungeon/stoneWallGateBars_E.png"/>
+  </tile>
+  <tile id="357">
+   <image width="256" height="512" source="../tiles/dungeon/stoneWallGateBars_N.png"/>
+  </tile>
+  <tile id="358">
+   <image width="256" height="512" source="../tiles/dungeon/stoneWallGateBars_S.png"/>
+  </tile>
+  <tile id="359">
+   <image width="256" height="512" source="../tiles/dungeon/stoneWallGateBars_W.png"/>
+  </tile>
+  <tile id="360">
+   <image width="256" height="512" source="../tiles/dungeon/stoneWallGateClosed_E.png"/>
+  </tile>
+  <tile id="361">
+   <image width="256" height="512" source="../tiles/dungeon/stoneWallGateClosed_N.png"/>
+  </tile>
+  <tile id="362">
+   <image width="256" height="512" source="../tiles/dungeon/stoneWallGateClosed_S.png"/>
+  </tile>
+  <tile id="363">
+   <image width="256" height="512" source="../tiles/dungeon/stoneWallGateClosed_W.png"/>
+  </tile>
+  <tile id="364">
+   <image width="256" height="512" source="../tiles/dungeon/stoneWallGateOpen_E.png"/>
+  </tile>
+  <tile id="365">
+   <image width="256" height="512" source="../tiles/dungeon/stoneWallGateOpen_N.png"/>
+  </tile>
+  <tile id="366">
+   <image width="256" height="512" source="../tiles/dungeon/stoneWallGateOpen_S.png"/>
+  </tile>
+  <tile id="367">
+   <image width="256" height="512" source="../tiles/dungeon/stoneWallGateOpen_W.png"/>
+  </tile>
+  <tile id="368">
+   <image width="256" height="512" source="../tiles/dungeon/stoneWallHole_E.png"/>
+  </tile>
+  <tile id="369">
+   <image width="256" height="512" source="../tiles/dungeon/stoneWallHole_N.png"/>
+  </tile>
+  <tile id="370">
+   <image width="256" height="512" source="../tiles/dungeon/stoneWallHole_S.png"/>
+  </tile>
+  <tile id="371">
+   <image width="256" height="512" source="../tiles/dungeon/stoneWallHole_W.png"/>
+  </tile>
+  <tile id="372">
+   <image width="256" height="512" source="../tiles/dungeon/stoneWallTop_E.png"/>
+  </tile>
+  <tile id="373">
+   <image width="256" height="512" source="../tiles/dungeon/stoneWallTop_N.png"/>
+  </tile>
+  <tile id="374">
+   <image width="256" height="512" source="../tiles/dungeon/stoneWallTop_S.png"/>
+  </tile>
+  <tile id="375">
+   <image width="256" height="512" source="../tiles/dungeon/stoneWallTop_W.png"/>
+  </tile>
+  <tile id="376">
+   <image width="256" height="512" source="../tiles/dungeon/stoneWallWindow_E.png"/>
+  </tile>
+  <tile id="377">
+   <image width="256" height="512" source="../tiles/dungeon/stoneWallWindow_N.png"/>
+  </tile>
+  <tile id="378">
+   <image width="256" height="512" source="../tiles/dungeon/stoneWallWindow_S.png"/>
+  </tile>
+  <tile id="379">
+   <image width="256" height="512" source="../tiles/dungeon/stoneWallWindow_W.png"/>
+  </tile>
+  <tile id="380">
+   <image width="256" height="512" source="../tiles/dungeon/stoneWallWindowBars_E.png"/>
+  </tile>
+  <tile id="381">
+   <image width="256" height="512" source="../tiles/dungeon/stoneWallWindowBars_N.png"/>
+  </tile>
+  <tile id="382">
+   <image width="256" height="512" source="../tiles/dungeon/stoneWallWindowBars_S.png"/>
+  </tile>
+  <tile id="383">
+   <image width="256" height="512" source="../tiles/dungeon/stoneWallWindowBars_W.png"/>
+  </tile>
+  <tile id="384">
+   <image width="256" height="512" source="../tiles/dungeon/tableChairsBroken_E.png"/>
+  </tile>
+  <tile id="385">
+   <image width="256" height="512" source="../tiles/dungeon/tableChairsBroken_N.png"/>
+  </tile>
+  <tile id="386">
+   <image width="256" height="512" source="../tiles/dungeon/tableChairsBroken_S.png"/>
+  </tile>
+  <tile id="387">
+   <image width="256" height="512" source="../tiles/dungeon/tableChairsBroken_W.png"/>
+  </tile>
+  <tile id="388">
+   <image width="256" height="512" source="../tiles/dungeon/tableRound_E.png"/>
+  </tile>
+  <tile id="389">
+   <image width="256" height="512" source="../tiles/dungeon/tableRound_N.png"/>
+  </tile>
+  <tile id="390">
+   <image width="256" height="512" source="../tiles/dungeon/tableRound_S.png"/>
+  </tile>
+  <tile id="391">
+   <image width="256" height="512" source="../tiles/dungeon/tableRound_W.png"/>
+  </tile>
+  <tile id="392">
+   <image width="256" height="512" source="../tiles/dungeon/tableRoundChairs_E.png"/>
+  </tile>
+  <tile id="393">
+   <image width="256" height="512" source="../tiles/dungeon/tableRoundChairs_N.png"/>
+  </tile>
+  <tile id="394">
+   <image width="256" height="512" source="../tiles/dungeon/tableRoundChairs_S.png"/>
+  </tile>
+  <tile id="395">
+   <image width="256" height="512" source="../tiles/dungeon/tableRoundChairs_W.png"/>
+  </tile>
+  <tile id="396">
+   <image width="256" height="512" source="../tiles/dungeon/tableShort_E.png"/>
+  </tile>
+  <tile id="397">
+   <image width="256" height="512" source="../tiles/dungeon/tableShort_N.png"/>
+  </tile>
+  <tile id="398">
+   <image width="256" height="512" source="../tiles/dungeon/tableShort_S.png"/>
+  </tile>
+  <tile id="399">
+   <image width="256" height="512" source="../tiles/dungeon/tableShort_W.png"/>
+  </tile>
+  <tile id="400">
+   <image width="256" height="512" source="../tiles/dungeon/tableShortChairs_E.png"/>
+  </tile>
+  <tile id="401">
+   <image width="256" height="512" source="../tiles/dungeon/tableShortChairs_N.png"/>
+  </tile>
+  <tile id="402">
+   <image width="256" height="512" source="../tiles/dungeon/tableShortChairs_S.png"/>
+  </tile>
+  <tile id="403">
+   <image width="256" height="512" source="../tiles/dungeon/tableShortChairs_W.png"/>
+  </tile>
+  <tile id="404">
+   <image width="256" height="512" source="../tiles/dungeon/woodenCrate_E.png"/>
+  </tile>
+  <tile id="405">
+   <image width="256" height="512" source="../tiles/dungeon/woodenCrate_N.png"/>
+  </tile>
+  <tile id="406">
+   <image width="256" height="512" source="../tiles/dungeon/woodenCrate_S.png"/>
+  </tile>
+  <tile id="407">
+   <image width="256" height="512" source="../tiles/dungeon/woodenCrate_W.png"/>
+  </tile>
+  <tile id="408">
+   <image width="256" height="512" source="../tiles/dungeon/woodenCrates_E.png"/>
+  </tile>
+  <tile id="409">
+   <image width="256" height="512" source="../tiles/dungeon/woodenCrates_N.png"/>
+  </tile>
+  <tile id="410">
+   <image width="256" height="512" source="../tiles/dungeon/woodenCrates_S.png"/>
+  </tile>
+  <tile id="411">
+   <image width="256" height="512" source="../tiles/dungeon/woodenCrates_W.png"/>
+  </tile>
+  <tile id="412">
+   <image width="256" height="512" source="../tiles/dungeon/woodenPile_E.png"/>
+  </tile>
+  <tile id="413">
+   <image width="256" height="512" source="../tiles/dungeon/woodenPile_N.png"/>
+  </tile>
+  <tile id="414">
+   <image width="256" height="512" source="../tiles/dungeon/woodenPile_S.png"/>
+  </tile>
+  <tile id="415">
+   <image width="256" height="512" source="../tiles/dungeon/woodenPile_W.png"/>
+  </tile>
+  <tile id="416">
+   <image width="256" height="512" source="../tiles/dungeon/woodenSupportBeams_E.png"/>
+  </tile>
+  <tile id="417">
+   <image width="256" height="512" source="../tiles/dungeon/woodenSupportBeams_N.png"/>
+  </tile>
+  <tile id="418">
+   <image width="256" height="512" source="../tiles/dungeon/woodenSupportBeams_S.png"/>
+  </tile>
+  <tile id="419">
+   <image width="256" height="512" source="../tiles/dungeon/woodenSupportBeams_W.png"/>
+  </tile>
+  <tile id="420">
+   <image width="256" height="512" source="../tiles/dungeon/woodenSupports_E.png"/>
+  </tile>
+  <tile id="421">
+   <image width="256" height="512" source="../tiles/dungeon/woodenSupports_N.png"/>
+  </tile>
+  <tile id="422">
+   <image width="256" height="512" source="../tiles/dungeon/woodenSupports_S.png"/>
+  </tile>
+  <tile id="423">
+   <image width="256" height="512" source="../tiles/dungeon/woodenSupports_W.png"/>
+  </tile>
+  <tile id="424">
+   <image width="256" height="512" source="../tiles/dungeon/woodenSupportsBeam_E.png"/>
+  </tile>
+  <tile id="425">
+   <image width="256" height="512" source="../tiles/dungeon/woodenSupportsBeam_N.png"/>
+  </tile>
+  <tile id="426">
+   <image width="256" height="512" source="../tiles/dungeon/woodenSupportsBeam_S.png"/>
+  </tile>
+  <tile id="427">
+   <image width="256" height="512" source="../tiles/dungeon/woodenSupportsBeam_W.png"/>
+  </tile>
+  <tile id="428">
+   <image width="256" height="512" source="../tiles/dungeon/woodenSupportsBlock_E.png"/>
+  </tile>
+  <tile id="429">
+   <image width="256" height="512" source="../tiles/dungeon/woodenSupportsBlock_N.png"/>
+  </tile>
+  <tile id="430">
+   <image width="256" height="512" source="../tiles/dungeon/woodenSupportsBlock_S.png"/>
+  </tile>
+  <tile id="431">
+   <image width="256" height="512" source="../tiles/dungeon/woodenSupportsBlock_W.png"/>
+  </tile>
+ </tileset>
+ <tileset firstgid="433" name="x" tilewidth="256" tileheight="512" tilecount="2">
+  <tile id="0">
+   <image width="256" height="512" source="../tiles/prototype/floor_S.png"/>
+  </tile>
+  <tile id="1">
+   <image width="256" height="512" source="../tiles/prototype/floor_E.png"/>
+  </tile>
+ </tileset>
+ <layer name="Tile Layer 1" width="20" height="20">
+  <data encoding="csv">
+51,51,51,51,51,51,51,51,51,51,51,51,51,51,51,51,51,51,51,51,
+51,51,51,51,51,51,51,51,51,51,51,51,51,51,51,51,51,51,51,51,
+51,51,51,51,51,51,51,51,51,51,51,51,51,51,51,51,51,51,51,51,
+51,51,51,51,51,51,51,51,51,51,51,51,51,51,51,51,51,51,51,51,
+51,51,245,245,245,245,245,51,51,51,51,51,51,51,51,51,51,51,51,51,
+51,51,245,245,245,245,245,51,51,51,51,51,51,51,51,51,51,51,51,51,
+51,51,245,245,245,245,245,51,51,51,51,51,51,51,51,51,51,51,51,51,
+51,51,245,245,245,245,51,51,51,51,51,51,51,51,51,51,51,51,51,51,
+51,51,245,245,245,245,245,51,51,51,51,51,51,51,51,51,51,51,51,51,
+51,51,245,245,245,245,245,245,245,245,245,245,51,51,51,51,51,51,51,51,
+51,51,245,245,245,245,245,245,245,245,245,245,51,51,51,51,51,51,51,51,
+51,51,245,245,245,245,245,245,245,245,245,245,51,51,51,51,51,51,51,51,
+51,51,245,245,245,245,245,245,245,245,245,245,51,51,51,51,51,51,51,51,
+51,51,245,245,245,245,245,245,245,245,245,245,51,51,51,51,51,51,51,51,
+51,51,245,245,245,245,51,245,245,245,245,245,51,51,51,51,51,51,51,51,
+51,51,51,51,51,51,51,51,51,51,51,51,51,51,51,51,51,51,51,51,
+51,51,51,51,51,51,51,51,51,51,51,51,51,51,51,51,51,51,51,51,
+51,51,51,51,51,51,51,51,51,51,51,51,51,51,51,51,51,51,51,51,
+51,51,51,51,51,51,51,51,51,51,51,51,51,51,51,51,51,51,51,51,
+51,51,51,51,51,51,51,51,51,51,51,51,51,51,51,51,51,51,51,51
+</data>
+ </layer>
+ <layer name="Tile Layer 2" width="20" height="20" visible="0">
+  <data encoding="csv">
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,194,194,0,153,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,194,194,0,153,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,192,194,194,0,153,
+0,0,0,0,0,0,15,0,0,0,0,0,0,0,0,192,194,194,0,153,
+0,0,1,1,1,1,1,0,0,0,0,0,0,0,0,0,194,194,0,153,
+0,0,1,0,0,0,1,0,0,0,0,0,0,0,0,0,194,194,0,153,
+0,0,1,0,0,0,1,0,0,0,0,0,0,0,0,0,194,194,0,153,
+0,0,1,0,0,0,124,0,0,0,0,0,0,0,0,0,194,194,0,153,
+0,13,1,0,0,0,1,0,0,0,0,0,0,0,0,253,194,194,0,153,
+0,0,1,0,0,0,1,1,1,1,1,1,16,0,0,253,194,194,0,153,
+0,13,1,0,0,0,0,0,0,0,0,1,212,0,0,253,194,194,0,153,
+0,0,1,1,1,0,0,0,0,0,0,1,212,0,0,0,194,194,0,153,
+0,0,1,0,0,0,0,0,0,0,0,165,0,0,0,0,194,194,0,153,
+0,0,1,0,0,0,0,0,0,0,0,165,0,0,0,0,194,194,0,153,
+0,13,1,1,1,1,122,1,1,1,1,1,0,0,0,192,194,194,0,153,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,192,194,194,0,153,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,194,194,0,153,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,194,194,0,153,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,194,194,0,153,
+155,155,155,155,155,155,155,155,155,155,155,155,155,155,155,155,194,194,155,115
+</data>
+ </layer>
+ <layer name="Tile Layer 3" width="20" height="20">
+  <data encoding="csv">
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,43,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,72,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,43,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,158,162,158,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+</data>
+ </layer>
+</map>

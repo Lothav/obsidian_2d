@@ -1,7 +1,2 @@
-# Obsidian2D
-2D game engine and framework
-
-
-* C++14
-* Cross-platform
-* Opinated
+## Obsidian2D
+![](https://github.com/Obsidian2D/Obsidian2D/blob/master/docs/ss.png)
